@@ -31,7 +31,7 @@ kubectl apply -f swan-ldap.yaml
 Exec into pod to create demo users (real CERN user names)
 
 ```bash
-kubectl exec -it ldap-pod-X bash
+kubectl exec -it ldap-pod-X -n swan bash
 ```
 
 Define CERN user
