@@ -2,6 +2,13 @@
 
 Playground to test k8s deployment @CERN. To be better organized in the future.
 
+This repository serves as equivalent of `https://gitlab.cern.ch/ai/it-puppet-hostgroup-swan` in magnum k8s
+
+- provides configuration bound to CERN infrastructure (puppet equivalent)
+- single purpose components
+- general purpose jupyter and jupyterhub images
+- jupyterhub_config ConfigMap for customization of deployments (clusters at CERN configuration, ports configuration, env variables configuration, storage configuration, authentication configuration)
+
 ### Prerequisites
 
 Create cluster
