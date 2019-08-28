@@ -114,6 +114,18 @@ ldapmodify -x -H $LDAP_URI -D $LDAP_ADMIN_BIND_DN -w $LDAP_ADMIN_BIND_PASSWORD -
 
 #### SWAN configuration
 
+Install swan configuration
+
+```bash
+kubectl create configmap swan-config --namespace swan --from-file=configs/jupyterhub_config.py --from-file=configs/jupyterhub_form.html
+```
+
+Install swan private scripts
+
+```bash
+kubectl create secret generic swan-tokens --namespace swan --from-file=private/eos-token.sh
+```
+
 Install swan
 
 ```bash
