@@ -136,6 +136,7 @@ Go inside SWAN pod and provide user auth for `eos-token.sh`
 
 ```bash
 kubectl exec -it -n swan $(kubectl get pods -n swan | grep swan- | grep Running | awk '{print $1}') bash
+ 
 # kinit <user>@CERN.CH
 ```
 
@@ -145,8 +146,25 @@ Access swan at cluster NodePort and login as `<username>:test`
 https://<any-cluster-node-ip>:30443
 ```
 
-### Building jupyterhub docker image
+### Useful commands
+
+Building jupyterhub docker image (temporarly)
 
 ```
 docker build -t gitlab-registry.cern.ch/db/spark-service/docker-registry/jupyterhub:1.0 . 
+```
+
+Restarting Jupyterhub
+
+```bash
+kubectl exec -it -n swan $(kubectl get pods -n swan | grep swan- | grep Running | awk '{print $1}') bash
+ 
+# supervisorctl stop jupyterhub; ps aux | grep http-proxy | awk '{print $2}' | head -1 | xargs -I{} kill {}; supervisorctl start jupyterhub
+```
+
+Entering user Notebook
+
+```bash
+
+kubectl exec -it -n swan jupyter-pmrowczy -c notebook bash
 ```
