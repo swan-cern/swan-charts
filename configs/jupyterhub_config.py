@@ -16,9 +16,6 @@ from kubernetes.client.rest import ApiException
 
 ### VARIABLES ###
 # Get configuration parameters from environment variables
-CVMFS_FOLDER = os.environ['CVMFS_FOLDER']
-EOS_USER_PATH = os.environ['EOS_USER_PATH']
-CONTAINER_IMAGE = os.environ['CONTAINER_IMAGE']
 LDAP_URI = os.environ['LDAP_URI']
 LDAP_PORT = os.environ['LDAP_PORT']
 LDAP_BASE_DN = os.environ['LDAP_BASE_DN']
@@ -110,25 +107,21 @@ else:
     print ("Cannot start JupyterHub.")
 
 ### Configuration for single-user containers ###
-# c.KubeSpawner.image_pull_policy = 'Always'
 # Spawn single-user's servers in the Kubernetes cluster
 c.JupyterHub.spawner_class = 'swanspawner.SwanKubeSpawner'
-c.SwanSpawner.image = CONTAINER_IMAGE
-c.SwanSpawner.namespace = NAMESPACE
+c.SwanSpawner.image = "gitlab-registry.cern.ch/swan/docker-images/systemuser:v5.1.1"
+c.SwanSpawner.image_pull_policy = 'IfNotPresent'
 c.SwanSpawner.options_form = '/srv/jupyterhub/jupyterhub_form.html'
 c.SwanSpawner.start_timeout = 90
+c.SwanSpawner.namespace = NAMESPACE
 
-# Single-user's servers extra config, CVMFS, EOS
-c.SwanSpawner.local_home = False  # $HOME is on EOS
-c.SwanSpawner.eos_path_prefix = EOS_USER_PATH
-
-c.SwanSpawner.available_cores = ["1", "2"]
-c.SwanSpawner.available_memory = ["2", "4"]
 c.SwanSpawner.check_cvmfs_status = False  # For now it only checks if available in same place as Jupyterhub.
 
 # local_home equal to true to hide the "always start with this config"
 c.SpawnHandlersConfigs.local_home = True
-c.SpawnHandlersConfigs.metrics_on = False  # For now the metrics are hardcoded for CERN
+
+c.SpawnHandlersConfigs.metrics_on = False
+
 c.SpawnHandlersConfigs.spawn_error_message = """SWAN could not start a session for your user, please try again. If the problem persists, please check:
 <ul>
     <li>Do you have a CERNBox account? If not, click <a href="https://cernbox.cern.ch" target="_blank">here</a>.</li>
@@ -145,6 +138,7 @@ c.SwanSpawner.volume_mounts = [
     {
         'name': 'cvmfs-sft-cern-ch',
         'mountPath': '/cvmfs/sft.cern.ch',
+        'readOnly': True
     },
     {
         'name': 'tmp-volume',
@@ -178,24 +172,17 @@ c.SwanSpawner.spark_ports_per_pod = 6
 
 def modify_pod_hook_call(spawner, pod):
     """
-    :param spawner: todo
+    :param spawner: Swan Kubernetes Spawner (swanspawner.SwanKubeSpawner)
     :type spawner: kubespawner.KubeSpawner
-    :param pod: todo
+    :param pod: default pod specification set by jupyterhub
     :type pod: client.V1Pod
-    :returns: todo
+    :returns: dynamically customized pod specification for user session
     :rtype: client.V1Pod
     """
 
     username = spawner.user.name
     user_tokens_secret = "user-tokens" + "-" + username
-    spark_ports_service = "spark-ports" + "-" + username
-    pod_label = {'swan': username}
     notebook_container = pod.spec.containers[0]
-
-    # Add pod label for service selector
-    pod.metadata.labels.update(
-        pod_label
-    )
 
     def append_or_replace_by_name(list, element):
         found = False
@@ -211,10 +198,87 @@ def modify_pod_hook_call(spawner, pod):
 
         return list
 
-    def create_notebook_ports():
-        # TODO: ports can be probably moved to kubespawner as this is infrastructure independent
+    def init_swan_container_env():
+        # Set server hostname of the pod running jupyterhub
+        notebook_container.env = append_or_replace_by_name(
+            notebook_container.env,
+            client.V1EnvVar(
+                name='SERVER_HOSTNAME',
+                value=SERVER_HOSTNAME
+            )
+        )
+
+        # Set server hostname of the pod running jupyterhub
+        notebook_container.env = append_or_replace_by_name(
+            notebook_container.env,
+            client.V1EnvVar(
+                name='HOME',
+                value="/eos/home-%s/%s" % (username[0], username)
+            )
+        )
+
+    def init_resource_requirements():
+        limits = {
+            "cpu": spawner.get_user_cores(),
+            "memory": spawner.get_user_memory()
+        }
+
+        # in demo cluster, request always 1cpu and 2G regardless of the form
+        requests = {
+            "cpu": 1,
+            "memory": '2G'
+        }
+
+        # add resource requirements for GPUs if available (this cluster has nvidia gpu's)
+        if "cu" in spawner.get_lcg_release():
+            requests["nvidia.com/gpu"] = "1"
+            limits["nvidia.com/gpu"] = "1"
+
+            # We are making visible all the devices, if the host has more that one can be used.
+            notebook_container.env = append_or_replace_by_name(
+                notebook_container.env,
+                client.V1EnvVar(
+                    name='NVIDIA_VISIBLE_DEVICES',
+                    value='all'
+                )
+            )
+            notebook_container.env = append_or_replace_by_name(
+                notebook_container.env,
+                client.V1EnvVar(
+                    name='NVIDIA_DRIVER_CAPABILITIES',
+                    value='compute,utility'
+                )
+            )
+            notebook_container.env = append_or_replace_by_name(
+                notebook_container.env,
+                client.V1EnvVar(
+                    name='NVIDIA_REQUIRE_CUDA',
+                    value='cuda>=10.0 driver>=410'
+                )
+            )
+
+        notebook_container.resources = client.V1ResourceRequirements(
+            limits=limits,
+            requests=requests
+        )
+
+    def init_spark():
         # FIXME: this might be needed in case hadoop-yarn 2.8.0 webapp still crashes on ApplicationProxy UI
         # pod.spec.host_network = True
+        spark_ports_service = "spark-ports" + "-" + username
+        spark_ports_label = {'spark-ports-pod': username}
+        pod.metadata.labels.update(
+            spark_ports_label
+        )
+
+        # Add spark config env
+        notebook_container.env = append_or_replace_by_name(
+            notebook_container.env,
+            client.V1EnvVar(
+                name='SPARK_CONFIG_SCRIPT',
+                value='/cvmfs/sft.cern.ch/lcg/etc/hadoop-confext/hadoop-swan-setconf.sh'
+            )
+        )
 
         try:
             spark_ports_env = []
@@ -235,7 +299,7 @@ def modify_pod_hook_call(spawner, pod):
                     name=spark_ports_service
                 ),
                 spec=client.V1ServiceSpec(
-                    selector=pod_label,  # attach this service to the pod with label {pod_label}
+                    selector=spark_ports_label,  # attach this service to the pod with label {spark_pod_label}
                     ports=service_template_ports,
                     type="NodePort"
                 )
@@ -243,6 +307,7 @@ def modify_pod_hook_call(spawner, pod):
 
             try:
                 # use existing if possible
+                spawner.api.delete_namespaced_service(spark_ports_service, NAMESPACE)
                 service = spawner.api.read_namespaced_service(spark_ports_service, NAMESPACE)
             except ApiException:
                 # not existing, create
@@ -280,17 +345,10 @@ def modify_pod_hook_call(spawner, pod):
                     value=','.join(spark_ports_env)
                 )
             )
-            notebook_container.env = append_or_replace_by_name(
-                notebook_container.env,
-                client.V1EnvVar(
-                    name='SERVER_HOSTNAME',
-                    value=SERVER_HOSTNAME
-                )
-            )
         except ApiException as e:
             raise Exception("Could not create required user ports: %s\n" % e)
 
-    def create_swan_secrets():
+    def init_swan_secrets():
         # Create eos token
         try:
             eos_token_base64 = subprocess.check_output(
@@ -341,44 +399,50 @@ def modify_pod_hook_call(spawner, pod):
 
         # Start side container which currently:
         #  - refreshes the kerberos token
-        side_container = {
-            "name": "side-ontainer",
-            "image": "busybox",
-            "command": [
-                "/bin/sh", "-c",
-                "while true; do " +
-                "cp /secrets/krb5cc /krb5cc_tmp; chmod 400 /krb5cc_tmp; chown $USER_ID:$USER_GID /krb5cc_tmp; mv /krb5cc_tmp /tmp/krb5cc_$USER_ID; sleep 60; " +
-                "done;"
-            ],
-            "env": [
-                {
-                    "name": "USER_ID",
-                    "value": str(pwd.getpwnam(username).pw_uid)
-                },
-                {
-                    "name": "USER_GID",
-                    "value": str(pwd.getpwnam(username).pw_gid)
-                }
-            ],
-            "volumeMounts": [
-                {
-                    'name': user_tokens_secret,
-                    'mountPath': '/secrets/',
-                },
-                {
-                    'name': 'tmp-volume',
-                    'mountPath': '/tmp',
-                }
-            ]
-        }
-
-        pod.spec.containers = [
-            side_container,  # start first
-            notebook_container  # start second
+        containers = [
+            {
+                "name": "side-container",
+                "image": "busybox",
+                "command": [
+                    "/bin/sh", "-c",
+                    "while true; do " +
+                    "cp /secrets/krb5cc /krb5cc_tmp; chmod 400 /krb5cc_tmp; chown $USER_ID:$USER_GID /krb5cc_tmp; mv /krb5cc_tmp /tmp/krb5cc_$USER_ID; sleep 60; " +
+                    "done;"
+                ],
+                "env": [
+                    {
+                        "name": "USER_ID",
+                        "value": str(pwd.getpwnam(username).pw_uid)
+                    },
+                    {
+                        "name": "USER_GID",
+                        "value": str(pwd.getpwnam(username).pw_gid)
+                    }
+                ],
+                "volumeMounts": [
+                    {
+                        'name': user_tokens_secret,
+                        'mountPath': '/secrets/',
+                    },
+                    {
+                        'name': 'tmp-volume',
+                        'mountPath': '/tmp',
+                    }
+                ]
+            }
         ]
 
-    create_notebook_ports()
-    create_swan_secrets()
+        # add the base containers after side container (to start after side container)
+        containers.extend(pod.spec.containers)
+
+        # assigning pod spec containers
+        pod.spec.containers = containers
+
+    init_swan_container_env()
+    init_swan_secrets()
+    init_resource_requirements()
+    if spawner.get_spark_cluster() != 'none':
+        init_spark()
 
     return pod
 

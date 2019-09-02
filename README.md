@@ -18,6 +18,10 @@ Install in `kube-system` namespace (if not provided by openstack by default)
 - `eosxd` - https://gitlab.cern.ch/helm/charts/cern/tree/master/eosxd
 - `cvmfs-csi` - https://gitlab.cern.ch/cloud-infrastructure/cvmfs-csi
 
+Build docker image:
+- jupyterhub branch [swan_k8s](https://gitlab.cern.ch/swan/jupyterhub/tree/swan_k8s)
+- jupyterhub docker [repo](https://gitlab.cern.ch/swan/docker-images/jupyterhub)
+
 ### Deployment to Openstack K8s with LDAP
 
 ### Namespace 
@@ -148,23 +152,39 @@ https://<any-cluster-node-ip>:30443
 
 ### Useful commands
 
-Building jupyterhub docker image (temporarly)
+Entering Jupyterhub Container
 
+```bash
+kubectl exec -it -n swan $(kubectl get pods -n swan | grep swan- | grep Running | awk '{print $1}') bash
 ```
-docker build -t gitlab-registry.cern.ch/db/spark-service/docker-registry/jupyterhub:1.0 . 
+
+Editing Jupyterhub (requires also jupyterhub restart to load changes)
+
+```bash
+# vi /srv/jupyterhub/<required-file>
+# cd <some-path-if-required>; pip install .
 ```
 
 Restarting Jupyterhub
 
 ```bash
-kubectl exec -it -n swan $(kubectl get pods -n swan | grep swan- | grep Running | awk '{print $1}') bash
- 
 # supervisorctl stop jupyterhub; ps aux | grep http-proxy | awk '{print $2}' | head -1 | xargs -I{} kill {}; supervisorctl start jupyterhub
+```
+
+Checking logs of Jupyterhub
+
+```bash
+# less /var/log/jupyterhub/jupyterhub.log
 ```
 
 Entering user Notebook
 
 ```bash
+kubectl exec -it -n swan jupyter-<username> -c notebook bash
+```
 
-kubectl exec -it -n swan jupyter-pmrowczy -c notebook bash
+Checking user Notebook logs
+
+```bash
+kubectl logs -n swan jupyter-<username>
 ```

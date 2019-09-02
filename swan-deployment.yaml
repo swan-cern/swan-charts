@@ -86,6 +86,7 @@ spec:
       containers:
       - name: jupyterhub
         #image: "gitlab-registry.cern.ch/swan/docker-images/jupyterhub:v1.8"
+        #imagePullPolicy: IfNotPresent
         # dev image
         image: "gitlab-registry.cern.ch/db/spark-service/docker-registry/jupyterhub:1.0"
         imagePullPolicy: Always
@@ -144,8 +145,6 @@ spec:
         ### JupyterHub configuration:
         - name: AUTH_TYPE
           value: "local" #FIXME: LDAP, but this should be OAuth2 from upstream JupyterHub
-        - name: CONTAINER_IMAGE
-          value: "gitlab-registry.cern.ch/swan/docker-images/systemuser:v5.1.1"
         - name: NAMESPACE
           value: *namespace
         ### LDAP parameters
@@ -159,11 +158,6 @@ spec:
           value: "cn=readuser,dc=example,dc=org"
         - name: LDAP_BIND_PASSWORD
           value: "readuser"
-        ### Mounts for single-user containers
-        - name: CVMFS_FOLDER
-          value: "/cvmfs"
-        - name: EOS_USER_PATH
-          value: "/eos/home"
       volumes:
       - name: *vm_swan-certs
         secret:
