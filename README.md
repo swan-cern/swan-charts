@@ -1,6 +1,6 @@
 # SWAN@CERN on k8s
 
-# How is it built
+### How is it built
 
 CERN jupyterhub image (leveraged from sciencebox work)  
 Helm Chart to deploy jupyterhub (yaml for development, for production we can use helm chart from upstream Zero to JupyterHub with Kubernetes)  
