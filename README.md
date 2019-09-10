@@ -2,18 +2,18 @@
 
 # How is it built
 
-CERN jupyterhub image (leveraged from sciencebox work)
-Helm Chart to deploy jupyterhub (yaml for development, for production we can use helm chart from upstream Zero to JupyterHub with Kubernetes)
-Image for the user session is developed by CERN IT (systemuser image from current SWAN production)
+CERN jupyterhub image (leveraged from sciencebox work)  
+Helm Chart to deploy jupyterhub (yaml for development, for production we can use helm chart from upstream Zero to JupyterHub with Kubernetes)  
+Image for the user session is developed by CERN IT (systemuser image from current SWAN production)  
+  
+Integrations  
 
-Integrations
-
-- SSO (OAuth or Sibhileth)
-- Authentication Tokens for CERNBox, Hadoop (and OS_TOKEN for k8s clusters in future, maybe) and refresh mechanism
-- Podspec customization to run Spark with IT Hadoop clusters and user home being CERNBox and software
-- Extensions
-	All can be reused from current SWAN production
-
+- SSO (OAuth or Sibhileth)  
+- Authentication Tokens for CERNBox, Hadoop (and OS_TOKEN for k8s clusters in future, maybe) and refresh mechanism  
+- Podspec customization to run Spark with IT Hadoop clusters and user home being CERNBox and software  
+- Extensions  
+	All can be reused from current SWAN production  
+  
 Playground to test k8s deployment @CERN. To be better organized in the future.
 
 This repository serves as equivalent of `https://gitlab.cern.ch/ai/it-puppet-hostgroup-swan` in magnum k8s
