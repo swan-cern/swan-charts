@@ -8,7 +8,7 @@ Image for the user session is developed by CERN IT (systemuser image from curren
   
 Integrations  
 
-- SSO (OAuth or Sibhileth)  
+- SSO (OAuth or Shibboleth)  
 - Authentication Tokens for CERNBox, Hadoop (and OS_TOKEN for k8s clusters in future, maybe) and refresh mechanism  
 - Podspec customization to run Spark with IT Hadoop clusters and user home being CERNBox and software  
 - Extensions  
