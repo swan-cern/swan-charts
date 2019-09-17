@@ -172,14 +172,20 @@ Entering Jupyterhub Container
 kubectl exec -it -n swan $(kubectl get pods -n swan | grep swan- | grep Running | awk '{print $1}') bash
 ```
 
-Editing Jupyterhub (requires also jupyterhub restart to load changes)
+Restarting JupyterHub Container
+
+```bash
+kubectl delete pod -n swan $(kubectl get pods -n swan | grep swan- | grep Running | awk '{print $1}')
+```
+
+Editing Jupyterhub inside the container (requires jupyterhub process restart) 
 
 ```bash
 # vi /srv/jupyterhub/<required-file>
 # cd <some-path-if-required>; pip install .
 ```
 
-Restarting Jupyterhub
+Restarting Jupyterhub inside the container 
 
 ```bash
 # supervisorctl stop jupyterhub; ps aux | grep http-proxy | awk '{print $2}' | head -1 | xargs -I{} kill {}; supervisorctl start jupyterhub
