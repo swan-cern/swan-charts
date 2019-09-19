@@ -14,8 +14,6 @@ Integrations
 - Extensions  
 	All can be reused from current SWAN production  
   
-Playground to test k8s deployment @CERN. To be better organized in the future.
-
 This repository serves as equivalent of `https://gitlab.cern.ch/ai/it-puppet-hostgroup-swan` in magnum k8s
 
 - provides configuration bound to CERN infrastructure (puppet equivalent)
@@ -33,8 +31,7 @@ Install in `kube-system` namespace (if not provided by openstack by default)
 - `cvmfs-csi` - https://gitlab.cern.ch/cloud-infrastructure/cvmfs-csi
 
 Build docker image:
-- jupyterhub branch [swan_k8s](https://gitlab.cern.ch/swan/jupyterhub/tree/swan_k8s)
-- jupyterhub docker [repo](https://gitlab.cern.ch/swan/docker-images/jupyterhub)
+- jupyterhub [docker image](https://gitlab.cern.ch/swan/docker-images/jupyterhub) build with jupyterhub branch [swan_k8s](https://gitlab.cern.ch/swan/jupyterhub/tree/swan_k8s)
 
 ### Deployment to Openstack K8s with LDAP
 
@@ -135,13 +132,18 @@ ldapmodify -x -H $LDAP_URI -D $LDAP_ADMIN_BIND_DN -w $LDAP_ADMIN_BIND_PASSWORD -
 Install swan configuration
 
 ```bash
-kubectl create configmap swan-config --namespace swan --from-file=configs/jupyterhub_config.py --from-file=configs/jupyterhub_form.html
+kubectl create configmap swan-config --namespace swan \
+--from-file=configs/jupyterhub_config.py \
+--from-file=configs/jupyterhub_form.html
 ```
 
 Install swan private scripts
 
 ```bash
-kubectl create secret generic swan-tokens --namespace swan --from-file=private/eos-token.sh
+kubectl create secret generic swan-scripts --namespace swan \
+--from-file=private/eos_token.sh \
+--from-file=private/check_ticket.sh \
+--from-file=private/delete_ticket.sh
 ```
 
 Install swan
@@ -150,7 +152,7 @@ Install swan
 kubectl apply -f swan-deployment.yaml
 ```
 
-Go inside SWAN pod and provide user auth for `eos-token.sh`
+Go inside SWAN pod and provide user auth for `eos_token.sh`
 
 ```bash
 kubectl exec -it -n swan $(kubectl get pods -n swan | grep swan- | grep Running | awk '{print $1}') bash

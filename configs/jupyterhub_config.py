@@ -15,47 +15,36 @@ class PodHookHandler:
         pass
 
     @staticmethod
-    def modify_pod_hook(spawner, pod):
+    def modify_pod_hook(spawner, pod_definition):
         """
         :param spawner: Swan Kubernetes Spawner (swanspawner.SwanKubeSpawner)
         :type spawner: kubespawner.KubeSpawner
-        :param pod: default pod specification set by jupyterhub
-        :type pod: client.V1Pod
+        :param pod_definition: default pod definition set by jupyterhub
+        :type pod_definition: client.V1Pod
         :returns: dynamically customized pod specification for user session
         :rtype: client.V1Pod
         """
 
         if spawner.get_spark_cluster() != 'none':
-            pod = PodHookHandler.init_spark_service(spawner, pod)
-        pod = PodHookHandler.init_resource_requirements(spawner, pod)
-        pod = PodHookHandler.init_swan_container_env(spawner, pod)
-        pod = PodHookHandler.init_swan_secrets(spawner, pod)
+            pod_definition = PodHookHandler._init_spark(spawner, pod_definition)
+        pod_definition = PodHookHandler._init_resource_requirements(spawner, pod_definition)
+        pod_definition = PodHookHandler._init_swan_container_env(spawner, pod_definition)
+        pod_definition = PodHookHandler._init_swan_secrets(spawner, pod_definition)
 
-        return pod
-
-    @staticmethod
-    def append_or_replace_by_name(list, element):
-        found = False
-        for list_index in range(0, len(list)):
-            if list[list_index].to_dict().get("name") == element.to_dict().get("name"):
-                list[list_index] = element
-                found = True
-                break
-
-        if not found:
-            list.append(element)
-
-        return list
+        return pod_definition
 
     @staticmethod
-    def init_swan_container_env(spawner, pod):
+    def _init_swan_container_env(spawner, pod):
+        """
+        Customize base notebook environment variables of systemuser container
+        https://gitlab.cern.ch/swan/jupyterhub/tree/swan_k8s/SwanSpawner#swanspawner-jupyter-notebook-environment-variables
+        """
+        notebook_container = PodHookHandler.__get_pod_container(pod, 'notebook')
         username = spawner.user.name
 
-        container = pod.spec.containers[0]
-
         # Set server hostname of the pod running jupyterhub
-        container.env = PodHookHandler.append_or_replace_by_name(
-            container.env,
+        notebook_container.env = PodHookHandler.__append_or_replace_by_name(
+            notebook_container.env,
             client.V1EnvVar(
                 name='SERVER_HOSTNAME',
                 value_from=client.V1EnvVarSource(
@@ -67,8 +56,8 @@ class PodHookHandler:
         )
 
         # Set server hostname of the pod running jupyterhub
-        container.env = PodHookHandler.append_or_replace_by_name(
-            container.env,
+        notebook_container.env = PodHookHandler.__append_or_replace_by_name(
+            notebook_container.env,
             client.V1EnvVar(
                 name='HOME',
                 value="/eos/home-%s/%s" % (username[0], username)
@@ -78,8 +67,11 @@ class PodHookHandler:
         return pod
 
     @staticmethod
-    def init_resource_requirements(spawner, pod):
-        container = pod.spec.containers[0]
+    def _init_resource_requirements(spawner, pod):
+        """
+        Customize notebook resource requirements from the form
+        """
+        notebook_container = PodHookHandler.__get_pod_container(pod, 'notebook')
 
         limits = {
             "cpu": spawner.get_user_cores(),
@@ -98,29 +90,29 @@ class PodHookHandler:
             limits["nvidia.com/gpu"] = "1"
 
             # We are making visible all the devices, if the host has more that one can be used.
-            container.env = PodHookHandler.append_or_replace_by_name(
-                container.env,
+            notebook_container.env = PodHookHandler.__append_or_replace_by_name(
+                notebook_container.env,
                 client.V1EnvVar(
                     name='NVIDIA_VISIBLE_DEVICES',
                     value='all'
                 )
             )
-            container.env = PodHookHandler.append_or_replace_by_name(
-                container.env,
+            notebook_container.env = PodHookHandler.__append_or_replace_by_name(
+                notebook_container.env,
                 client.V1EnvVar(
                     name='NVIDIA_DRIVER_CAPABILITIES',
                     value='compute,utility'
                 )
             )
-            container.env = PodHookHandler.append_or_replace_by_name(
-                container.env,
+            notebook_container.env = PodHookHandler.__append_or_replace_by_name(
+                notebook_container.env,
                 client.V1EnvVar(
                     name='NVIDIA_REQUIRE_CUDA',
                     value='cuda>=10.0 driver>=410'
                 )
             )
 
-        container.resources = client.V1ResourceRequirements(
+        notebook_container.resources = client.V1ResourceRequirements(
             limits=limits,
             requests=requests
         )
@@ -128,13 +120,12 @@ class PodHookHandler:
         return pod
 
     @staticmethod
-    def hostport_hash(username):
-        return 30000 + hash(username) % 2000
-
-    @staticmethod
-    def init_spark_service(spawner, pod):
+    def _init_spark(spawner, pod):
+        """
+        Set cern related configuration for spark cluster and open ports
+        """
         username = spawner.user.name
-        container = pod.spec.containers[0]
+        notebook_container = PodHookHandler.__get_pod_container(pod, 'notebook')
 
         spark_ports_service = "spark-ports" + "-" + username
         spark_ports_label = {'spark-ports-pod': username}
@@ -143,8 +134,8 @@ class PodHookHandler:
         )
 
         # Add spark config env
-        container.env = PodHookHandler.append_or_replace_by_name(
-            container.env,
+        notebook_container.env = PodHookHandler.__append_or_replace_by_name(
+            notebook_container.env,
             client.V1EnvVar(
                 name='SPARK_CONFIG_SCRIPT',
                 value='/cvmfs/sft.cern.ch/lcg/etc/hadoop-confext/hadoop-swan-setconf.sh'
@@ -154,7 +145,7 @@ class PodHookHandler:
         try:
             spark_ports_env = []
 
-            # Allocate some 6 random NodePorts on the cluster for spark
+            # Define some 6 random NodePorts on the cluster for spark using V1Service
             service_template_ports = []
             for port_id in range(1, c.SwanSpawner.spark_ports_per_pod + 1):
                 service_template_ports.append(
@@ -176,6 +167,7 @@ class PodHookHandler:
                 )
             )
 
+            # Create V1Service which allocates random ports for spark in k8s cluster
             try:
                 # use existing if possible
                 spawner.api.delete_namespaced_service(spark_ports_service, NAMESPACE)
@@ -184,8 +176,9 @@ class PodHookHandler:
                 # not existing, create
                 service = spawner.api.create_namespaced_service(NAMESPACE, service_template)
 
+            # Replace the service with allocated nodeports to map nodeport:targetport
+            # and set these ports for the notebook container
             for port_id in range(len(service.spec.ports)):
-                # Adjust the service to map nodeport:targetport
                 name = service.spec.ports[port_id].name
                 node_port = service.spec.ports[port_id].node_port
                 service.spec.ports[port_id] = client.V1ServicePort(
@@ -199,8 +192,8 @@ class PodHookHandler:
                 spark_ports_env.append(str(node_port))
 
                 # Open proper ports in the notebook container to map nodeport:targetport
-                container.ports = PodHookHandler.append_or_replace_by_name(
-                    container.ports,
+                notebook_container.ports = PodHookHandler.__append_or_replace_by_name(
+                    notebook_container.ports,
                     client.V1ContainerPort(
                         name=name,
                         container_port=node_port,
@@ -211,29 +204,37 @@ class PodHookHandler:
             spawner.api.replace_namespaced_service(spark_ports_service, NAMESPACE, service)
 
             # Add ports env for spark
-            container.env = PodHookHandler.append_or_replace_by_name(
-                container.env,
+            notebook_container.env = PodHookHandler.__append_or_replace_by_name(
+                notebook_container.env,
                 client.V1EnvVar(
                     name='SPARK_PORTS',
                     value=','.join(spark_ports_env)
                 )
             )
         except ApiException as e:
+            # FIXME: Exception message should be c.SpawnHandlersConfigs.spawn_error_message and the exception should be only logged
             raise Exception("Could not create required user ports: %s\n" % e)
 
         return pod
 
     @staticmethod
-    def init_swan_secrets(spawner, pod):
+    def _init_swan_secrets(spawner, pod):
+        """
+        Define cern related secrets for spark and eos
+        """
         username = spawner.user.name
-        user_tokens_secret = "user-tokens" + "-" + username
+        user_tokens_secret = USER_TOKENS_SECRET_PREFIX + username
+        notebook_container = PodHookHandler.__get_pod_container(pod, 'notebook')
+        pod_shared_tokens_volume_name = 'user-secrets'
+        pod_spec_containers = []
 
-        # Create eos token
+        # Retrieve eos token for user
         try:
             eos_token_base64 = subprocess.check_output(
-                ['sudo', '/srv/jupyterhub/private/eos-token.sh', username], timeout=60
+                ['sudo', '/srv/jupyterhub/private/eos_token.sh', username], timeout=60
             ).decode('ascii')
         except Exception:
+            # FIXME: Exception message should be c.SpawnHandlersConfigs.spawn_error_message and the exception should be only logged
             raise Exception("Could not create required user credential\n")
 
         # Create V1Secret with eos token
@@ -245,7 +246,7 @@ class PodHookHandler:
             secret_meta.namespace = NAMESPACE
             secret_data.metadata = secret_meta
             secret_data.data = {}
-            secret_data.data['eosToken'] = eos_token_base64
+            secret_data.data[USER_TOKENS_SECRET_KEY] = eos_token_base64
 
             try:
                 spawner.api.read_namespaced_secret(user_tokens_secret, NAMESPACE)
@@ -258,67 +259,117 @@ class PodHookHandler:
             else:
                 spawner.api.create_namespaced_secret(NAMESPACE, secret_data)
         except ApiException as e:
+            # FIXME: Exception message should be c.SpawnHandlersConfigs.spawn_error_message and the exception should be only logged
             raise Exception("Could not create required user secret: %s\n" % e)
 
-        # Allocate V1 Secret volume to pod exlusivelly
         pod.spec.volumes.append(
-            {
-                'name': user_tokens_secret,
-                'secret': {
-                    'secretName': user_tokens_secret,
-                    'items': [
-                        {
-                            'key': 'eosToken',
-                            'path': 'krb5cc',
-                        }
-                    ],
-                }
-            }
+            # V1Secret for tokens without adjusted permissions
+            client.V1Volume(
+                name=user_tokens_secret,
+                secret=client.V1SecretVolumeSource(
+                    secret_name=user_tokens_secret,
+                    items=[
+                        client.V1KeyToPath(
+                            key=USER_TOKENS_SECRET_KEY,
+                            path='krb5cc'
+                        )
+                    ]
+                )
+            )
+        )
+        pod.spec.volumes.append(
+            # Shared V1EmptyDir between notebook and side-container for tokens with correct privileges
+            client.V1Volume(
+                name=pod_shared_tokens_volume_name,
+                empty_dir=client.V1EmptyDirVolumeSource(
+                    medium='Memory'
+                )
+            )
         )
 
-        # Start side container which currently:
-        #  - refreshes the kerberos token
-        containers = [
-            {
-                "name": "side-container",
-                "image": "busybox",
-                "command": [
-                    "/bin/sh", "-c",
-                    "while true; do " +
-                    "cp /secrets/krb5cc /krb5cc_tmp; chmod 400 /krb5cc_tmp; chown $USER_ID:$USER_GID /krb5cc_tmp; mv /krb5cc_tmp /tmp/krb5cc_$USER_ID; sleep 60; " +
-                    "done;"
+        # Append as first (it will be first to spawn) side container which currently:
+        #  - refreshes the kerberos token and adjust permissions for the user
+        user_id = str(pwd.getpwnam(username).pw_uid)
+        user_gid = str(pwd.getpwnam(username).pw_gid)
+        krb_token_name = "krb5cc_%s" % user_id
+        pod_spec_containers.append(
+            client.V1Container(
+                name='side-container',
+                image='cern/cc7-base:20181210',
+                command=['/bin/sh', '-c'],
+                args=[
+                    # in a loop - use mounted token secret, adjust permissions and move to /tokens pod volume
+                    'while true; do ' +
+                    'cp /tokens-secret/krb5cc /tmp/krb5cc; ' +
+                    'chmod 400 /tmp/krb5cc; chown '+ user_id + ':' + user_gid + ' /tmp/krb5cc; ' +
+                    'mv /tmp/krb5cc /tokens/' + krb_token_name + '; ' +
+                    'sleep 60; ' +
+                    'done;'
                 ],
-                "env": [
-                    {
-                        "name": "USER_ID",
-                        "value": str(pwd.getpwnam(username).pw_uid)
-                    },
-                    {
-                        "name": "USER_GID",
-                        "value": str(pwd.getpwnam(username).pw_gid)
-                    }
-                ],
-                "volumeMounts": [
-                    {
-                        'name': user_tokens_secret,
-                        'mountPath': '/secrets/',
-                    },
-                    {
-                        'name': 'tmp-volume',
-                        'mountPath': '/tmp',
-                    }
+                volume_mounts=[
+                    client.V1VolumeMount(
+                        name=user_tokens_secret,
+                        mount_path='/tokens-secret'
+                    ),
+                    client.V1VolumeMount(
+                        name=pod_shared_tokens_volume_name,
+                        mount_path='/tokens'
+                    ),
                 ]
-            }
-        ]
+            )
+        )
+
+        # Mount user-exposed tokens and set KRB5CCNAME for the user to point to the krb5 token
+        notebook_container.volume_mounts.append(
+            client.V1VolumeMount(
+                name=pod_shared_tokens_volume_name,
+                mount_path='/tokens'
+            )
+        )
+        notebook_container.env = PodHookHandler.__append_or_replace_by_name(
+            notebook_container.env,
+            client.V1EnvVar(
+                name='KRB5CCNAME',
+                value='/tokens/' + krb_token_name
+            )
+        )
 
         # add the base containers after side container (to start after side container)
-        containers.extend(pod.spec.containers)
+        existing_containers = pod.spec.containers
+        pod_spec_containers.extend(existing_containers)
 
         # assigning pod spec containers
-        pod.spec.containers = containers
+        pod.spec.containers = pod_spec_containers
 
         return pod
 
+    @staticmethod
+    def __get_pod_container(pod, container_name):
+        """
+        :param pod: pod definition
+        :type pod: client.V1Pod
+        :returns: required container from pod spec
+        :rtype: client.V1Container
+        """
+        for container in pod.spec.containers:
+            if container.name == container_name:
+                return container
+
+        return None
+
+    @staticmethod
+    def __append_or_replace_by_name(list, element):
+        found = False
+        for list_index in range(0, len(list)):
+            if list[list_index].to_dict().get("name") == element.to_dict().get("name"):
+                list[list_index] = element
+                found = True
+                break
+
+        if not found:
+            list.append(element)
+
+        return list
 
 """
 Configuration for JupyterHub - variables 
@@ -330,6 +381,11 @@ LDAP_PORT = os.environ['LDAP_PORT']
 LDAP_BASE_DN = os.environ['LDAP_BASE_DN']
 
 NAMESPACE = os.environ['PODINFO_NAMESPACE']
+
+SWAN_CONTAINER_NAME = 'notebook'
+SWAN_CONTAINER_NAMSPACE = 'swan'
+USER_TOKENS_SECRET_PREFIX = 'user-tokens-'
+USER_TOKENS_SECRET_KEY = 'eosToken'
 
 c = get_config()
 
@@ -354,16 +410,21 @@ c.JupyterHub.logo_file = '/usr/local/share/jupyterhub/static/swan/logos/logo_swa
 # Reach the Hub from outside
 c.JupyterHub.ip = "0.0.0.0"  # Listen on all IPs for HTTP traffic when in Kubernetes
 c.JupyterHub.port = 8000  # You may end up in detecting the wrong IP address due to:
-#       - Kubernetes services in front of Pods (headed//headless//clusterIPs)
-#       - hostNetwork used by the JupyterHub Pod
 
 c.JupyterHub.cleanup_servers = False
-# Use local_home set to true to prevent calling the script that updates EOS tickets
+
 c.JupyterHub.services = [
     {
         'name': 'cull-idle',
         'admin': True,
-        'command': 'python3 /srv/jupyterhub/jh_gitlab/scripts/cull_idle_servers.py --cull_every=600 --timeout=14400 --local_home=True --cull_users=True'.split(),
+        'command': [
+            'python3', '/srv/jupyterhub/jh_gitlab/scripts/cull_idle_servers.py',
+            '--cull_every=600',
+            '--timeout=14400',
+            '--cull_users=True',
+            '--local_home=False', # make sure to call check_ticket.sh and delete_ticket.sh scripts
+            '--culler_dir=/srv/jupyterhub/culler' # path with check_ticket.sh and delete_ticket.sh scripts
+        ],
     }
 ]
 
@@ -447,10 +508,6 @@ c.SwanSpawner.volume_mounts = [
         'name': 'cvmfs-sft-cern-ch',
         'mountPath': '/cvmfs/sft.cern.ch',
         'readOnly': True
-    },
-    {
-        'name': 'tmp-volume',
-        'mountPath': '/tmp',
     }
 ]
 
@@ -467,17 +524,13 @@ c.SwanSpawner.volumes = [
             'claimName': 'cvmfs-sft-cern-ch-pvc'
         }
     },
-    {
-        'name': 'tmp-volume',
-        'emptyDir': {}
-    }
 ]
 
 c.SwanSpawner.port = 8888
 c.SwanSpawner.spark_ports_per_pod = 6
 
 c.SwanSpawner.extra_container_config = {
-    'name': 'notebook'
+    'name': SWAN_CONTAINER_NAME
 }
 
 # https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html

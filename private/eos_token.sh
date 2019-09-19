@@ -1,5 +1,8 @@
 #!/bin/bash
-set -e
+
+# Function variables
+# 1) username for which to check ticket
+USER=$1
 
 if [[ ! -f "/tmp/krb5cc_0" ]]; then
     exit 1;

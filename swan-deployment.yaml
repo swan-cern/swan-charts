@@ -102,15 +102,24 @@ spec:
           mountPath: /etc/boxed/certs
         - name: &vm_cvmfs-sft-cern-ch cvmfs-sft-cern-ch
           mountPath: /cvmfs/sft.cern.ch
+          # overwrite the default form and kubespawner
         - name: &vm_swan-config swan-config
           mountPath: /srv/jupyterhub/jupyterhub_form.complete.html
           subPath: jupyterhub_form.complete.html
         - name: &vm_swan-config swan-config
           mountPath: /root/jupyterhub_config/kubespawner.py
           subPath: kubespawner.py
-        - name: &vm_swan-tokens swan-tokens
-          mountPath: /srv/jupyterhub/private/eos-token.sh
-          subPath: eos-token.sh
+          # add eos_token.sh in private dir
+        - name: &vm_swan-scripts swan-scripts
+          mountPath: /srv/jupyterhub/private/eos_token.sh
+          subPath: eos_token.sh
+          # add check_ticket.sh and delete_ticket.sh in culler dir
+        - name: &vm_swan-scripts swan-scripts
+          mountPath: /srv/jupyterhub/culler/check_ticket.sh
+          subPath: check_ticket.sh
+        - name: &vm_swan-scripts swan-scripts
+          mountPath: /srv/jupyterhub/culler/delete_ticket.sh
+          subPath: delete_ticket.sh
         env:
         - name: PODINFO_NAMESPACE
           valueFrom:
@@ -144,7 +153,7 @@ spec:
           value: "443"
         ### JupyterHub configuration:
         - name: AUTH_TYPE
-          value: "local" #FIXME: LDAP, but this should be OAuth2 from upstream JupyterHub
+          value: "local" #FIXME: LDAP, but this should be OAuth2/Shibboleth
         - name: NAMESPACE
           value: *namespace
         ### LDAP parameters
@@ -159,6 +168,9 @@ spec:
         - name: LDAP_BIND_PASSWORD
           value: "readuser"
       volumes:
+      - name: *vm_cvmfs-sft-cern-ch
+        persistentVolumeClaim:
+          claimName: cvmfs-sft-cern-ch-pvc
       - name: *vm_swan-certs
         secret:
           secretName: swan-certs
@@ -171,14 +183,15 @@ spec:
             path: kubespawner.py
           - key: jupyterhub_form.html
             path: jupyterhub_form.complete.html
-      - name: *vm_swan-tokens
+      - name: *vm_swan-scripts
         secret:
-          secretName: swan-tokens
+          secretName: swan-scripts
           items:
-          - key: eos-token.sh
-            path: eos-token.sh
+          - key: eos_token.sh
+            path: eos_token.sh
+          - key: check_ticket.sh
+            path: check_ticket.sh
+          - key: delete_ticket.sh
+            path: delete_ticket.sh
           defaultMode: 356 # 0544 perm
-      - name: *vm_cvmfs-sft-cern-ch
-        persistentVolumeClaim:
-          claimName: cvmfs-sft-cern-ch-pvc
 ---
