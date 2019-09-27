@@ -35,7 +35,6 @@ data:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  creationTimestamp: null
   name: add-on-cluster-admin
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -49,7 +48,7 @@ subjects:
 apiVersion: v1
 kind: Service
 metadata:
-  name: &name swan
+  name: &name hub
   namespace: &namespace swan
 spec:
   type: NodePort
@@ -70,7 +69,7 @@ spec:
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: &name swan
+  name: &name hub
   namespace: &namespace swan
   labels:
     app: *name
@@ -85,9 +84,7 @@ spec:
       terminationGracePeriodSeconds: 60
       containers:
       - name: jupyterhub
-        #image: "gitlab-registry.cern.ch/swan/docker-images/jupyterhub:v1.8"
-        #imagePullPolicy: IfNotPresent
-        # dev image
+        #image: "gitlab-registry.cern.ch/swan/docker-images/jupyterhub:v1.8" + jupyterhub:swan_k8s
         image: "gitlab-registry.cern.ch/db/spark-service/docker-registry/jupyterhub:1.0"
         imagePullPolicy: Always
         ports:

@@ -1,0 +1,107 @@
+jupyterhub:
+  singleuser:
+    uid: 0
+    fsGid: 0
+    storage:
+      type: none
+    image:
+      name: gitlab-registry.cern.ch/swan/docker-images/systemuser
+      tag: v5.1.1
+    cloudMetadata:
+      enabled: true
+  proxy:
+    service:
+      type: NodePort
+      nodePorts:
+        # accessible at <any-node>:31080
+        http: 31080
+        https: 31443
+    secretToken: 9840739268135b56fc340d5c8b4b5962c489479eecfd0e1e7b6bbb108697b90a
+  hub:
+    uid: 0
+    fsGid: 0
+    image:
+      # https://gitlab.cern.ch/swan/docker-images/jupyterhub/tree/swan_k8s
+      # WARN: pull policy Always not possible, remember always about new tag
+      name: gitlab-registry.cern.ch/db/spark-service/docker-registry/jupyterhub
+      tag: 270919-2
+    extraVolumeMounts:
+      - name: swan-config
+        mountPath: /srv/jupyterhub/jupyterhub_form.html
+        subPath: jupyterhub_form.html
+      - name: swan-config
+        mountPath: /srv/jupyterhub/swan_config.py
+        subPath: swan_config.py
+      - name: swan-secrets
+        mountPath: /srv/jupyterhub/culler/check_ticket.sh
+        subPath: check_ticket.sh
+      - name: swan-secrets
+        mountPath: /srv/jupyterhub/culler/delete_ticket.sh
+        subPath: delete_ticket.sh
+      - name: swan-secrets
+        mountPath: /srv/jupyterhub/private/eos_token.sh
+        subPath: eos_token.sh
+      - name: swan-secrets
+        mountPath: /srv/jupyterhub/private/hadoop_token.sh
+        subPath: hadoop_token.sh
+      - name: swan-secrets
+        mountPath: /srv/jupyterhub/private/webhdfs_token.sh
+        subPath: webhdfs_token.sh
+      - name: cvmfs-sft-cern-ch
+        mountPath: /cvmfs/sft.cern.ch
+    extraVolumes:
+      - name: cvmfs-sft-cern-ch
+        persistentVolumeClaim:
+          claimName: cvmfs-sft-cern-ch-pvc
+      - name: swan-config
+        configMap:
+          name: swan-config
+          items:
+          - key: jupyterhub_form.html
+            path: jupyterhub_form.html
+          - key: swan_config.py
+            path: swan_config.py
+      - name: swan-secrets
+        secret:
+          secretName: swan-secrets
+          items:
+          - key: check_ticket.sh
+            path: check_ticket.sh
+          - key: delete_ticket.sh
+            path: delete_ticket.sh
+          - key: eos_token.sh
+            path: eos_token.sh
+          - key: hadoop_token.sh
+            path: hadoop_token.sh
+          - key: webhdfs_token.sh
+            path: webhdfs_token.sh
+          defaultMode: 356 # 0544 perm
+    extraConfig:
+      configuration: |
+        exec(open('/srv/jupyterhub/swan_config.py').read())
+      dummyAuthConf: |
+        def pre_spawn_hook(spawner):
+          username = spawner.user.name
+          uid = 1000 + hash(username) % 10000
+          os.system("useradd -u " + str(uid) + " " + username)
+        c.Spawner.pre_spawn_hook = pre_spawn_hook
+    db:
+      type: sqlite-memory
+  auth:
+    type: dummy
+    dummy:
+      password: test
+  rbac:
+    enabled: true
+  cull:
+    enabled: false
+  scheduling:
+    userScheduler:
+      enabled: false
+    podPriority:
+      enabled: false
+  prePuller:
+    hook:
+      enabled: true
+    continuous:
+      enabled: false

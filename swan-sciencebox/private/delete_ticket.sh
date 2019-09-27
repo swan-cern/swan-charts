@@ -15,11 +15,11 @@ STATUS_DELETE=$(curl -ik \
     -o /dev/null \
     -w "%{http_code}" \
     -X DELETE \
-	-H "Authorization: Bearer $TOKEN" \
+    -H "Authorization: Bearer $TOKEN" \
     -H 'Accept: application/json' \
     -H 'Content-Type: application/json' \
     -d '{}' \
-	https://kubernetes.default.svc/api/v1/namespaces/${USER_TOKENS_SECRET_NAMESPACE}/secrets/${SECRET_NAME})
+    https://kubernetes.default.svc/api/v1/namespaces/${USER_TOKENS_SECRET_NAMESPACE}/secrets/${SECRET_NAME})
 echo "Delete a previous secret ${USER_TOKENS_SECRET_NAMESPACE}/${SECRET_NAME} status: ${STATUS_DELETE}"
 
 case "$STATUS_DELETE" in

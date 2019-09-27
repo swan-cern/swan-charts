@@ -1,9 +1,7 @@
-import os
-import pwd
-import socket
-import subprocess
+import pwd, os, subprocess
 from kubernetes import client
 from kubernetes.client.rest import ApiException
+
 
 """
 Class handling KubeSpawner.modify_pod_hook_call(spawner,pod) call
@@ -212,7 +210,6 @@ class PodHookHandler:
                 )
             )
         except ApiException as e:
-            # FIXME: Exception message should be c.SpawnHandlersConfigs.spawn_error_message and the exception should be only logged
             raise Exception("Could not create required user ports: %s\n" % e)
 
         return pod
@@ -228,14 +225,30 @@ class PodHookHandler:
         pod_shared_tokens_volume_name = 'user-secrets'
         pod_spec_containers = []
 
-        # Retrieve eos token for user
         try:
+            # Retrieve eos token for user
             eos_token_base64 = subprocess.check_output(
                 ['sudo', '/srv/jupyterhub/private/eos_token.sh', username], timeout=60
             ).decode('ascii')
-        except Exception:
-            # FIXME: Exception message should be c.SpawnHandlersConfigs.spawn_error_message and the exception should be only logged
-            raise Exception("Could not create required user credential\n")
+        except Exception as e:
+            raise ValueError("Could not create required user credential: %s\n" % e)
+
+        cluster = spawner.get_spark_cluster()
+        if cluster != 'none':
+            try:
+                # Retrieve hdfs token for user
+                hadoop_token_base64 = subprocess.check_output(
+                    ['sudo', '/srv/jupyterhub/private/hadoop_token.sh', cluster, username], timeout=60
+                ).decode('ascii')
+
+                # Retrieve hdfs token for user
+                webhdfs_token_base64 = subprocess.check_output(
+                    ['sudo', '/srv/jupyterhub/private/webhdfs_token.sh', cluster, username], timeout=60
+                ).decode('ascii')
+            except Exception as e:
+                # if no access, all good for now
+                #raise ValueError("Could not get spark tokens: %s\n" % e)
+                pass
 
         # Create V1Secret with eos token
         try:
@@ -259,7 +272,6 @@ class PodHookHandler:
             else:
                 spawner.api.create_namespaced_secret(NAMESPACE, secret_data)
         except ApiException as e:
-            # FIXME: Exception message should be c.SpawnHandlersConfigs.spawn_error_message and the exception should be only logged
             raise Exception("Could not create required user secret: %s\n" % e)
 
         pod.spec.volumes.append(
@@ -376,162 +388,82 @@ Configuration for JupyterHub - variables
 """
 
 # Get configuration parameters from environment variables
-LDAP_URI = os.environ['LDAP_URI']
-LDAP_PORT = os.environ['LDAP_PORT']
-LDAP_BASE_DN = os.environ['LDAP_BASE_DN']
-
-NAMESPACE = os.environ['PODINFO_NAMESPACE']
-
+NAMESPACE = os.environ.get('POD_NAMESPACE', 'default')
 SWAN_CONTAINER_NAME = 'notebook'
 SWAN_CONTAINER_NAMSPACE = 'swan'
 USER_TOKENS_SECRET_PREFIX = 'user-tokens-'
 USER_TOKENS_SECRET_KEY = 'eosToken'
-
-c = get_config()
-
-"""
-Configuration for JupyterHub - general
-"""
-
-# JupyterHub runtime configuration
-jupyterhub_runtime_dir = '/srv/jupyterhub/jupyterhub_data/'
-os.makedirs(jupyterhub_runtime_dir, exist_ok=True)
-c.JupyterHub.cookie_secret_file = os.path.join(jupyterhub_runtime_dir, 'cookie_secret')
-c.JupyterHub.db_url = os.path.join(jupyterhub_runtime_dir, 'jupyterhub.sqlite')
-
-# Resume previous state if the Hub fails
-c.JupyterHub.cleanup_proxy = True  # Kill the proxy if the hub fails
-c.JupyterHub.cleanup_servers = False  # Do not kill single-user's servers (SQLite DB must be on persistent storage)
-
-# Add SWAN look&feel
-c.JupyterHub.template_paths = ['/srv/jupyterhub/jh_gitlab/templates']
-c.JupyterHub.logo_file = '/usr/local/share/jupyterhub/static/swan/logos/logo_swan_cloudhisto.png'
-
-# Reach the Hub from outside
-c.JupyterHub.ip = "0.0.0.0"  # Listen on all IPs for HTTP traffic when in Kubernetes
-c.JupyterHub.port = 8000  # You may end up in detecting the wrong IP address due to:
-
-c.JupyterHub.cleanup_servers = False
-
-c.JupyterHub.services = [
-    {
-        'name': 'cull-idle',
-        'admin': True,
-        'command': [
-            'python3', '/srv/jupyterhub/jh_gitlab/scripts/cull_idle_servers.py',
-            '--cull_every=600',
-            '--timeout=14400',
-            '--cull_users=True',
-            '--local_home=False', # make sure to call check_ticket.sh and delete_ticket.sh scripts
-            '--culler_dir=/srv/jupyterhub/culler' # path with check_ticket.sh and delete_ticket.sh scripts
-        ],
-    }
-]
-
-# Reach the Hub from Jupyter containers
-# NOTE: The Hub IP must be known and rechable from spawned containers
-# 	Leveraging on the FQDN makes the Hub accessible both when the JupyterHub Pod
-#	uses the Kubernetes overlay network and the host network
-try:
-    hub_ip = socket.gethostbyname(socket.getfqdn())
-except:
-    print ("WARNING: Unable to identify iface IP from FQDN")
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect(("8.8.8.8", 80))
-    hub_ip = s.getsockname()[0]
-hub_port = 8080
-c.JupyterHub.hub_ip = hub_ip
-c.JupyterHub.hub_port = hub_port
-c.KubeSpawner.hub_connect_ip = hub_ip
-c.KubeSpawner.hub_connect_port = hub_port
-
-# Proxy
-# Wrap the start of the proxy to allow bigger headers in nodejs
-c.ConfigurableHTTPProxy.command = '/srv/jupyterhub/jh_gitlab/scripts/start_proxy.sh'
-
-# Load the list of users with admin privileges and enable access
-admins = set(open(os.path.join(os.path.dirname(__file__), 'adminslist'), 'r').read().splitlines())
-c.Authenticator.admin_users = admins
-c.JupyterHub.admin_access = True
-
-"""
-Configuration for JupyterHub - user authentication
-"""
-
-if (os.environ['AUTH_TYPE'] == "shibboleth"):
-    print ("Authenticator: Using user-defined authenticator")
-    c.JupyterHub.authenticator_class = '%%%SHIBBOLETH_AUTHENTICATOR_CLASS%%%'
-    # %%% Additional SHIBBOLETH_AUTHENTICATOR_CLASS parameters here %%% #
-
-elif (os.environ['AUTH_TYPE'] == "local"):
-    print ("Authenticator: Using LDAP")
-    c.JupyterHub.authenticator_class = 'ldapauthenticator.LDAPAuthenticator'
-    c.LDAPAuthenticator.server_address = LDAP_URI
-    c.LDAPAuthenticator.use_ssl = False
-    c.LDAPAuthenticator.server_port = int(LDAP_PORT)
-    if (LDAP_URI[0:8] == "ldaps://"):
-        c.LDAPAuthenticator.use_ssl = True
-    c.LDAPAuthenticator.bind_dn_template = 'uid={username},' + LDAP_BASE_DN
-
-else:
-    print ("ERROR: Authentication type not specified.")
-    print ("Cannot start JupyterHub.")
-
-"""
-Configuration for JupyterHub - single-user container customization
-"""
-
-# Spawn single-user's servers in the Kubernetes cluster
-c.JupyterHub.spawner_class = 'swanspawner.SwanKubeSpawner'
-c.SwanSpawner.image = "gitlab-registry.cern.ch/swan/docker-images/systemuser:v5.1.1"
-c.SwanSpawner.image_pull_policy = 'IfNotPresent'
-c.SwanSpawner.options_form = '/srv/jupyterhub/jupyterhub_form.html'
-c.SwanSpawner.start_timeout = 90
-c.SwanSpawner.namespace = NAMESPACE
-
-c.SpawnHandlersConfigs.metrics_on = False
-
-c.SpawnHandlersConfigs.spawn_error_message = """SWAN could not start a session for your user, please try again. If the problem persists, please check:
+SPAWN_ERROR_MESSAGE = """SWAN could not start a session for your user, please try again. If the problem persists, please check:
 <ul>
     <li>Do you have a CERNBox account? If not, click <a href="https://cernbox.cern.ch" target="_blank">here</a>.</li>
     <li>Is there a problem with the service? Find information <a href="https://cern.service-now.com/service-portal/ssb.do" target="_blank">here</a>.</li>
     <li>If none of the options apply, please open a <a href="https://cern.service-now.com/service-portal/function.do?name=swan" target="_blank">Support Ticket</a>.</li>
 </ul>"""
 
+"""
+Configuration for JupyterHub - general
+"""
+
+# Spawn single-user's servers in the Kubernetes cluster
+c.JupyterHub.spawner_class = 'swanspawner.SwanKubeSpawner'
+
+# Add SWAN look&feel
+c.JupyterHub.template_paths = ['/srv/jupyterhub/jh_gitlab/templates']
+c.JupyterHub.logo_file = '/usr/local/share/jupyterhub/static/swan/logos/logo_swan_cloudhisto.png'
+c.SwanSpawner.options_form = '/srv/jupyterhub/jupyterhub_form.html'
+
+# SWAN@CERN error message
+c.SpawnHandlersConfigs.metrics_on = False
+
+c.SpawnHandlersConfigs.spawn_error_message = SPAWN_ERROR_MESSAGE
+
+# Culling of users and ticket refresh
+c.JupyterHub.services = [
+            {
+                'name': 'cull-idle',
+                'admin': True,
+                'command': 'python3 /srv/jupyterhub/jh_gitlab/scripts/cull_idle_servers.py --cull_every=600 --timeout=14400 --local_home=False --cull_users=True'.split(),
+            }
+]
+
+# Give notebook 45s to start a webserver and max 60 for whole spawn process
+c.SwanSpawner.http_timeout = 45
+c.SwanSpawner.start_timeout = 60
+c.SwanSpawner.consecutive_failure_limit = 0
+"""
+Configuration for Jupyter Notebook - general
+"""
+
+c.SwanSpawner.spark_ports_per_pod = 6
+
+c.SwanSpawner.cmd = None
+
 c.SwanSpawner.volume_mounts = [
-    {
-        'name': 'eos',
-        'mountPath': '/eos',
-        'mountPropagation': 'HostToContainer',
-    },
-    {
-        'name': 'cvmfs-sft-cern-ch',
-        'mountPath': '/cvmfs/sft.cern.ch',
-        'readOnly': True
-    }
+    client.V1VolumeMount(
+        name='eos',
+        mount_path='/eos',
+    ),
+    client.V1VolumeMount(
+        name='cvmfs-sft-cern-ch',
+        mount_path='/cvmfs/sft.cern.ch',
+        read_only=True
+    )
 ]
 
 c.SwanSpawner.volumes = [
-    {
-        'name': 'eos',
-        'hostPath': {
-            'path': '/var/eos'
-        }
-    },
-    {
-        'name': 'cvmfs-sft-cern-ch',
-        'persistentVolumeClaim': {
-            'claimName': 'cvmfs-sft-cern-ch-pvc'
-        }
-    },
+    client.V1Volume(
+        name='eos',
+        host_path=client.V1HostPathVolumeSource(
+            path='/var/eos'
+        )
+    ),
+    client.V1Volume(
+        name='cvmfs-sft-cern-ch',
+        persistent_volume_claim=client.V1PersistentVolumeClaimVolumeSource(
+            claim_name='cvmfs-sft-cern-ch-pvc'
+        )
+    ),
 ]
-
-c.SwanSpawner.port = 8888
-c.SwanSpawner.spark_ports_per_pod = 6
-
-c.SwanSpawner.extra_container_config = {
-    'name': SWAN_CONTAINER_NAME
-}
 
 # https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html
 c.SwanSpawner.modify_pod_hook = PodHookHandler.modify_pod_hook

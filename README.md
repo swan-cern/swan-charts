@@ -21,6 +21,14 @@ This repository serves as equivalent of `https://gitlab.cern.ch/ai/it-puppet-hos
 - general purpose jupyter and jupyterhub images
 - jupyterhub_config ConfigMap for customization of deployments (clusters at CERN configuration, ports configuration, env variables configuration, storage configuration, authentication configuration)
 
+List of contents
+- [Prerequisites](#prerequisites)
+- [Option 1: Deployment to Openstack K8s with HELM](#option-1:-deployment-to-openstack-k8s-with-helm)
+- [Option 2: Deployment to Openstack K8s with KUBECTL / LDAP](#option-2:-deployment-to-openstack-k8s-with-kubectl-/-ldap)
+- [Useful commands](#useful-commands)
+- [Current Sciencebox issues](#sciencebox-issues)
+- [Current Jupyterhub Chart issues](#current-jupyterhub-chart-issues)
+
 ### Prerequisites
 
 Create cluster
@@ -30,19 +38,39 @@ Install in `kube-system` namespace (if not provided by openstack by default)
 - `eosxd` - https://gitlab.cern.ch/helm/charts/cern/tree/master/eosxd
 - `cvmfs-csi` - https://gitlab.cern.ch/cloud-infrastructure/cvmfs-csi
 
-Build docker image:
-- jupyterhub [docker image](https://gitlab.cern.ch/swan/docker-images/jupyterhub) build with jupyterhub branch [swan_k8s](https://gitlab.cern.ch/swan/jupyterhub/tree/swan_k8s)
+### Option 1: Deployment to Openstack K8s with HELM
 
-### Deployment to Openstack K8s with LDAP
+Prerequisite: build helm chart with required dependencies (`Chart.yaml`, `requirements.yaml` and `values.yaml` customized)
+- jupyterhub [docker image on branch swan_k8s](https://gitlab.cern.ch/swan/docker-images/jupyterhub/tree/swan_k8s) build with [spawner/handler branch swan_k8s](https://gitlab.cern.ch/swan/jupyterhub/tree/swan_k8s)
+- `helm init --history-max 5 --service-account tiller`
+- `helm dependency build swan-upstream-chart`
+- `helm package swan-upstream-chart`
 
-### Namespace 
+Install SWAN with all required settings
+
+```bash
+helm upgrade --install --namespace swan --recreate-pods swan swan-upstream-chart-0.0.1.tgz
+```
+
+Access swan at cluster NodePort and login as `<username>:test`
+
+```bash
+http://<any-cluster-node-ip>:31080
+```
+
+### Option 2: Deployment to Openstack K8s with KUBECTL / LDAP
+
+##### Uses current sciencebox docker image
+- jupyterhub [docker image](https://gitlab.cern.ch/swan/docker-images/jupyterhub) build with jupyterhub branch [master](https://gitlab.cern.ch/swan/jupyterhub/tree/master)
+
+##### Namespace 
 
 Create namespace for swan
 ```bash
 kubectl apply -f swan-namespace.yaml
 ```
 
-#### LDAP configuration (testing)
+##### LDAP configuration (testing)
 
 Install ldap
 
@@ -124,10 +152,9 @@ memberuid: $USER
 EOP
 >$ACTION_FILE
 ldapmodify -x -H $LDAP_URI -D $LDAP_ADMIN_BIND_DN -w $LDAP_ADMIN_BIND_PASSWORD -f $ACTION_FILE
-
 ```
 
-#### SWAN configuration
+##### SWAN configuration
 
 Install swan configuration
 
@@ -171,32 +198,19 @@ https://<any-cluster-node-ip>:30443
 Entering Jupyterhub Container
 
 ```bash
-kubectl exec -it -n swan $(kubectl get pods -n swan | grep swan- | grep Running | awk '{print $1}') bash
+kubectl exec -it -n swan $(kubectl get pods -n swan | grep hub- | awk '{print $1}') bash
+```
+
+Get logs of Jupyterhub Container
+
+```bash
+kubectl logs -f -n swan $(kubectl get pods -n swan | grep hub- | awk '{print $1}') bash
 ```
 
 Restarting JupyterHub Container
 
 ```bash
-kubectl delete pod -n swan $(kubectl get pods -n swan | grep swan- | grep Running | awk '{print $1}')
-```
-
-Editing Jupyterhub inside the container (requires jupyterhub process restart) 
-
-```bash
-# vi /srv/jupyterhub/<required-file>
-# cd <some-path-if-required>; pip install .
-```
-
-Restarting Jupyterhub inside the container 
-
-```bash
-# supervisorctl stop jupyterhub; ps aux | grep http-proxy | awk '{print $2}' | head -1 | xargs -I{} kill {}; supervisorctl start jupyterhub
-```
-
-Checking logs of Jupyterhub
-
-```bash
-# less /var/log/jupyterhub/jupyterhub.log
+kubectl delete pod -n swan $(kubectl get pods -n swan | grep hub- | awk '{print $1}')
 ```
 
 Entering user Notebook
@@ -210,3 +224,19 @@ Checking user Notebook logs
 ```bash
 kubectl logs -n swan jupyter-<username>
 ```
+
+### Current JupyterHub chart issues
+
+Using JupyterHub chart from [upstream](https://github.com/jupyterhub/zero-to-jupyterhub-k8s/blob/master/jupyterhub/values.yaml) :
+- BLOCKER - does not allow to customize [jupyterhub rbac](https://github.com/jupyterhub/zero-to-jupyterhub-k8s/blob/master/jupyterhub/templates/hub/rbac.yaml), we need to be able to create secrets - development upstream required
+- BLOCKER - chart has separate deployment for proxy and it is not possible to disable it
+- does not allow to specify separate user namespace
+- does not allow to customize culler (can be done as jupyterhub config)
+
+### ScienceBox issues
+
+Using JupyterHub image from [ScienceBox](https://gitlab.cern.ch/swan/docker-images/jupyterhub) :
+
+- sciencebox proxy with supervisord instead of separate deployment (as in upstream)
+- we need [hadoop-fetchdt rpm](https://gitlab.cern.ch/db/hadoop-fetchdt/tree/qa) installed
+- should we generate tokens for EOS/Spark in JupyterHub or as part of side-container in each pod ? 

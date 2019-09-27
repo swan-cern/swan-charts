@@ -22,7 +22,7 @@ STATUS_REPLACE=$(curl -ik \
     -o /dev/null \
     -w "%{http_code}" \
     -X PUT \
-	-H "Authorization: Bearer $TOKEN" \
+    -H "Authorization: Bearer $TOKEN" \
     -H 'Accept: application/json' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -35,7 +35,7 @@ STATUS_REPLACE=$(curl -ik \
         "'"$USER_TOKENS_SECRET_KEY"'": "'"$KRB5CC_BASE64"'"
     }
     }' \
-	https://kubernetes.default.svc/api/v1/namespaces/${USER_TOKENS_SECRET_NAMESPACE}/secrets/${SECRET_NAME})
+    https://kubernetes.default.svc/api/v1/namespaces/${USER_TOKENS_SECRET_NAMESPACE}/secrets/${SECRET_NAME})
 
 echo "Replacing a secret ${USER_TOKENS_SECRET_NAMESPACE}/${SECRET_NAME} with token ${USER_TOKENS_SECRET_KEY} status-create: ${STATUS_REPLACE}"
 
