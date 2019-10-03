@@ -228,10 +228,7 @@ kubectl logs -n swan jupyter-<username>
 ### Current JupyterHub chart issues
 
 Using JupyterHub chart from [upstream](https://github.com/jupyterhub/zero-to-jupyterhub-k8s/blob/master/jupyterhub/values.yaml) :
-- BLOCKER - does not allow to customize [jupyterhub rbac](https://github.com/jupyterhub/zero-to-jupyterhub-k8s/blob/master/jupyterhub/templates/hub/rbac.yaml), we need to be able to create secrets - development upstream required
-- BLOCKER - chart has separate deployment for proxy and it is not possible to disable it
 - does not allow to specify separate user namespace
-- does not allow to customize culler (can be done as jupyterhub config)
 
 ### ScienceBox issues
 
