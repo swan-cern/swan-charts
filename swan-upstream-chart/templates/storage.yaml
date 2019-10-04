@@ -17,3 +17,39 @@ spec:
     requests:
       storage: 1Gi
   storageClassName: csi-cvmfs-swan-sft-cern-ch
+---
+# FIXME: build dedicated pause container prePuller->pause->image->name: gitlab-registry.cern.ch/swan/docker-images/pause -> tag: 1.0
+# FIXME: pause container will be a deamonset running on each node
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cvmfs-puller
+spec:
+  selector:
+    matchLabels:
+      name: cvmfs-puller
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 100%
+  template:
+    metadata:
+      labels:
+        name: cvmfs-puller
+    spec:
+      terminationGracePeriodSeconds: 0
+      volumes:
+      - name: cvmfs-sft-cern-ch
+        persistentVolumeClaim:
+          claimName: cvmfs-sft-cern-ch-pvc
+      containers:
+      - name: cvmfs-puller
+        image: gitlab-registry.cern.ch/swan/docker-images/systemuser:v5.1.1
+        volumeMounts:
+          - name: cvmfs-sft-cern-ch
+            mountPath: /cvmfs/sft.cern.ch
+        command:
+          - /bin/sh
+          - -c
+        args:
+          - 'while true; do source /cvmfs/sft.cern.ch/lcg/views/LCG_96/x86_64-centos7-gcc8-opt/setup.sh && ( timeout 20s python -m ipykernel > /dev/null 2>&1 || true ); sleep 60; done;'

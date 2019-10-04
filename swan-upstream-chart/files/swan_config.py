@@ -412,9 +412,10 @@ c.JupyterHub.template_paths = ['/srv/jupyterhub/jh_gitlab/templates']
 c.JupyterHub.logo_file = '/usr/local/share/jupyterhub/static/swan/logos/logo_swan_cloudhisto.png'
 c.SwanSpawner.options_form = '/srv/jupyterhub/jupyterhub_form.html'
 
-# SWAN@CERN error message
 c.SpawnHandlersConfigs.metrics_on = False
+c.SpawnHandlersConfigs.local_home = True
 
+# SWAN@CERN error message
 c.SpawnHandlersConfigs.spawn_error_message = SPAWN_ERROR_MESSAGE
 
 # Culling of users and ticket refresh
@@ -435,7 +436,6 @@ Configuration for Jupyter Notebook - general
 """
 
 c.SwanSpawner.spark_ports_per_pod = 6
-
 c.SwanSpawner.cmd = None
 
 c.SwanSpawner.volume_mounts = [
