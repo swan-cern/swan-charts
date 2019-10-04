@@ -76,7 +76,7 @@ jupyterhub:
             path: webhdfs_token.sh
           defaultMode: 356 # 0544 perm
     extraConfig:
-      configuration: |
+      swanConf: |
         exec(open('/srv/jupyterhub/swan_config.py').read())
       dummyAuthConf: |
         def pre_spawn_hook(spawner):

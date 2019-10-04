@@ -21,14 +21,19 @@ This repository serves as equivalent of `https://gitlab.cern.ch/ai/it-puppet-hos
 - jupyterhub_config ConfigMap for customization of deployments (clusters at CERN configuration, ports configuration, env variables configuration, storage configuration, authentication configuration)
 
 List of contents
-- [Prerequisites](#prerequisites)
+- [SWAN Deployment Prerequisites](#swan-deployment-prerequisites)
 - [Option 1: Deployment to Openstack K8s with HELM](#option-1:-deployment-to-openstack-k8s-with-jupyterhub-helm-chart)
 - [Option 2: Deployment to Openstack K8s with KUBECTL / LDAP](#option-2:-deployment-to-openstack-k8s-with-sciencebox-templates)
 - [Useful commands](#useful-commands)
 - [Current Sciencebox issues](#sciencebox-issues)
 - [Current Jupyterhub Chart issues](#current-jupyterhub-chart-issues)
 
-### Prerequisites
+### Demo of upstream JupyterHub (no SWAN, no EOS, no CVMFS)
+This option uses upstream [JupyterHub Helm Chart](https://jupyterhub.github.io/helm-chart/)
+
+[JupyterHub Helm Chart](jupyterhub-upstream-chart/README.md)
+
+### SWAN Deployment Prerequisites
 
 Create cluster
 - `openstack magnum` - https://clouddocs.web.cern.ch/clouddocs/containers/quickstart.html#kubernetes
