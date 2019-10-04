@@ -224,6 +224,7 @@ class PodHookHandler:
         notebook_container = PodHookHandler.__get_pod_container(pod, 'notebook')
         pod_shared_tokens_volume_name = 'user-secrets'
         pod_spec_containers = []
+        eos_token_base64 = ''
 
         try:
             # Retrieve eos token for user
@@ -231,7 +232,14 @@ class PodHookHandler:
                 ['sudo', '/srv/jupyterhub/private/eos_token.sh', username], timeout=60
             ).decode('ascii')
         except Exception as e:
-            raise ValueError("Could not create required user credential: %s\n" % e)
+            notebook_container.env = PodHookHandler.__append_or_replace_by_name(
+                notebook_container.env,
+                client.V1EnvVar(
+                    name='HOME',
+                    value="/scratch/%s" % (username)
+                )
+            )
+            #raise ValueError("Could not create required user credential: %s\n" % e)
 
         cluster = spawner.get_spark_cluster()
         if cluster != 'none':
