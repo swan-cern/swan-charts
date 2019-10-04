@@ -101,6 +101,11 @@ jupyterhub:
       enabled: false
   prePuller:
     hook:
-      enabled: false
+      enabled: true
     continuous:
       enabled: false
+
+swan:
+  cvmfs:
+    prefetcher:
+      enable: true
