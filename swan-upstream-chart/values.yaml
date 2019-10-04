@@ -21,10 +21,9 @@ jupyterhub:
     uid: 0
     fsGid: 0
     image:
-      # https://gitlab.cern.ch/swan/docker-images/jupyterhub/tree/swan_k8s
       # WARN: pull policy Always not possible, remember always about new tag
-      name: gitlab-registry.cern.ch/db/spark-service/docker-registry/jupyterhub
-      tag: 031019-2
+      name: "gitlab-registry.cern.ch/db/spark-service/docker-registry/jupyterhub"
+      tag: "041019"
     extraVolumeMounts:
       - name: swan-config
         mountPath: /srv/jupyterhub/jupyterhub_form.html
@@ -102,6 +101,6 @@ jupyterhub:
       enabled: false
   prePuller:
     hook:
-      enabled: true
+      enabled: false
     continuous:
       enabled: false
