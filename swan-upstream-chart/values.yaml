@@ -9,13 +9,18 @@ jupyterhub:
       tag: v5.1.1
     cloudMetadata:
       enabled: true
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: traefik
+      traefik.frontend.entryPoints: "https"
+    tls: 
+      - secretName: tls-cert
+    hosts:
+      - swan-pkothuri.cern.ch
   proxy:
     service:
-      type: NodePort
-      nodePorts:
-        # accessible at <any-node>:31080
-        http: 31080
-        https: 31443
+      type: ClusterIP
     secretToken: 9840739268135b56fc340d5c8b4b5962c489479eecfd0e1e7b6bbb108697b90a
   hub:
     uid: 0
@@ -85,7 +90,9 @@ jupyterhub:
           os.system("useradd -u " + str(uid) + " " + username)
         c.Spawner.pre_spawn_hook = pre_spawn_hook
     db:
-      type: sqlite-memory
+      type: postgres
+      url: postgres+psycopg2://swanjh:{seceretpassword}@dbod-jupyterhub.cern.ch:6602/swanjh
+    cookieSecret: ca4ac8ac414707020a7db74341eaf25de01f6d0bd73f4ceb9d2a197f1e3b9f32
   auth:
     type: dummy
     dummy:
