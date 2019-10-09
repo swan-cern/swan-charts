@@ -29,6 +29,10 @@ jupyterhub:
       # WARN: pull policy Always not possible, remember always about new tag
       name: "gitlab-registry.cern.ch/db/spark-service/docker-registry/jupyterhub"
       tag: "041019"
+    extraEnv:
+      OAUTH2_AUTHORIZE_URL: https://oauth.web.cern.ch/OAuth/Authorize
+      OAUTH2_TOKEN_URL: https://oauth.web.cern.ch/OAuth/Token
+      OAUTH_CALLBACK_URL: https://swan-pkothuri.cern.ch/hub/oauth_callback
     extraVolumeMounts:
       - name: swan-config
         mountPath: /srv/jupyterhub/jupyterhub_form.html
@@ -91,12 +95,36 @@ jupyterhub:
         c.Spawner.pre_spawn_hook = pre_spawn_hook
     db:
       type: postgres
-      url: postgres+psycopg2://swanjh:{seceretpassword}@dbod-jupyterhub.cern.ch:6602/swanjh
+      url: postgres+psycopg2://swanjh:<redacted>@dbod-jupyterhub.cern.ch:6602/swanjh
     cookieSecret: ca4ac8ac414707020a7db74341eaf25de01f6d0bd73f4ceb9d2a197f1e3b9f32
   auth:
-    type: dummy
-    dummy:
-      password: test
+    type: custom
+    admin:
+      users:
+        - pkothuri
+    whitelist:
+      users:
+        - pkothuri
+        - pmrowczy
+        - nbarros
+        - mmartinm
+        - jlunadur
+        - ekleszcz
+        - rcastell
+        - canali
+    custom:
+      className: oauthenticator.generic.GenericOAuthenticator
+      config:
+        client_id: "swan-pkothuri.cern.ch"
+        client_secret: <redacted>
+        token_url: "https://oauth.web.cern.ch/OAuth/Token"
+        userdata_url: "https://oauthresource.web.cern.ch/api/User"
+        groupdata_url: "https://oauthresource.web.cern.ch/api/Group"
+        userdata_method: GET
+        userdata_params: {'state': 'state'}
+        username_key: username
+        group_whitelist:
+          - swan-admins
   rbac:
     enabled: true
   cull:
