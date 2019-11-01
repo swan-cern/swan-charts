@@ -35,6 +35,7 @@ jupyterhub:
       OAUTH2_AUTHORIZE_URL: https://oauth.web.cern.ch/OAuth/Authorize
       OAUTH2_TOKEN_URL: https://oauth.web.cern.ch/OAuth/Token
       OAUTH_CALLBACK_URL: https://swan-k8s.cern.ch/hub/oauth_callback
+      JUPYTERHUB_CRYPT_KEY: 34639d457a10b13a99a653728ad6a146bdca66ad7e5519a595a8d8521e945031
     extraVolumeMounts:
       - name: swan-jh
         mountPath: /srv/jupyterhub/jupyterhub_form.html

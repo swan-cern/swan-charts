@@ -17,13 +17,6 @@ class CERNOAuthenticator(GenericOAuthenticator):
     CERN_OAUTH_LDAP_GID_TYPE = "http://schemas.xmlsoap.org/claims/gidNumber"
     CERN_OAUTH_LDAP_USERNAME_TYPE = "http://schemas.xmlsoap.org/claims/CommonName"
 
-    @staticmethod
-    def get_oauth_response_value(type, response):
-        for field in response:
-            if field['Type'] == type:
-                return field['Value']
-        return None
-
     async def authenticate(self, handler, data=None):
         user_data = await super().authenticate(handler, data)
 
@@ -41,12 +34,27 @@ class CERNOAuthenticator(GenericOAuthenticator):
                           )
         resp = await http_client.fetch(req)
         resp_json = json.loads(resp.body.decode('utf8', 'replace'))
-        
-        username = self.get_oauth_response_value(self.CERN_OAUTH_LDAP_USERNAME_TYPE, resp_json)
-        uid = self.get_oauth_response_value(self.CERN_OAUTH_LDAP_UID_TYPE, resp_json)
-        os.system("useradd " + username + " -u " + str(uid))
+
+        user_data['auth_state']['ldap_uid'] = self.__get_oauth_response_value(self.CERN_OAUTH_LDAP_UID_TYPE, resp_json)
+
+        self.log.info("Retrieved LDAP user %s(%s) info from OAuth"
+                      % (user_data['auth_state']['ldap_uid'], user_data['name']))
 
         return user_data
+
+    async def pre_spawn_start(self, user, spawner):
+        auth_state = await user.get_auth_state()
+        os.system("groupadd " + user.name + " -g " + auth_state['ldap_uid'])
+        os.system("useradd " + user.name + " -u " + auth_state['ldap_uid'] + " -g " + auth_state['ldap_uid'])
+
+        self.log.info("Added user %s(%s) to pwd" % (auth_state['ldap_uid'], user.name))
+
+    @staticmethod
+    def __get_oauth_response_value(type, response):
+        for field in response:
+            if field['Type'] == type:
+                return field['Value']
+        return None
 
 
 """
@@ -520,6 +528,7 @@ c.SwanSpawner.volumes = [
 
 # SwanKubeSpawner requires to add user to pwd
 c.JupyterHub.authenticator_class = CERNOAuthenticator
+c.Authenticator.enable_auth_state = True
 
 # https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html
 c.SwanSpawner.modify_pod_hook = PodHookHandler.modify_pod_hook
