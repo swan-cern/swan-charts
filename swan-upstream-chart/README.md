@@ -17,7 +17,7 @@ Install Prod SWAN (`https://swan-k8s.cern.ch` and login with cern oauth)
 ```bash
 $ helm upgrade --install --namespace swan --recreate-pods \
 --set jupyterhub.hub.db.password=redacted \
---set jupyterhub.custom.config.client_secret=redacted \
+--set jupyterhub.auth.custom.config.client_secret=redacted \
 --set-file jupyterhub.swan.ingress.cert=path-to-cert.pem \
 --set-file jupyterhub.swan.ingress.key=path-to-key.pem \
 --set jupyterhub.debug.enabled=true \
