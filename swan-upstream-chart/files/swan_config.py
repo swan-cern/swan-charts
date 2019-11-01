@@ -1,6 +1,52 @@
 import pwd, os, subprocess
 from kubernetes import client
 from kubernetes.client.rest import ApiException
+from oauthenticator.generic import GenericOAuthenticator
+from tornado.httpclient import HTTPRequest, AsyncHTTPClient
+import json
+
+"""
+Classes handling authentication for SWAN at CERN
+"""
+
+
+class CERNOAuthenticator(GenericOAuthenticator):
+
+    CERN_OAUTH_ME_ENDPOINT = "https://oauthresource.web.cern.ch/api/Me"
+    CERN_OAUTH_LDAP_UID_TYPE = "http://schemas.xmlsoap.org/claims/uidNumber"
+    CERN_OAUTH_LDAP_GID_TYPE = "http://schemas.xmlsoap.org/claims/gidNumber"
+    CERN_OAUTH_LDAP_USERNAME_TYPE = "http://schemas.xmlsoap.org/claims/CommonName"
+
+    @staticmethod
+    def get_oauth_response_value(type, response):
+        for field in response:
+            if field['Type'] == type:
+                return field['Value']
+        return None
+
+    async def authenticate(self, handler, data=None):
+        user_data = await super().authenticate(handler, data)
+
+        headers = {
+            "Accept": "application/json",
+            "User-Agent": "JupyterHub",
+            "Authorization": "Bearer {}".format(user_data['auth_state']['access_token'])
+        }
+
+        http_client = AsyncHTTPClient()
+        req = HTTPRequest(self.CERN_OAUTH_ME_ENDPOINT,
+                          method=self.userdata_method,
+                          headers=headers,
+                          validate_cert=self.tls_verify,
+                          )
+        resp = await http_client.fetch(req)
+        resp_json = json.loads(resp.body.decode('utf8', 'replace'))
+        
+        username = self.get_oauth_response_value(self.CERN_OAUTH_LDAP_USERNAME_TYPE, resp_json)
+        uid = self.get_oauth_response_value(self.CERN_OAUTH_LDAP_UID_TYPE, resp_json)
+        os.system("useradd " + username + " -u " + str(uid))
+
+        return user_data
 
 
 """
@@ -123,7 +169,7 @@ class PodHookHandler:
         Set cern related configuration for spark cluster and open ports
         """
         username = spawner.user.name
-        notebook_container = PodHookHandler.__get_pod_container(pod, 'notebook')
+        notebook_container = PodHookHandler.__get_pod_container(pod, SWAN_CONTAINER_NAME)
 
         spark_ports_service = "spark-ports" + "-" + username
         spark_ports_label = {'spark-ports-pod': username}
@@ -168,11 +214,11 @@ class PodHookHandler:
             # Create V1Service which allocates random ports for spark in k8s cluster
             try:
                 # use existing if possible
-                spawner.api.delete_namespaced_service(spark_ports_service, NAMESPACE)
-                service = spawner.api.read_namespaced_service(spark_ports_service, NAMESPACE)
+                spawner.api.delete_namespaced_service(spark_ports_service, SWAN_CONTAINER_NAMESPACE)
+                service = spawner.api.read_namespaced_service(spark_ports_service, SWAN_CONTAINER_NAMESPACE)
             except ApiException:
                 # not existing, create
-                service = spawner.api.create_namespaced_service(NAMESPACE, service_template)
+                service = spawner.api.create_namespaced_service(SWAN_CONTAINER_NAMESPACE, service_template)
 
             # Replace the service with allocated nodeports to map nodeport:targetport
             # and set these ports for the notebook container
@@ -199,7 +245,7 @@ class PodHookHandler:
                         host_port=node_port,
                     )
                 )
-            spawner.api.replace_namespaced_service(spark_ports_service, NAMESPACE, service)
+            spawner.api.replace_namespaced_service(spark_ports_service, SWAN_CONTAINER_NAMESPACE, service)
 
             # Add ports env for spark
             notebook_container.env = PodHookHandler.__append_or_replace_by_name(
@@ -221,7 +267,7 @@ class PodHookHandler:
         """
         username = spawner.user.name
         user_tokens_secret = USER_TOKENS_SECRET_PREFIX + username
-        notebook_container = PodHookHandler.__get_pod_container(pod, 'notebook')
+        notebook_container = PodHookHandler.__get_pod_container(pod, SWAN_CONTAINER_NAME)
         pod_shared_tokens_volume_name = 'user-secrets'
         pod_spec_containers = []
         eos_token_base64 = ''
@@ -264,21 +310,21 @@ class PodHookHandler:
 
             secret_meta = client.V1ObjectMeta()
             secret_meta.name = user_tokens_secret
-            secret_meta.namespace = NAMESPACE
+            secret_meta.namespace = SWAN_CONTAINER_NAMESPACE
             secret_data.metadata = secret_meta
             secret_data.data = {}
             secret_data.data[USER_TOKENS_SECRET_KEY] = eos_token_base64
 
             try:
-                spawner.api.read_namespaced_secret(user_tokens_secret, NAMESPACE)
+                spawner.api.read_namespaced_secret(user_tokens_secret, SWAN_CONTAINER_NAMESPACE)
                 exists = True
             except ApiException:
                 exists = False
 
             if exists:
-                spawner.api.replace_namespaced_secret(user_tokens_secret, NAMESPACE, secret_data)
+                spawner.api.replace_namespaced_secret(user_tokens_secret, SWAN_CONTAINER_NAMESPACE, secret_data)
             else:
-                spawner.api.create_namespaced_secret(NAMESPACE, secret_data)
+                spawner.api.create_namespaced_secret(SWAN_CONTAINER_NAMESPACE, secret_data)
         except ApiException as e:
             raise Exception("Could not create required user secret: %s\n" % e)
 
@@ -396,9 +442,8 @@ Configuration for JupyterHub - variables
 """
 
 # Get configuration parameters from environment variables
-NAMESPACE = os.environ.get('POD_NAMESPACE', 'default')
+SWAN_CONTAINER_NAMESPACE = os.environ.get('POD_NAMESPACE', 'default')
 SWAN_CONTAINER_NAME = 'notebook'
-SWAN_CONTAINER_NAMSPACE = 'swan'
 USER_TOKENS_SECRET_PREFIX = 'user-tokens-'
 USER_TOKENS_SECRET_KEY = 'eosToken'
 SPAWN_ERROR_MESSAGE = """SWAN could not start a session for your user, please try again. If the problem persists, please check:
@@ -472,6 +517,9 @@ c.SwanSpawner.volumes = [
         )
     ),
 ]
+
+# SwanKubeSpawner requires to add user to pwd
+c.JupyterHub.authenticator_class = CERNOAuthenticator
 
 # https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html
 c.SwanSpawner.modify_pod_hook = PodHookHandler.modify_pod_hook

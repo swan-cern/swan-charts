@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: swan-config
+  name: swan
 data:
 {{- if (.Files.Glob "files/jupyterhub_form.html") }}
 {{ (.Files.Glob "files/jupyterhub_form.html").AsConfig | indent 2 }}
@@ -9,26 +9,44 @@ data:
 {{- if (.Files.Glob "files/swan_config.py") }}
 {{ (.Files.Glob "files/swan_config.py").AsConfig | indent 2 }}
 {{- end }}
+{{- if (.Files.Glob "files/private/check_ticket.sh") }}
+{{ (.Files.Glob "files/private/check_ticket.sh").AsConfig | indent 2 }}
+{{- end }}
+{{- if (.Files.Glob "files/private/delete_ticket.sh") }}
+{{ (.Files.Glob "files/private/delete_ticket.sh").AsConfig | indent 2 }}
+{{- end }}
+{{- if (.Files.Glob "files/private/eos_token.sh") }}
+{{ (.Files.Glob "files/private/eos_token.sh").AsConfig | indent 2 }}
+{{- end }}
+{{- if (.Files.Glob "files/private/hadoop_token.sh") }}
+{{ (.Files.Glob "files/private/hadoop_token.sh").AsConfig | indent 2 }}
+{{- end }}
+{{- if (.Files.Glob "files/private/webhdfs_token.sh") }}
+{{ (.Files.Glob "files/private/webhdfs_token.sh").AsConfig | indent 2 }}
+{{- end }}
 ---
 apiVersion: v1
 kind: Secret
 type: Opaque
 metadata:
-  name: swan-secrets
+  name: swan
 data:
-{{- if (.Files.Glob "files/private/check_ticket.sh") }}
-{{ (.Files.Glob "files/private/check_ticket.sh").AsSecrets | indent 2 }}
+{{ if eq .Values.jupyterhub.hub.db.type "postgres" }}
+  db.password: {{ (required "PostgresDB password must be specified (helm --set jupyterhub.hub.db.password=<redacted> ..)!" .Values.jupyterhub.hub.db.password) | b64enc | quote }}
 {{- end }}
-{{- if (.Files.Glob "files/private/delete_ticket.sh") }}
-{{ (.Files.Glob "files/private/delete_ticket.sh").AsSecrets | indent 2 }}
-{{- end }}
-{{- if (.Files.Glob "files/private/eos_token.sh") }}
-{{ (.Files.Glob "files/private/eos_token.sh").AsSecrets | indent 2 }}
-{{- end }}
-{{- if (.Files.Glob "files/private/hadoop_token.sh") }}
-{{ (.Files.Glob "files/private/hadoop_token.sh").AsSecrets | indent 2 }}
-{{- end }}
-{{- if (.Files.Glob "files/private/webhdfs_token.sh") }}
-{{ (.Files.Glob "files/private/webhdfs_token.sh").AsSecrets | indent 2 }}
+{{ if eq .Values.jupyterhub.auth.type "custom" }}
+  oauth.client_secret: {{ (required "OAuth password must be specified (helm --set jupyterhub.auth.custom.config.client_secret=<redacted> ..)!" .Values.jupyterhub.auth.custom.config.client_secret) | b64enc | quote }}
 {{- end }}
 ---
+{{ if .Values.jupyterhub.ingress.enabled }}
+{{- range .Values.jupyterhub.ingress.tls }}
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/tls
+metadata:
+  name: {{ .secretName }}
+data:
+  tls.crt: {{ $.Values.jupyterhub.swan.ingress.cert | b64enc }}
+  tls.key: {{ $.Values.jupyterhub.swan.ingress.key | b64enc }}
+{{- end }}
+{{- end }}

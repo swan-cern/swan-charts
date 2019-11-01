@@ -44,15 +44,15 @@ Install in `kube-system` namespace (if not provided by openstack by default)
 
 ### Option 1: Deployment to Openstack K8s with JupyterHub Helm Chart
 
-This option uses upstream [JupyterHub Helm Chart](https://jupyterhub.github.io/helm-chart/)
+This option uses upstream JupyterHub Helm Chart `https://jupyterhub.github.io/helm-chart/`
 
-[SWAN Helm Chart](swan-upstream-chart/README.md)
+[Go to SWAN Helm Chart](swan-upstream-chart/README.md)
 
 ### Option 2: Deployment to Openstack K8s with ScienceBox Templates
 
-This option uses [ScienceBox Kuboxed](https://github.com/cernbox/kuboxed/blob/master/SWAN.yaml)
+This option uses ScienceBox Kuboxed `https://github.com/cernbox/kuboxed/blob/master/SWAN.yaml`
 
-[ScienceBox Templates](swan-sciencebox/README.md)
+[Go to ScienceBox Templates](swan-sciencebox/README.md)
 
 ### Useful commands
 

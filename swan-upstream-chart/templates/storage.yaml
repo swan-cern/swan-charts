@@ -18,7 +18,7 @@ spec:
       storage: 1Gi
   storageClassName: csi-cvmfs-swan-sft-cern-ch
 ---
-{{ if .Values.swan.cvmfs.prefetcher.enable }}
+{{ if .Values.jupyterhub.cvmfs.prefetcher.enable }}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
