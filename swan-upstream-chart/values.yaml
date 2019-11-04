@@ -139,6 +139,18 @@ jupyterhub:
       enabled: true
     continuous:
       enabled: false
-  cvmfs:
-    prefetcher:
-      enable: true
+  custom:
+    # all swan custom helm values
+    cvmfs:
+      repositories:
+        - sft.cern.ch
+        - sft-nightlies.cern.ch
+        - cms.cern.ch
+        - atlas.cern.ch
+        - lhcb.cern.ch
+        - compass.cern.ch
+      prefetcher:
+        image:
+          name: gitlab-registry.cern.ch/swan/docker-images/cvmfs-prefetcher
+          tag: v1.0
+        enable: true

@@ -1,24 +1,50 @@
+{{ range .Values.jupyterhub.custom.cvmfs.repositories }}
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: csi-cvmfs-swan-sft-cern-ch
+  name: cvmfs-{{ . | replace "." "-" }}
 provisioner: csi-cvmfsplugin
 parameters:
-  repository: sft.cern.ch
+  repository: {{ . }}
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: cvmfs-sft-cern-ch-pvc
+  name: cvmfs-{{ . | replace "." "-" }}-pvc
 spec:
   accessModes:
   - ReadOnlyMany
   resources:
     requests:
       storage: 1Gi
-  storageClassName: csi-cvmfs-swan-sft-cern-ch
+  storageClassName: cvmfs-{{ . | replace "." "-" }}
 ---
-{{ if .Values.jupyterhub.cvmfs.prefetcher.enable }}
+{{ end }}
+{{ if .Values.jupyterhub.custom.cvmfs.prefetcher.enable }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cvmfs-prefetcher-config
+data:
+  cvmfs_prefetch_modules.sh: |-
+    #!/bin/bash
+
+    while true; do
+        source /cvmfs/sft.cern.ch/lcg/views/LCG_96/x86_64-centos7-gcc8-opt/setup.sh && ( timeout 10s python -m ipykernel > /dev/null 2>&1 || true )
+        if [ $? -ne 0 ]; then
+            echo "Getting ipykernel failed"
+        fi
+
+        source /cvmfs/sft.cern.ch/lcg/views/LCG_96/x86_64-centos7-gcc8-opt/setup.sh && ( timeout 20s python -m JupyROOT.kernel.rootkernel > /dev/null 2>&1 || true )
+        if [ $? -ne 0 ]; then
+            echo "Getting JupyROOT.kernel.rootkernel failed"
+        fi
+
+        sleep 15m
+    done
+
+    exit 1
+---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -38,14 +64,28 @@ spec:
     spec:
       terminationGracePeriodSeconds: 0
       volumes:
-      - name: cvmfs-sft-cern-ch
+      {{ range .Values.jupyterhub.custom.cvmfs.repositories }}
+      - name: cvmfs-{{ . | replace "." "-" }}
         persistentVolumeClaim:
-          claimName: cvmfs-sft-cern-ch-pvc
+          claimName: cvmfs-{{ . | replace "." "-" }}-pvc
+      {{ end }}
+      - name: cvmfs-prefetcher-config
+        configMap:
+          name: cvmfs-prefetcher-config
+          items:
+          - key: cvmfs_prefetch_modules.sh
+            path: cvmfs_prefetch_modules.sh
+          defaultMode: 356 # 0544 perm
       containers:
       - name: cvmfs-puller
-        image: gitlab-registry.cern.ch/db/spark-service/docker-registry/cvmfs-prefetcher:latest
-        imagePullPolicy: 'Always'
+        image: {{ .Values.jupyterhub.custom.cvmfs.prefetcher.image.name }}:{{ .Values.jupyterhub.custom.cvmfs.prefetcher.image.tag }}
+        imagePullPolicy: 'IfNotPresent'
         volumeMounts:
-          - name: cvmfs-sft-cern-ch
-            mountPath: /cvmfs/sft.cern.ch
+          {{ range .Values.jupyterhub.custom.cvmfs.repositories }}
+          - name: cvmfs-{{ . | replace "." "-" }}
+            mountPath: /cvmfs/{{ . }}
+          {{ end }}
+          - name: cvmfs-prefetcher-config
+            mountPath: /etc/cvmfs-prefetcher/cvmfs_prefetch_modules.sh
+            subPath: cvmfs_prefetch_modules.sh
 {{ end }}
