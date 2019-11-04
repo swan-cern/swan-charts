@@ -492,6 +492,12 @@ c.JupyterHub.services = [
 c.SwanSpawner.http_timeout = 45
 c.SwanSpawner.start_timeout = 60
 c.SwanSpawner.consecutive_failure_limit = 0
+
+
+# SwanKubeSpawner requires to add user to pwd after authentication
+c.JupyterHub.authenticator_class = CERNOAuthenticator
+c.Authenticator.enable_auth_state = True
+
 """
 Configuration for Jupyter Notebook - general
 """
@@ -499,18 +505,20 @@ Configuration for Jupyter Notebook - general
 c.SwanSpawner.spark_ports_per_pod = 6
 c.SwanSpawner.cmd = None
 
+# https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html
+c.SwanSpawner.modify_pod_hook = PodHookHandler.modify_pod_hook
+
+"""
+Configuration for Jupyter Notebook - storage available to the user
+"""
+
+# add EOS home
 c.SwanSpawner.volume_mounts = [
     client.V1VolumeMount(
         name='eos',
         mount_path='/eos',
     ),
-    client.V1VolumeMount(
-        name='cvmfs-sft-cern-ch',
-        mount_path='/cvmfs/sft.cern.ch',
-        read_only=True
-    )
 ]
-
 c.SwanSpawner.volumes = [
     client.V1Volume(
         name='eos',
@@ -518,17 +526,24 @@ c.SwanSpawner.volumes = [
             path='/var/eos'
         )
     ),
-    client.V1Volume(
-        name='cvmfs-sft-cern-ch',
-        persistent_volume_claim=client.V1PersistentVolumeClaimVolumeSource(
-            claim_name='cvmfs-sft-cern-ch-pvc'
-        )
-    ),
 ]
 
-# SwanKubeSpawner requires to add user to pwd
-c.JupyterHub.authenticator_class = CERNOAuthenticator
-c.Authenticator.enable_auth_state = True
-
-# https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html
-c.SwanSpawner.modify_pod_hook = PodHookHandler.modify_pod_hook
+# add CVMFS
+cvmfs_repos = get_config('custom.cvmfs.repositories', [])
+for cvmfs_repo_path in cvmfs_repos:
+    cvmfs_repo_id = cvmfs_repo_path.replace('.', '-')
+    c.SwanSpawner.volumes.append(
+        client.V1Volume(
+            name='cvmfs-'+cvmfs_repo_id,
+            persistent_volume_claim=client.V1PersistentVolumeClaimVolumeSource(
+                claim_name='cvmfs-'+cvmfs_repo_id+'-pvc'
+            )
+        )
+    )
+    c.SwanSpawner.volume_mounts.append(
+        client.V1VolumeMount(
+            name='cvmfs-'+cvmfs_repo_id,
+            mount_path='/cvmfs/'+cvmfs_repo_path,
+            read_only=True
+        )
+    )

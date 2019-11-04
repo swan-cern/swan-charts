@@ -33,13 +33,13 @@ metadata:
 data:
 {{ if eq .Values.jupyterhub.hub.db.type "postgres" }}
   db.password: {{ (required "PostgresDB password must be specified (helm --set jupyterhub.hub.db.password=<redacted> ..)!" .Values.jupyterhub.hub.db.password) | b64enc | quote }}
-{{- end }}
+{{ end }}
 {{ if eq .Values.jupyterhub.auth.type "custom" }}
   oauth.client_secret: {{ (required "OAuth password must be specified (helm --set jupyterhub.auth.custom.config.client_secret=<redacted> ..)!" .Values.jupyterhub.auth.custom.config.client_secret) | b64enc | quote }}
-{{- end }}
+{{ end }}
 ---
 {{ if .Values.jupyterhub.ingress.enabled }}
-{{- range .Values.jupyterhub.ingress.tls }}
+{{ range .Values.jupyterhub.ingress.tls }}
 apiVersion: v1
 kind: Secret
 type: kubernetes.io/tls
@@ -48,5 +48,5 @@ metadata:
 data:
   tls.crt: {{ $.Values.jupyterhub.swan.ingress.cert | b64enc }}
   tls.key: {{ $.Values.jupyterhub.swan.ingress.key | b64enc }}
-{{- end }}
-{{- end }}
+{{ end }}
+{{ end }}
