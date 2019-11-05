@@ -9,6 +9,8 @@ jupyterhub:
       tag: v5.1.1
     cloudMetadata:
       enabled: true
+    networkPolicy:
+      enabled: false
   ingress:
     enabled: true
     annotations:
@@ -98,6 +100,11 @@ jupyterhub:
       type: postgres
       url: postgres+psycopg2://swanjh@dbod-jupyterhub.cern.ch:6602/swanjh
     cookieSecret: ca4ac8ac414707020a7db74341eaf25de01f6d0bd73f4ceb9d2a197f1e3b9f32
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/path: /hub/metrics
+    networkPolicy:
+      enabled: false
   auth:
     type: custom
     admin:
