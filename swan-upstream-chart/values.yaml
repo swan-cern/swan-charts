@@ -39,6 +39,12 @@ jupyterhub:
       OAUTH_CALLBACK_URL: https://swan-k8s.cern.ch/hub/oauth_callback
       JUPYTERHUB_CRYPT_KEY: 34639d457a10b13a99a653728ad6a146bdca66ad7e5519a595a8d8521e945031
     extraVolumeMounts:
+      - name: swan-secrets
+        mountPath: /srv/jupyterhub/private/eos.keytab
+        subPath: eos.keytab
+      - name: swan-secret-scripts
+        mountPath: /srv/jupyterhub/private/eos_token.sh
+        subPath: eos_token.sh
       - name: swan-jh
         mountPath: /srv/jupyterhub/jupyterhub_form.html
         subPath: jupyterhub_form.html
@@ -51,9 +57,6 @@ jupyterhub:
       - name: swan-scripts
         mountPath: /srv/jupyterhub/culler/delete_ticket.sh
         subPath: delete_ticket.sh
-      - name: swan-scripts
-        mountPath: /srv/jupyterhub/private/eos_token.sh
-        subPath: eos_token.sh
       - name: swan-scripts
         mountPath: /srv/jupyterhub/private/hadoop_token.sh
         subPath: hadoop_token.sh
@@ -82,17 +85,24 @@ jupyterhub:
             path: check_ticket.sh
           - key: delete_ticket.sh
             path: delete_ticket.sh
-          - key: eos_token.sh
-            path: eos_token.sh
           - key: hadoop_token.sh
             path: hadoop_token.sh
           - key: webhdfs_token.sh
             path: webhdfs_token.sh
           defaultMode: 356 # 0544 perm
-      #- name: swan-secrets
-      #  secret:
-      #    secretName: swan-secrets
-      #    items:
+      - name: swan-secret-scripts
+        secret:
+          secretName: swan
+          items:
+          - key: eos_token.sh
+            path: eos_token.sh
+          defaultMode: 356 # 0544 perm
+      - name: swan-secrets
+        secret:
+          secretName: swan
+          items:
+          - key: eos.keytab
+            path: eos.keytab
     extraConfig:
       swanConf: |
         exec(open('/srv/jupyterhub/swan_config.py').read())

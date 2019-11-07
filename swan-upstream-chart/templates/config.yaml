@@ -15,9 +15,6 @@ data:
 {{- if (.Files.Glob "files/private/delete_ticket.sh") }}
 {{ (.Files.Glob "files/private/delete_ticket.sh").AsConfig | indent 2 }}
 {{- end }}
-{{- if (.Files.Glob "files/private/eos_token.sh") }}
-{{ (.Files.Glob "files/private/eos_token.sh").AsConfig | indent 2 }}
-{{- end }}
 {{- if (.Files.Glob "files/private/hadoop_token.sh") }}
 {{ (.Files.Glob "files/private/hadoop_token.sh").AsConfig | indent 2 }}
 {{- end }}
@@ -37,6 +34,8 @@ data:
 {{ if eq .Values.jupyterhub.auth.type "custom" }}
   oauth.client_secret: {{ (required "OAuth password must be specified (helm --set jupyterhub.auth.custom.config.client_secret=<redacted> ..)!" .Values.jupyterhub.auth.custom.config.client_secret) | b64enc | quote }}
 {{ end }}
+  eos.keytab: {{ (required "helm --set swan.secrets.eos.keytab=$(base64 -w0 <path>)" .Values.swan.secrets.eos.keytab) }}
+  eos_token.sh: {{ (required "helm --set-file swan.secrets.eos.script=<path>" .Values.swan.secrets.eos.script) | b64enc }}
 ---
 {{ if .Values.jupyterhub.ingress.enabled }}
 {{ range .Values.jupyterhub.ingress.tls }}
@@ -46,7 +45,7 @@ type: kubernetes.io/tls
 metadata:
   name: {{ .secretName }}
 data:
-  tls.crt: {{ $.Values.jupyterhub.swan.ingress.cert | b64enc }}
-  tls.key: {{ $.Values.jupyterhub.swan.ingress.key | b64enc }}
+  tls.crt: {{ (required "helm --set-file swan.secrets.ingress.cert=<path>" $.Values.swan.secrets.ingress.cert) | b64enc }}
+  tls.key: {{ (required "helm --set-file swan.secrets.ingress.key=<path>" $.Values.swan.secrets.ingress.key) | b64enc }}
 {{ end }}
 {{ end }}

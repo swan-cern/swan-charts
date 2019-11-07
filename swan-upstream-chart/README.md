@@ -18,9 +18,10 @@ Install Prod SWAN (`https://swan-k8s.cern.ch` and login with cern oauth)
 $ helm upgrade --install --namespace swan --recreate-pods \
 --set jupyterhub.hub.db.password=redacted \
 --set jupyterhub.auth.custom.config.client_secret=redacted \
---set-file jupyterhub.swan.ingress.cert=path-to-cert.pem \
---set-file jupyterhub.swan.ingress.key=path-to-key.pem \
+--set-file swan.secrets.ingress.cert=path \
+--set-file swan.secrets.ingress.key=path \
+--set-file swan.secrets.eos.script=path \
+--set swan.secrets.eos.keytab=$(base64 -w0 path) \
 --set jupyterhub.debug.enabled=true \
 swan swan-upstream-chart-0.0.1.tgz
 ```
-
