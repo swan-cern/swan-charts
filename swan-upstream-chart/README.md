@@ -15,13 +15,76 @@ $ helm package swan-upstream-chart
 Install Prod SWAN (`https://swan-k8s.cern.ch` and login with cern oauth)
 
 ```bash
-$ helm upgrade --install --namespace swan --recreate-pods \
+$ helm upgrade --install --namespace swan \
 --set jupyterhub.hub.db.password=redacted \
 --set jupyterhub.auth.custom.config.client_secret=redacted \
 --set-file swan.secrets.ingress.cert=path \
 --set-file swan.secrets.ingress.key=path \
+--set-file swan.secrets.hadoop.script=path \
 --set-file swan.secrets.eos.script=path \
---set swan.secrets.eos.keytab=$(base64 -w0 path) \
---set jupyterhub.debug.enabled=true \
+--set swan.secrets.hadoop.cred="$(base64 -w0 path)" \
+--set swan.secrets.eos.cred="$(base64 -w0 path)" \
 swan swan-upstream-chart-0.0.1.tgz
+```
+
+Install Developer SWAN (`https://swan-k8s-dev01.cern.ch` and login with cern oauth)
+
+```bash
+# Create authentication token for eos and spark
+# It will be mounted to `/srv/jupyterhub/private/eos.cred` and `/srv/jupyterhub/private/hadoop.cred`
+ 
+$ kinit <username>@CERN.CH -c krb5cc
+```
+```bash
+# Create script that gets krb5cc and prints its contents
+ 
+$ cat << 'EOF' > eos_token.sh
+#!/bin/bash
+USER=$1
+if [[ ! -f "/srv/jupyterhub/private/eos.cred" ]]; then
+    exit 1;
+fi
+id -u "$USER" > /dev/null 2>&1
+if [[ $? -ne 0 ]]; then
+    exit 1;
+fi
+echo $(cat /srv/jupyterhub/private/eos.cred | base64 -w 0)
+EOF
+```
+```bash
+# Create script that gets krb5cc and prints its contents
+ 
+$ cat << 'EOF' > hadoop_token.sh
+#!/bin/bash
+CLUSTER=$1
+USER=$2
+if [[ ! -f "/srv/jupyterhub/private/hadoop.cred" ]]; then
+    exit 1;
+fi
+id -u "$USER" > /dev/null 2>&1
+if [[ $? -ne 0 ]]; then
+    exit 1;
+fi
+echo $(cat /srv/jupyterhub/private/hadoop.cred | base64 -w 0)
+EOF
+```
+```bash
+# Install development swan authenticated as <username>
+ 
+$ helm upgrade --install --namespace swandev01 --recreate-pods \
+--set jupyterhub.hub.db.type=sqlite-memory \
+--set jupyterhub.ingress.hosts={swan-k8s-dev01.cern.ch} \
+--set jupyterhub.hub.extraEnv.OAUTH_CALLBACK_URL=https://swan-k8s-dev01.cern.ch/hub/oauth_callback \
+--set jupyterhub.auth.custom.config.client_id=swan-k8s-dev01.cern.ch \
+--set jupyterhub.auth.custom.config.client_secret=redacted \
+--set jupyterhub.custom.cvmfs.prefetcher.enable=false \
+--set jupyterhub.prePuller.hook.enabled=false \
+--set jupyterhub.debug.enabled=true \
+--set-file swan.secrets.ingress.cert=hostcert.pem \
+--set-file swan.secrets.ingress.key=hostkey.pem \
+--set-file swan.secrets.hadoop.script=hadoop_token.sh \
+--set-file swan.secrets.eos.script=eos_token.sh \
+--set swan.secrets.hadoop.cred="$(base64 -w0 krb5cc)" \
+--set swan.secrets.eos.cred="$(base64 -w0 krb5cc)" \
+swandev01 swan-upstream-chart-0.0.1.tgz
 ```

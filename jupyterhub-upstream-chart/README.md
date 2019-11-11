@@ -11,14 +11,12 @@ proxy:
   service:
     type: NodePort
     nodePorts:
-      # accessible at <any-node>:31080
-      http: 32080
-      https: 32443
+      http: 30080
   secretToken: 9840739268135b56fc340d5c8b4b5962c489479eecfd0e1e7b6bbb108697b90a
 singleuser:
   uid: 0
   fsGid: 0
-  startTimeout: 60
+  startTimeout: 90
   storage:
     type: none
   cloudMetadata:
@@ -58,7 +56,7 @@ scheduling:
     enabled: false
 prePuller:
   hook:
-    enabled: true
+    enabled: false
   continuous:
     enabled: false
 EOF
@@ -73,5 +71,5 @@ helm upgrade --install --namespace jhub --values values.yaml --version=0.8.2 --r
 Access swan at cluster NodePort and login as `<username>:test`
 
 ```bash
-http://<any-cluster-node-ip>:32080
+http://<any-cluster-node-ip>:30080
 ```

@@ -293,24 +293,19 @@ class PodHookHandler:
                     value="/scratch/%s" % (username)
                 )
             )
-            #raise ValueError("Could not create required user credential: %s\n" % e)
+            raise ValueError("Could not create required user credential")
 
         cluster = spawner.get_spark_cluster()
         if cluster != 'none':
             try:
                 # Retrieve hdfs token for user
+                # FIXME: for now not used
                 hadoop_token_base64 = subprocess.check_output(
                     ['sudo', '/srv/jupyterhub/private/hadoop_token.sh', cluster, username], timeout=60
                 ).decode('ascii')
-
-                # Retrieve hdfs token for user
-                webhdfs_token_base64 = subprocess.check_output(
-                    ['sudo', '/srv/jupyterhub/private/webhdfs_token.sh', cluster, username], timeout=60
-                ).decode('ascii')
             except Exception as e:
                 # if no access, all good for now
-                #raise ValueError("Could not get spark tokens: %s\n" % e)
-                pass
+                raise ValueError("Could not get spark tokens")
 
         # Create V1Secret with eos token
         try:
@@ -346,7 +341,7 @@ class PodHookHandler:
                         client.V1KeyToPath(
                             key=USER_TOKENS_SECRET_KEY,
                             path='krb5cc'
-                        )
+                        ),
                     ]
                 )
             )
@@ -492,6 +487,9 @@ c.JupyterHub.services = [
 c.SwanSpawner.http_timeout = 45
 c.SwanSpawner.start_timeout = 60
 c.SwanSpawner.consecutive_failure_limit = 0
+c.JupyterHub.tornado_settings = {
+    'slow_spawn_timeout': 15
+}
 
 
 # SwanKubeSpawner requires to add user to pwd after authentication

@@ -39,11 +39,17 @@ jupyterhub:
       JUPYTERHUB_CRYPT_KEY: 34639d457a10b13a99a653728ad6a146bdca66ad7e5519a595a8d8521e945031
     extraVolumeMounts:
       - name: swan-secrets
-        mountPath: /srv/jupyterhub/private/eos.keytab
-        subPath: eos.keytab
+        mountPath: /srv/jupyterhub/private/eos.cred
+        subPath: eos.cred
+      - name: swan-secrets
+        mountPath: /srv/jupyterhub/private/hadoop.cred
+        subPath: hadoop.cred
       - name: swan-secret-scripts
         mountPath: /srv/jupyterhub/private/eos_token.sh
         subPath: eos_token.sh
+      - name: swan-secret-scripts
+        mountPath: /srv/jupyterhub/private/hadoop_token.sh
+        subPath: hadoop_token.sh
       - name: swan-jh
         mountPath: /srv/jupyterhub/jupyterhub_form.html
         subPath: jupyterhub_form.html
@@ -56,12 +62,6 @@ jupyterhub:
       - name: swan-scripts
         mountPath: /srv/jupyterhub/culler/delete_ticket.sh
         subPath: delete_ticket.sh
-      - name: swan-scripts
-        mountPath: /srv/jupyterhub/private/hadoop_token.sh
-        subPath: hadoop_token.sh
-      - name: swan-scripts
-        mountPath: /srv/jupyterhub/private/webhdfs_token.sh
-        subPath: webhdfs_token.sh
       - name: cvmfs-sft-cern-ch
         mountPath: /cvmfs/sft.cern.ch
     extraVolumes:
@@ -84,15 +84,13 @@ jupyterhub:
             path: check_ticket.sh
           - key: delete_ticket.sh
             path: delete_ticket.sh
-          - key: hadoop_token.sh
-            path: hadoop_token.sh
-          - key: webhdfs_token.sh
-            path: webhdfs_token.sh
           defaultMode: 356 # 0544 perm
       - name: swan-secret-scripts
         secret:
           secretName: swan
           items:
+          - key: hadoop_token.sh
+            path: hadoop_token.sh
           - key: eos_token.sh
             path: eos_token.sh
           defaultMode: 356 # 0544 perm
@@ -100,8 +98,10 @@ jupyterhub:
         secret:
           secretName: swan
           items:
-          - key: eos.keytab
-            path: eos.keytab
+          - key: eos.cred
+            path: eos.cred
+          - key: hadoop.cred
+            path: hadoop.cred
     extraConfig:
       swanConf: |
         exec(open('/srv/jupyterhub/swan_config.py').read())
@@ -155,6 +155,8 @@ jupyterhub:
       enabled: true
     continuous:
       enabled: false
+  debug:
+    enabled: true
   custom:
     # all swan custom helm values
     cvmfs:

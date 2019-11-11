@@ -4,10 +4,13 @@
 # 1) username for which to check ticket
 USER=$1
 
+TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+USER_TOKENS_SECRET_NAMESPACE=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
+
 USER_TOKENS_SECRET_NAMESPACE="swan"
 USER_TOKENS_SECRET_PREFIX='user-tokens-'
 USER_TOKENS_SECRET_KEY='eosToken'
-TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+
 SECRET_NAME="${USER_TOKENS_SECRET_PREFIX}${USER}"
 
 # Delete user secret
