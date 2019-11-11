@@ -2,6 +2,7 @@ kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: swan
+  namespace: {{ .Release.Namespace }}
 rules:
   - apiGroups: [""]       # "" indicates the core API group
     resources: ["secrets", "services"]
@@ -11,6 +12,7 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: swan
+  namespace: {{ .Release.Namespace }}
 subjects:
   - kind: ServiceAccount
     name: hub

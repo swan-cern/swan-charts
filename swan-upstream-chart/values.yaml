@@ -21,7 +21,6 @@ jupyterhub:
       - secretName: swan-tls-cert
     hosts:
       - swan-k8s.cern.ch
-    enabled: true
   proxy:
     service:
       type: ClusterIP

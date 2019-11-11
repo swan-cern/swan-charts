@@ -2,6 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: swan
+  namespace: {{ .Release.Namespace }}
 data:
 {{- if (.Files.Glob "files/jupyterhub_form.html") }}
 {{ (.Files.Glob "files/jupyterhub_form.html").AsConfig | indent 2 }}
@@ -27,6 +28,7 @@ kind: Secret
 type: Opaque
 metadata:
   name: swan
+  namespace: {{ .Release.Namespace }}
 data:
 {{ if eq .Values.jupyterhub.hub.db.type "postgres" }}
   db.password: {{ (required "PostgresDB password must be specified (helm --set jupyterhub.hub.db.password=<redacted> ..)!" .Values.jupyterhub.hub.db.password) | b64enc | quote }}
@@ -44,6 +46,7 @@ kind: Secret
 type: kubernetes.io/tls
 metadata:
   name: {{ .secretName }}
+  namespace: {{ .Release.Namespace }}
 data:
   tls.crt: {{ (required "helm --set-file swan.secrets.ingress.cert=<path>" $.Values.swan.secrets.ingress.cert) | b64enc }}
   tls.key: {{ (required "helm --set-file swan.secrets.ingress.key=<path>" $.Values.swan.secrets.ingress.key) | b64enc }}

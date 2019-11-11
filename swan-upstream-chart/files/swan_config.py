@@ -495,8 +495,10 @@ c.SwanSpawner.consecutive_failure_limit = 0
 
 
 # SwanKubeSpawner requires to add user to pwd after authentication
-c.JupyterHub.authenticator_class = CERNOAuthenticator
-c.Authenticator.enable_auth_state = True
+auth_type = get_config('auth.type', None)
+if auth_type == 'custom':
+    c.JupyterHub.authenticator_class = CERNOAuthenticator
+    c.Authenticator.enable_auth_state = True
 
 """
 Configuration for Jupyter Notebook - general
