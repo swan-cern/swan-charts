@@ -367,10 +367,6 @@ class PodHookHandler:
                             key='hadoopToken',
                             path='hadoop.toks'
                         ),
-                        client.V1KeyToPath(
-                            key='webhdfsToken',
-                            path='hadoop.toks'
-                        ),
                     ]
                 )
             )
@@ -447,7 +443,7 @@ class PodHookHandler:
                 name='WEBHDFS_TOKEN',
                 value_from=client.V1EnvVarSource(
                     secret_key_ref=client.V1SecretKeySelector(
-                        key='webhdfsToken', 
+                        key='webhdfsToken',
                         name=user_tokens_secret
                     )
                 )
