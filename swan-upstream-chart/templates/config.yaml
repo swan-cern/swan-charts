@@ -33,6 +33,7 @@ data:
   eos.cred: {{ (required "helm --set swan.secrets.eos.cred=$(base64 -w0 <path>)" .Values.swan.secrets.eos.cred) }}
   hadoop.cred: {{ (required "helm --set swan.secrets.hadoop.cred=$(base64 -w0 <path>)" .Values.swan.secrets.hadoop.cred) }}
   hadoop_token.sh: {{ (required "helm --set-file swan.secrets.hadoop.script=<path>" .Values.swan.secrets.hadoop.script) | b64enc }}
+  webhdfs_token.sh: {{ (required "helm --set-file swan.secrets.webhdfs.script=<path>" .Values.swan.secrets.webhdfs.script) | b64enc }}
   eos_token.sh: {{ (required "helm --set-file swan.secrets.eos.script=<path>" .Values.swan.secrets.eos.script) | b64enc }}
 ---
 {{ if .Values.jupyterhub.ingress.enabled }}

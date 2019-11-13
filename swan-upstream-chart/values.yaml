@@ -39,10 +39,10 @@ jupyterhub:
       JUPYTERHUB_CRYPT_KEY: 34639d457a10b13a99a653728ad6a146bdca66ad7e5519a595a8d8521e945031
     extraVolumeMounts:
       - name: swan-secrets
-        mountPath: /srv/jupyterhub/private/eos.cred
+        mountPath: /srv/jupyterhub/private/eos.keytab
         subPath: eos.cred
       - name: swan-secrets
-        mountPath: /srv/jupyterhub/private/hadoop.cred
+        mountPath: /srv/jupyterhub/private/hadoop.keytab
         subPath: hadoop.cred
       - name: swan-secret-scripts
         mountPath: /srv/jupyterhub/private/eos_token.sh
@@ -50,6 +50,9 @@ jupyterhub:
       - name: swan-secret-scripts
         mountPath: /srv/jupyterhub/private/hadoop_token.sh
         subPath: hadoop_token.sh
+      - name: swan-secret-scripts
+        mountPath: /srv/jupyterhub/private/webhdfs_token.sh
+        subPath: webhdfs_token.sh
       - name: swan-jh
         mountPath: /srv/jupyterhub/jupyterhub_form.html
         subPath: jupyterhub_form.html
@@ -91,6 +94,8 @@ jupyterhub:
           items:
           - key: hadoop_token.sh
             path: hadoop_token.sh
+          - key: webhdfs_token.sh
+            path: webhdfs_token.sh
           - key: eos_token.sh
             path: eos_token.sh
           defaultMode: 356 # 0544 perm
