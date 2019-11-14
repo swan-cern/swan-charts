@@ -5,8 +5,8 @@ jupyterhub:
     storage:
       type: none
     image:
-      name: gitlab-registry.cern.ch/swan/docker-images/systemuser
-      tag: swandb
+      name: "gitlab-registry.cern.ch/swan/docker-images/systemuser"
+      tag: "swandb"
     cloudMetadata:
       enabled: true
     networkPolicy:
@@ -25,13 +25,31 @@ jupyterhub:
     service:
       type: ClusterIP
     secretToken: 9840739268135b56fc340d5c8b4b5962c489479eecfd0e1e7b6bbb108697b90a
+    chp:
+      image:
+        name: "jupyterhub/configurable-http-proxy"
+        tag: "4.2.0"
+        pullPolicy: IfNotPresent
+      resources:
+        requests:
+          cpu: 200m
+          memory: 512Mi
   hub:
     uid: 0
     fsGid: 0
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+    livenessProbe:
+      enabled: false
+    readinessProbe:
+      enabled: false
+    allowNamedServers: false
     image:
-      # WARN: pull policy Always not possible, remember always about new tag
       name: "gitlab-registry.cern.ch/db/spark-service/docker-registry/jupyterhub"
-      tag: "101019"
+      tag: "v0.9.6-cern1"
+      pullPolicy: "IfNotPresent"
     extraEnv:
       OAUTH2_AUTHORIZE_URL: https://oauth.web.cern.ch/OAuth/Authorize
       OAUTH2_TOKEN_URL: https://oauth.web.cern.ch/OAuth/Token
@@ -179,6 +197,6 @@ jupyterhub:
         - compass.cern.ch
       prefetcher:
         image:
-          name: gitlab-registry.cern.ch/swan/docker-images/cvmfs-prefetcher
-          tag: v1.0
+          name: "gitlab-registry.cern.ch/swan/docker-images/cvmfs-prefetcher"
+          tag: "v1.0"
         enable: true

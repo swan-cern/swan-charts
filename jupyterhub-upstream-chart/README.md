@@ -38,6 +38,7 @@ hub:
   fsGid: 0
   db:
     type: sqlite-memory
+  allowNamedServers: true
   extraConfig:
     myConfig: |
       c.Spawner.args = ['--allow-root']
@@ -65,7 +66,9 @@ EOF
 Install Upstream JupyterHub with all required settings
 
 ```bash
-helm upgrade --install --namespace jhub --values values.yaml --version=0.8.2 --recreate-pods jhub jupyterhub/jupyterhub
+helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
+helm repo update
+helm upgrade --install --namespace jhub --values values.yaml --version=0.9.0-alpha.1.022.59437a5 jhub jupyterhub/jupyterhub
 ```
 
 Access swan at cluster NodePort and login as `<username>:test`

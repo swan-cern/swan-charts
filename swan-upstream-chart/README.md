@@ -21,6 +21,7 @@ $ helm package swan-upstream-chart
 
 ```bash
 $ helm upgrade --install --namespace swan \
+--set jupyterhub.hub.annotations.version="release-$(date +%s)" \
 --set jupyterhub.hub.db.password=redacted \
 --set jupyterhub.auth.custom.config.client_secret=redacted \
 --set-file swan.secrets.ingress.cert=path \
@@ -64,20 +65,24 @@ $ cat << 'EOF' > hadoop_token.sh
 #!/bin/bash
 CLUSTER=$1
 USER=$2
-if [[ ! -f "/srv/jupyterhub/private/hadoop.cred" ]]; then
-    exit 1;
-fi
-id -u "$USER" > /dev/null 2>&1
-if [[ $? -ne 0 ]]; then
-    exit 1;
-fi
-echo $(cat /srv/jupyterhub/private/hadoop.cred | base64 -w 0)
+echo "dummytoken" | base64 -w 0
+EOF
+```
+```bash
+# Create script that returns dummy token
+ 
+$ cat << 'EOF' > webhdfs_token.sh
+#!/bin/bash
+CLUSTER=$1
+USER=$2
+echo "dummytoken" | base64 -w 0
 EOF
 ```
 ```bash
 # Install development swan authenticated as <username>
  
-$ helm upgrade --install --namespace swandev01 --recreate-pods \
+$ helm upgrade --install --namespace swandev01 \
+--set jupyterhub.hub.annotations.version="release-$(date +%s)" \
 --set jupyterhub.hub.db.type=sqlite-memory \
 --set jupyterhub.ingress.hosts={swan-k8s-dev01.cern.ch} \
 --set jupyterhub.hub.extraEnv.OAUTH_CALLBACK_URL=https://swan-k8s-dev01.cern.ch/hub/oauth_callback \
@@ -90,6 +95,7 @@ $ helm upgrade --install --namespace swandev01 --recreate-pods \
 --set-file swan.secrets.ingress.key=hostkey.pem \
 --set-file swan.secrets.hadoop.script=hadoop_token.sh \
 --set-file swan.secrets.eos.script=eos_token.sh \
+--set-file swan.secrets.webhdfs.script=webhdfs_token.sh \
 --set swan.secrets.hadoop.cred="$(base64 -w0 krb5cc)" \
 --set swan.secrets.eos.cred="$(base64 -w0 krb5cc)" \
 swandev01 swan-upstream-chart-0.0.1.tgz
