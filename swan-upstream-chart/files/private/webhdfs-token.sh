@@ -1,5 +1,5 @@
 #!/bin/bash
-# Located at [/srv/jupyterhub/private/get_hdfs_tokens.sh]
+# Located at [/srv/jupyterhub/private/webhdfs-token.sh]
 
 #Determine the active namenode, this is required as the webHDFS implementation doesn't redirect to active namenode
 function get_active_namenode {
@@ -41,7 +41,7 @@ USER=$2
 
 # Generate HDFS, YARN, HIVE tokens
 export KRB5CCNAME=$(mktemp /tmp/hswan.XXXXXXXXX)
-kinit -V -kt /srv/jupyterhub/private/hadoop.keytab hswan@CERN.CH -c $KRB5CCNAME >/dev/null 2>&1
+kinit -V -kt /srv/jupyterhub/private/hadoop.cred hswan@CERN.CH -c $KRB5CCNAME >/dev/null 2>&1
 
 # Generate web-hdfs tokens
 namenode=$(get_active_namenode $CLUSTER)
