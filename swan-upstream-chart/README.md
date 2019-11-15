@@ -1,4 +1,4 @@
-# Option 1: Deployment to Openstack K8s with HELM
+# Deployment of SWAN to Openstack K8s with HELM
 
 Prerequisite: build helm chart with required dependencies (`Chart.yaml`, `requirements.yaml` and `values.yaml` customized)
 - [jupyterhub spawner/handler customized for SWAN on branch swan_k8s](https://gitlab.cern.ch/swan/jupyterhub/tree/swan_k8s)
