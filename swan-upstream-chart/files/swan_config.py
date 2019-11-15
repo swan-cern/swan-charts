@@ -82,8 +82,18 @@ class PodHookHandler:
         pod_definition = PodHookHandler._init_resource_requirements(spawner, pod_definition)
         pod_definition = PodHookHandler._init_swan_container_env(spawner, pod_definition)
         pod_definition = PodHookHandler._init_swan_secrets(spawner, pod_definition)
+        # pod_definition = PodHookHandler._init_pod_affinity(spawner, pod_definition)
 
         return pod_definition
+
+    @staticmethod
+    def _init_pod_affinity(spawner, pod):
+        spec = client.V1PodSpec()
+        aff = client.V1Affinity()
+        aff.node_affinity
+        spec.affinity(aff)
+        return pod.spec(spec)
+
 
     @staticmethod
     def _init_swan_container_env(spawner, pod):
@@ -274,11 +284,13 @@ class PodHookHandler:
         Define cern related secrets for spark and eos
         """
         username = spawner.user.name
-        user_tokens_secret = USER_TOKENS_SECRET_PREFIX + username
+        user_tokens_secret = 'user-tokens-' + username
         notebook_container = PodHookHandler.__get_pod_container(pod, SWAN_CONTAINER_NAME)
         pod_shared_tokens_volume_name = 'user-secrets'
         pod_spec_containers = []
         eos_token_base64 = ''
+        hadoop_token_base64 = ''
+        webhdfs_token_base64 = ''
 
         try:
             # Retrieve eos token for user
@@ -298,14 +310,21 @@ class PodHookHandler:
         cluster = spawner.get_spark_cluster()
         if cluster != 'none':
             try:
-                # Retrieve hdfs token for user
-                # FIXME: for now not used
+                # Retrieve HDFS, YARN token for user
                 hadoop_token_base64 = subprocess.check_output(
                     ['sudo', '/srv/jupyterhub/private/hadoop_token.sh', cluster, username], timeout=60
                 ).decode('ascii')
             except Exception as e:
                 # if no access, all good for now
                 raise ValueError("Could not get spark tokens")
+            try:
+                # Retrieve hdfs token for user
+                webhdfs_token_base64 = subprocess.check_output(
+                    ['sudo', '/srv/jupyterhub/private/webhdfs_token.sh', cluster, username], timeout=60
+                ).decode('ascii')
+            except Exception as e:
+                # if no access, all good for now
+                raise ValueError("Could not get webhdfs tokens")
 
         # Create V1Secret with eos token
         try:
@@ -316,7 +335,9 @@ class PodHookHandler:
             secret_meta.namespace = SWAN_CONTAINER_NAMESPACE
             secret_data.metadata = secret_meta
             secret_data.data = {}
-            secret_data.data[USER_TOKENS_SECRET_KEY] = eos_token_base64
+            secret_data.data['eosToken'] = eos_token_base64
+            secret_data.data['hadoopToken'] = hadoop_token_base64
+            secret_data.data['webhdfsToken'] = webhdfs_token_base64
 
             try:
                 spawner.api.read_namespaced_secret(user_tokens_secret, SWAN_CONTAINER_NAMESPACE)
@@ -339,8 +360,12 @@ class PodHookHandler:
                     secret_name=user_tokens_secret,
                     items=[
                         client.V1KeyToPath(
-                            key=USER_TOKENS_SECRET_KEY,
+                            key='eosToken',
                             path='krb5cc'
+                        ),
+                        client.V1KeyToPath(
+                            key='hadoopToken',
+                            path='hadoop.toks'
                         ),
                     ]
                 )
@@ -367,6 +392,9 @@ class PodHookHandler:
                 image='cern/cc7-base:20181210',
                 command=['/bin/sh', '-c'],
                 args=[
+                    'cp /tokens-secret/hadoop.toks /tmp/hadoop.toks; ' +
+                    'chmod 400 /tmp/hadoop.toks; chown ' + user_id + ':' + user_gid + ' /tmp/hadoop.toks; ' +
+                    'mv /tmp/hadoop.toks /tokens/hadoop.toks; ' +
                     # in a loop - use mounted token secret, adjust permissions and move to /tokens pod volume
                     'while true; do ' +
                     'cp /tokens-secret/krb5cc /tmp/krb5cc; ' +
@@ -400,7 +428,26 @@ class PodHookHandler:
             client.V1EnvVar(
                 name='KRB5CCNAME',
                 value='/tokens/' + krb_token_name
-            )
+            ),
+        )
+        notebook_container.env = PodHookHandler.__append_or_replace_by_name(
+            notebook_container.env,
+            client.V1EnvVar(
+                name='HADOOP_TOKEN_FILE_LOCATION',
+                value='/tokens/hadoop.toks'
+            ),
+        )
+        notebook_container.env = PodHookHandler.__append_or_replace_by_name(
+            notebook_container.env,
+            client.V1EnvVar(
+                name='WEBHDFS_TOKEN',
+                value_from=client.V1EnvVarSource(
+                    secret_key_ref=client.V1SecretKeySelector(
+                        key='webhdfsToken',
+                        name=user_tokens_secret
+                    )
+                )
+            ),
         )
 
         # add the base containers after side container (to start after side container)
@@ -547,3 +594,4 @@ for cvmfs_repo_path in cvmfs_repos:
             read_only=True
         )
     )
+

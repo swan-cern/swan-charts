@@ -6,7 +6,7 @@ jupyterhub:
       type: none
     image:
       name: gitlab-registry.cern.ch/swan/docker-images/systemuser
-      tag: v5.1.1
+      tag: swandb
     cloudMetadata:
       enabled: true
     networkPolicy:
@@ -50,6 +50,9 @@ jupyterhub:
       - name: swan-secret-scripts
         mountPath: /srv/jupyterhub/private/hadoop_token.sh
         subPath: hadoop_token.sh
+      - name: swan-secret-scripts
+        mountPath: /srv/jupyterhub/private/webhdfs_token.sh
+        subPath: webhdfs_token.sh
       - name: swan-jh
         mountPath: /srv/jupyterhub/jupyterhub_form.html
         subPath: jupyterhub_form.html
@@ -91,6 +94,8 @@ jupyterhub:
           items:
           - key: hadoop_token.sh
             path: hadoop_token.sh
+          - key: webhdfs_token.sh
+            path: webhdfs_token.sh
           - key: eos_token.sh
             path: eos_token.sh
           defaultMode: 356 # 0544 perm
@@ -129,6 +134,11 @@ jupyterhub:
         - ekleszcz
         - rcastell
         - canali
+        - dalvesde
+        - ebocchi
+        - moscicki
+        - etejedor
+        - mato
     custom:
       className: oauthenticator.generic.GenericOAuthenticator
       config:
