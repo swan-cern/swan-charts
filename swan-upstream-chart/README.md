@@ -3,7 +3,12 @@
 Prerequisite: build helm chart with required dependencies (`Chart.yaml`, `requirements.yaml` and `values.yaml` customized)
 - [jupyterhub spawner/handler customized for SWAN on branch swan_k8s](https://gitlab.cern.ch/swan/jupyterhub/tree/swan_k8s)
 - [jupyterhub docker image on branch swan_k8s](https://gitlab.cern.ch/swan/docker-images/jupyterhub/tree/swan_k8s)
+- [system user image from this commit] (https://gitlab.cern.ch/swan/jupyter/commit/fc44790348c0ac9987dc204709160d4273b96fec)- 
 - `helm init --history-max 5 --service-account tiller`
+
+## K8s cluster creation, OAuth setup and Certificates
+
+(placeholder to add k8s creation instructions)
 
 Build chart dependency (optional) and package the chart
 
@@ -12,7 +17,7 @@ $ helm dependency build swan-upstream-chart
 $ helm package swan-upstream-chart
 ```
 
-Install Prod SWAN (`https://swan-k8s.cern.ch` and login with cern oauth)
+## Install Prod SWAN (`https://swan-k8s.cern.ch` and login with cern oauth)
 
 ```bash
 $ helm upgrade --install --namespace swan \
@@ -21,13 +26,14 @@ $ helm upgrade --install --namespace swan \
 --set-file swan.secrets.ingress.cert=path \
 --set-file swan.secrets.ingress.key=path \
 --set-file swan.secrets.hadoop.script=path \
+--set-file swan.secrets.webhdfs.script=path \
 --set-file swan.secrets.eos.script=path \
 --set swan.secrets.hadoop.cred="$(base64 -w0 path)" \
 --set swan.secrets.eos.cred="$(base64 -w0 path)" \
 swan swan-upstream-chart-0.0.1.tgz
 ```
 
-Install Developer SWAN (`https://swan-k8s-dev01.cern.ch` and login with cern oauth)
+## Install Developer SWAN (`https://swan-k8s-dev01.cern.ch` and login with cern oauth)
 
 ```bash
 # Create authentication token for eos and spark
