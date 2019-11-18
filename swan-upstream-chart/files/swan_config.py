@@ -544,6 +544,7 @@ auth_type = get_config('auth.type', None)
 if auth_type == 'custom':
     c.JupyterHub.authenticator_class = CERNOAuthenticator
     c.Authenticator.enable_auth_state = True
+    c.Authenticator.auto_login = True
 
 """
 Configuration for Jupyter Notebook - general
