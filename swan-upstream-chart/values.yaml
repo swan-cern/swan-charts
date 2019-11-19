@@ -47,9 +47,9 @@ jupyterhub:
       enabled: false
     allowNamedServers: false
     image:
-      name: "gitlab-registry.cern.ch/db/spark-service/docker-registry/jupyterhub"
-      tag: "v0.9.6-cern1"
-      pullPolicy: "IfNotPresent"
+      name: "gitlab-registry.cern.ch/swan/docker-images/jupyterhub"
+      tag: "swandb"
+      pullPolicy: "Always"
     extraEnv:
       OAUTH2_AUTHORIZE_URL: https://oauth.web.cern.ch/OAuth/Authorize
       OAUTH2_TOKEN_URL: https://oauth.web.cern.ch/OAuth/Token
@@ -62,6 +62,9 @@ jupyterhub:
       - name: swan-secrets
         mountPath: /srv/jupyterhub/private/hadoop.cred
         subPath: hadoop.cred
+      - name: swan-secrets
+        mountPath: /srv/jupyterhub/private/sparkk8s.cred
+        subPath: sparkk8s.cred
       - name: swan-secret-scripts
         mountPath: /srv/jupyterhub/private/eos_token.sh
         subPath: eos_token.sh
@@ -71,6 +74,9 @@ jupyterhub:
       - name: swan-secret-scripts
         mountPath: /srv/jupyterhub/private/webhdfs_token.sh
         subPath: webhdfs_token.sh
+      - name: swan-secret-scripts
+        mountPath: /srv/jupyterhub/private/sparkk8s_token.sh
+        subPath: sparkk8s_token.sh
       - name: swan-jh
         mountPath: /srv/jupyterhub/jupyterhub_form.html
         subPath: jupyterhub_form.html
@@ -116,6 +122,8 @@ jupyterhub:
             path: webhdfs_token.sh
           - key: eos_token.sh
             path: eos_token.sh
+          - key: sparkk8s_token.sh
+            path: sparkk8s_token.sh
           defaultMode: 356 # 0544 perm
       - name: swan-secrets
         secret:
@@ -125,6 +133,8 @@ jupyterhub:
             path: eos.cred
           - key: hadoop.cred
             path: hadoop.cred
+          - key: sparkk8s.cred
+            path: sparkk8s.cred
     extraConfig:
       swanConf: |
         exec(open('/srv/jupyterhub/swan_config.py').read())

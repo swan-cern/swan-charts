@@ -195,14 +195,24 @@ class PodHookHandler:
             spark_ports_label
         )
 
+        cluster = spawner.get_spark_cluster()
         # Add spark config env
-        notebook_container.env = PodHookHandler.__append_or_replace_by_name(
-            notebook_container.env,
-            client.V1EnvVar(
-                name='SPARK_CONFIG_SCRIPT',
-                value='/cvmfs/sft.cern.ch/lcg/etc/hadoop-confext/hadoop-swan-setconf.sh'
+        if cluster == 'k8s':
+            notebook_container.env = PodHookHandler.__append_or_replace_by_name(
+                notebook_container.env,
+                client.V1EnvVar(
+                    name='SPARK_CONFIG_SCRIPT',
+                    value='/cvmfs/sft.cern.ch/lcg/etc/hadoop-confext/k8s-swan-setconf.sh'
+                )
             )
-        )
+        else:
+            notebook_container.env = PodHookHandler.__append_or_replace_by_name(
+                notebook_container.env,
+                client.V1EnvVar(
+                    name='SPARK_CONFIG_SCRIPT',
+                    value='/cvmfs/sft.cern.ch/lcg/etc/hadoop-confext/hadoop-swan-setconf.sh'
+                )
+            )
 
         try:
             spark_ports_env = []
@@ -291,6 +301,7 @@ class PodHookHandler:
         eos_token_base64 = ''
         hadoop_token_base64 = ''
         webhdfs_token_base64 = ''
+        k8suser_config_base64 = ''
 
         try:
             # Retrieve eos token for user
@@ -308,7 +319,34 @@ class PodHookHandler:
             raise ValueError("Could not create required user credential")
 
         cluster = spawner.get_spark_cluster()
-        if cluster != 'none':
+
+        if cluster != 'none' and cluster == 'k8s':
+            hdfs_cluster = 'analytix'
+            try:
+                # Setup the user and generate user kube config
+                k8suser_config_base64 = subprocess.check_output(
+                    ['sudo', '/srv/jupyterhub/private/sparkk8s_token.sh', username], timeout=60
+                ).decode('ascii')
+            except Exception as e:
+                # if no access, all good for now
+                raise ValueError("Could not setup user on k8s")
+            try:
+                # Retrieve HDFS, YARN token for user
+                hadoop_token_base64 = subprocess.check_output(
+                    ['sudo', '/srv/jupyterhub/private/hadoop_token.sh', hdfs_cluster, username], timeout=60
+                ).decode('ascii')
+            except Exception as e:
+                # if no access, all good for now
+                raise ValueError("Could not get spark tokens")
+            try:
+                # Retrieve hdfs token for user
+                webhdfs_token_base64 = subprocess.check_output(
+                    ['sudo', '/srv/jupyterhub/private/webhdfs_token.sh', hdfs_cluster, username], timeout=60
+                ).decode('ascii')
+            except Exception as e:
+                # if no access, all good for now
+                raise ValueError("Could not get webhdfs tokens")
+        elif cluster != 'none':
             try:
                 # Retrieve HDFS, YARN token for user
                 hadoop_token_base64 = subprocess.check_output(
@@ -326,6 +364,7 @@ class PodHookHandler:
                 # if no access, all good for now
                 raise ValueError("Could not get webhdfs tokens")
 
+
         # Create V1Secret with eos token
         try:
             secret_data = client.V1Secret()
@@ -338,6 +377,7 @@ class PodHookHandler:
             secret_data.data['eosToken'] = eos_token_base64
             secret_data.data['hadoopToken'] = hadoop_token_base64
             secret_data.data['webhdfsToken'] = webhdfs_token_base64
+            secret_data.data['k8sToken'] = k8suser_config_base64
 
             try:
                 spawner.api.read_namespaced_secret(user_tokens_secret, SWAN_CONTAINER_NAMESPACE)
@@ -367,6 +407,10 @@ class PodHookHandler:
                             key='hadoopToken',
                             path='hadoop.toks'
                         ),
+                        client.V1KeyToPath(
+                            key='k8sToken',
+                            path='k8s-user.config'
+                        ),
                     ]
                 )
             )
@@ -395,6 +439,9 @@ class PodHookHandler:
                     'cp /tokens-secret/hadoop.toks /tmp/hadoop.toks; ' +
                     'chmod 400 /tmp/hadoop.toks; chown ' + user_id + ':' + user_gid + ' /tmp/hadoop.toks; ' +
                     'mv /tmp/hadoop.toks /tokens/hadoop.toks; ' +
+                    'cp /tokens-secret/k8s-user.config /tmp/k8s-user.config; ' +
+                    'chmod 400 /tmp/k8s-user.config; chown ' + user_id + ':' + user_gid + ' /tmp/k8s-user.config; ' +
+                    'mv /tmp/k8s-user.config /tokens/k8s-user.config; ' +
                     # in a loop - use mounted token secret, adjust permissions and move to /tokens pod volume
                     'while true; do ' +
                     'cp /tokens-secret/krb5cc /tmp/krb5cc; ' +
@@ -447,6 +494,13 @@ class PodHookHandler:
                         name=user_tokens_secret
                     )
                 )
+            ),
+        )
+        notebook_container.env = PodHookHandler.__append_or_replace_by_name(
+            notebook_container.env,
+            client.V1EnvVar(
+                name='KUBECONFIG',
+                value='/tokens/k8s-user.config'
             ),
         )
 
