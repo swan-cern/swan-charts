@@ -219,7 +219,8 @@ class PodHookHandler:
 
             # Define some 6 random NodePorts on the cluster for spark using V1Service
             service_template_ports = []
-            for port_id in range(1, c.SwanSpawner.spark_ports_per_pod + 1):
+            spark_ports_per_pod = 6
+            for port_id in range(1, spark_ports_per_pod + 1):
                 service_template_ports.append(
                     client.V1ServicePort(
                         name="spark-port-" + str(port_id),
@@ -569,9 +570,6 @@ c.JupyterHub.template_paths = ['/srv/jupyterhub/jh_gitlab/templates']
 c.JupyterHub.logo_file = '/usr/local/share/jupyterhub/static/swan/logos/logo_swan_cloudhisto.png'
 c.SwanSpawner.options_form = '/srv/jupyterhub/jupyterhub_form.html'
 
-c.SpawnHandlersConfigs.metrics_on = False
-c.SpawnHandlersConfigs.local_home = True
-
 # SWAN@CERN error message
 c.SpawnHandlersConfigs.spawn_error_message = SPAWN_ERROR_MESSAGE
 
@@ -604,7 +602,6 @@ if auth_type == 'custom':
 Configuration for Jupyter Notebook - general
 """
 
-c.SwanSpawner.spark_ports_per_pod = 6
 c.SwanSpawner.cmd = None
 
 # https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html

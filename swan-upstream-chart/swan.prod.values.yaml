@@ -24,7 +24,6 @@ jupyterhub:
   proxy:
     service:
       type: ClusterIP
-    secretToken: 9840739268135b56fc340d5c8b4b5962c489479eecfd0e1e7b6bbb108697b90a
     chp:
       image:
         name: "jupyterhub/configurable-http-proxy"
@@ -34,9 +33,13 @@ jupyterhub:
         requests:
           cpu: 200m
           memory: 512Mi
+    # placeholder for hub secret token
+    secretToken:
   hub:
     uid: 0
     fsGid: 0
+    deploymentStrategy:
+      type: RollingUpdate
     resources:
       requests:
         cpu: 200m
@@ -48,14 +51,21 @@ jupyterhub:
     allowNamedServers: false
     image:
       name: "gitlab-registry.cern.ch/swan/docker-images/jupyterhub"
-      tag: "swandb"
+      tag: "0.9.6-cern2"
       pullPolicy: "Always"
     extraEnv:
       OAUTH2_AUTHORIZE_URL: https://oauth.web.cern.ch/OAuth/Authorize
       OAUTH2_TOKEN_URL: https://oauth.web.cern.ch/OAuth/Token
       OAUTH_CALLBACK_URL: https://swan-k8s.cern.ch/hub/oauth_callback
-      JUPYTERHUB_CRYPT_KEY: 34639d457a10b13a99a653728ad6a146bdca66ad7e5519a595a8d8521e945031
+      # placeholder for hub auth state cryptographic key
+      JUPYTERHUB_CRYPT_KEY:
     extraVolumeMounts:
+      - name: swan-jh
+        mountPath: /srv/jupyterhub/jupyterhub_form.html
+        subPath: jupyterhub_form.html
+      - name: swan-jh
+        mountPath: /srv/jupyterhub/swan_config.py
+        subPath: swan_config.py
       - name: swan-secrets
         mountPath: /srv/jupyterhub/private/eos.cred
         subPath: eos.cred
@@ -65,24 +75,6 @@ jupyterhub:
       - name: swan-secrets
         mountPath: /srv/jupyterhub/private/sparkk8s.cred
         subPath: sparkk8s.cred
-      - name: swan-secret-scripts
-        mountPath: /srv/jupyterhub/private/eos_token.sh
-        subPath: eos_token.sh
-      - name: swan-secret-scripts
-        mountPath: /srv/jupyterhub/private/hadoop_token.sh
-        subPath: hadoop_token.sh
-      - name: swan-secret-scripts
-        mountPath: /srv/jupyterhub/private/webhdfs_token.sh
-        subPath: webhdfs_token.sh
-      - name: swan-secret-scripts
-        mountPath: /srv/jupyterhub/private/sparkk8s_token.sh
-        subPath: sparkk8s_token.sh
-      - name: swan-jh
-        mountPath: /srv/jupyterhub/jupyterhub_form.html
-        subPath: jupyterhub_form.html
-      - name: swan-jh
-        mountPath: /srv/jupyterhub/swan_config.py
-        subPath: swan_config.py
       - name: swan-scripts
         mountPath: /srv/jupyterhub/culler/check_ticket.sh
         subPath: check_ticket.sh
@@ -91,13 +83,25 @@ jupyterhub:
         subPath: delete_ticket.sh
       - name: cvmfs-sft-cern-ch
         mountPath: /cvmfs/sft.cern.ch
+      - name: swan-scripts
+        mountPath: /srv/jupyterhub/private/eos_token.sh
+        subPath: eos_token.sh
+      - name: swan-scripts
+        mountPath: /srv/jupyterhub/private/hadoop_token.sh
+        subPath: hadoop_token.sh
+      - name: swan-scripts
+        mountPath: /srv/jupyterhub/private/webhdfs_token.sh
+        subPath: webhdfs_token.sh
+      - name: swan-scripts
+        mountPath: /srv/jupyterhub/private/sparkk8s_token.sh
+        subPath: sparkk8s_token.sh
     extraVolumes:
       - name: cvmfs-sft-cern-ch
         persistentVolumeClaim:
           claimName: cvmfs-sft-cern-ch-pvc
       - name: swan-jh
         configMap:
-          name: swan
+          name: swan-prod
           items:
           - key: jupyterhub_form.html
             path: jupyterhub_form.html
@@ -105,17 +109,12 @@ jupyterhub:
             path: swan_config.py
       - name: swan-scripts
         configMap:
-          name: swan
+          name: swan-prod
           items:
           - key: check_ticket.sh
             path: check_ticket.sh
           - key: delete_ticket.sh
             path: delete_ticket.sh
-          defaultMode: 356 # 0544 perm
-      - name: swan-secret-scripts
-        secret:
-          secretName: swan
-          items:
           - key: hadoop_token.sh
             path: hadoop_token.sh
           - key: webhdfs_token.sh
@@ -141,12 +140,15 @@ jupyterhub:
     db:
       type: postgres
       url: postgres+psycopg2://swanjh@dbod-jupyterhub.cern.ch:6602/swanjh
-    cookieSecret: ca4ac8ac414707020a7db74341eaf25de01f6d0bd73f4ceb9d2a197f1e3b9f32
+      # placeholder for postgres password
+      password:
     annotations:
       prometheus.io/scrape: "true"
       prometheus.io/path: /hub/metrics
     networkPolicy:
       enabled: false
+    # placeholder for hub cookieSecret
+    cookieSecret:
   auth:
     type: custom
     admin:
@@ -171,6 +173,8 @@ jupyterhub:
       className: oauthenticator.generic.GenericOAuthenticator
       config:
         client_id: "swan-k8s.cern.ch"
+        # placeholder for oauth secret to be filed by secrets.yaml
+        client_secret:
         token_url: "https://oauth.web.cern.ch/OAuth/Token"
         userdata_url: "https://oauthresource.web.cern.ch/api/User"
         groupdata_url: "https://oauthresource.web.cern.ch/api/Group"
@@ -196,8 +200,8 @@ jupyterhub:
   debug:
     enabled: true
   custom:
-    # all swan custom helm values
     cvmfs:
+      storagePrivisioner: csi-cvmfsplugin
       repositories:
         - sft.cern.ch
         - sft-nightlies.cern.ch
@@ -206,7 +210,19 @@ jupyterhub:
         - lhcb.cern.ch
         - compass.cern.ch
       prefetcher:
+        enabled: true
         image:
           name: "gitlab-registry.cern.ch/swan/docker-images/cvmfs-prefetcher"
           tag: "v1.0"
-        enable: true
+# placeholders for swan credentials
+swan:
+  secrets:
+    eos:
+      cred:
+    hadoop:
+      cred:
+    sparkk8s:
+      cred:
+    ingress:
+      cert:
+      key:

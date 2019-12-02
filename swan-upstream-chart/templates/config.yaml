@@ -1,53 +1,29 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: swan
+  name: swan-prod
   namespace: {{ .Release.Namespace }}
 data:
-{{- if (.Files.Glob "files/jupyterhub_form.html") }}
 {{ (.Files.Glob "files/jupyterhub_form.html").AsConfig | indent 2 }}
-{{- end }}
-{{- if (.Files.Glob "files/swan_config.py") }}
 {{ (.Files.Glob "files/swan_config.py").AsConfig | indent 2 }}
-{{- end }}
-{{- if (.Files.Glob "files/private/check_ticket.sh") }}
 {{ (.Files.Glob "files/private/check_ticket.sh").AsConfig | indent 2 }}
-{{- end }}
-{{- if (.Files.Glob "files/private/delete_ticket.sh") }}
 {{ (.Files.Glob "files/private/delete_ticket.sh").AsConfig | indent 2 }}
-{{- end }}
+{{ (.Files.Glob "files/private/prod/webhdfs_token.sh").AsConfig | indent 2 }}
+{{ (.Files.Glob "files/private/prod/hadoop_token.sh").AsConfig | indent 2 }}
+{{ (.Files.Glob "files/private/prod/sparkk8s_token.sh").AsConfig | indent 2 }}
+{{ (.Files.Glob "files/private/prod/eos_token.sh").AsConfig | indent 2 }}
 ---
 apiVersion: v1
-kind: Secret
-type: Opaque
+kind: ConfigMap
 metadata:
-  name: swan
+  name: swan-dev
   namespace: {{ .Release.Namespace }}
 data:
-{{ if eq .Values.jupyterhub.hub.db.type "postgres" }}
-  db.password: {{ (required "PostgresDB password must be specified (helm --set jupyterhub.hub.db.password=<redacted> ..)!" .Values.jupyterhub.hub.db.password) | b64enc | quote }}
-{{ end }}
-{{ if eq .Values.jupyterhub.auth.type "custom" }}
-  oauth.client_secret: {{ (required "OAuth password must be specified (helm --set jupyterhub.auth.custom.config.client_secret=<redacted> ..)!" .Values.jupyterhub.auth.custom.config.client_secret) | b64enc | quote }}
-{{ end }}
-  eos.cred: {{ (required "helm --set swan.secrets.eos.cred=$(base64 -w0 <path>)" .Values.swan.secrets.eos.cred) }}
-  hadoop.cred: {{ (required "helm --set swan.secrets.hadoop.cred=$(base64 -w0 <path>)" .Values.swan.secrets.hadoop.cred) }}
-  sparkk8s.cred: {{ (required "helm --set swan.secrets.sparkk8s.cred=$(base64 -w0 <path>)" .Values.swan.secrets.sparkk8s.cred) }}
-  hadoop_token.sh: {{ (required "helm --set-file swan.secrets.hadoop.script=<path>" .Values.swan.secrets.hadoop.script) | b64enc }}
-  webhdfs_token.sh: {{ (required "helm --set-file swan.secrets.webhdfs.script=<path>" .Values.swan.secrets.webhdfs.script) | b64enc }}
-  eos_token.sh: {{ (required "helm --set-file swan.secrets.eos.script=<path>" .Values.swan.secrets.eos.script) | b64enc }}
-  sparkk8s_token.sh: {{ (required "helm --set-file swan.secrets.sparkk8s.script=<path>" .Values.swan.secrets.sparkk8s.script) | b64enc }}
----
-{{ if .Values.jupyterhub.ingress.enabled }}
-{{ range .Values.jupyterhub.ingress.tls }}
-apiVersion: v1
-kind: Secret
-type: kubernetes.io/tls
-metadata:
-  name: {{ .secretName }}
-  namespace: {{ $.Release.Namespace }}
-data:
-  tls.crt: {{ (required "helm --set-file swan.secrets.ingress.cert=<path>" $.Values.swan.secrets.ingress.cert) | b64enc }}
-  tls.key: {{ (required "helm --set-file swan.secrets.ingress.key=<path>" $.Values.swan.secrets.ingress.key) | b64enc }}
-{{ end }}
-{{ end }}
+{{ (.Files.Glob "files/jupyterhub_form.html").AsConfig | indent 2 }}
+{{ (.Files.Glob "files/swan_config.py").AsConfig | indent 2 }}
+{{ (.Files.Glob "files/private/check_ticket.sh").AsConfig | indent 2 }}
+{{ (.Files.Glob "files/private/delete_ticket.sh").AsConfig | indent 2 }}
+{{ (.Files.Glob "files/private/dev/webhdfs_token.sh").AsConfig | indent 2 }}
+{{ (.Files.Glob "files/private/dev/hadoop_token.sh").AsConfig | indent 2 }}
+{{ (.Files.Glob "files/private/dev/sparkk8s_token.sh").AsConfig | indent 2 }}
+{{ (.Files.Glob "files/private/dev/eos_token.sh").AsConfig | indent 2 }}

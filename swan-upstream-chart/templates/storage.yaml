@@ -3,7 +3,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: {{ $.Release.Name }}-cvmfs-{{ . | replace "." "-" }}
-provisioner: csi-cvmfsplugin
+provisioner: {{ $.Values.jupyterhub.custom.cvmfs.storagePrivisioner }}
 parameters:
   repository: {{ . }}
 ---
@@ -21,7 +21,7 @@ spec:
   storageClassName: {{ $.Release.Name }}-cvmfs-{{ . | replace "." "-" }}
 ---
 {{ end }}
-{{ if .Values.jupyterhub.custom.cvmfs.prefetcher.enable }}
+{{ if .Values.jupyterhub.custom.cvmfs.prefetcher.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
