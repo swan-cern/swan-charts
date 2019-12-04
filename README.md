@@ -2,14 +2,14 @@
 
 ### How is it built
 
-CERN jupyterhub image (leveraged from sciencebox work)  
-Helm Chart to deploy jupyterhub (yaml for development, for production we can use helm chart from upstream Zero to JupyterHub with Kubernetes)  
-Image for the user session is developed by CERN IT (systemuser image from current SWAN production)  
+Helm Chart to deploy SWAN (from upstream https://zero-to-jupyterhub.readthedocs.io/en/latest/)  
+CERN jupyterhub image (from https://gitlab.cern.ch/swan/jupyterhub/tree/sciencebox)  
+User session image developed by CERN IT (https://gitlab.cern.ch/swan/docker-images/systemuser)  
   
 Integrations  
 
-- SSO (OAuth or Shibboleth) 
-- Authentication Tokens for CERNBox, Hadoop (and OS_TOKEN for k8s clusters in future, maybe) and refresh mechanism  
+- SSO (OAuth) 
+- Authentication Tokens for CERNBox, Hadoop and Spark k8s and refresh mechanism  
 - Podspec customization to run Spark with IT Hadoop clusters and user home being CERNBox and software  
 - Extensions  
 	All can be reused from current SWAN production  
@@ -20,12 +20,7 @@ This repository serves as equivalent of `https://gitlab.cern.ch/ai/it-puppet-hos
 - general purpose jupyter and jupyterhub images
 - jupyterhub_config ConfigMap for customization of deployments (clusters at CERN configuration, ports configuration, env variables configuration, storage configuration, authentication configuration)
 
-### Demo of upstream JupyterHub (no SWAN, no EOS, no CVMFS)
-This option uses upstream [JupyterHub Helm Chart](https://jupyterhub.github.io/helm-chart/)
-
-[JupyterHub Helm Chart](jupyterhub-upstream-chart/README.md)
-
-### SWAN Deployment including dependencies
+#### SWAN Deployment including dependencies
 
 <b>[1] Create cluster with `CSI 1.0`, ingress `traefik` and `kubernetes-1.14.6-2`. </b>
 
@@ -49,15 +44,40 @@ $ openstack coe cluster create \
   --master-flavor m2.medium \
   --node-count 2 \
   --flavor m2.large \
-  --keypair pmrowczy-mac \
-  swan-k8s-dev
+  --keypair k8s-spark \
+  swan-k8s
 ```
+
+<b>[2] Create DNS alias, label nodes to run ingress and obtain ssl certificates. </b>
 
 Add specific nodes to `swan-k8s.cern.ch` alias and label ingress nodes, retrieve certificates and OAuth client token
 
+Create DNS alias
 ```bash
-$ place to add commands
+$ i=0;for node in $(kubectl get nodes --no-headers | grep -v master | awk '{print $1}'); do openstack server set --property landb-alias=swan-k8s--load-$i- $node; i=$(($i + 1)); done
 ```
+
+label nodes
+```bash
+$ for node in $(kubectl get nodes --no-headers | grep -v master | awk '{print $1}'); do kubectl label node $node role=ingress; done
+```
+
+Obtain SSL
+Request from - https://ca.cern.ch/ca/host/Request.aspx?template=ee2host (automatic certificate generation) and unpack
+```bash
+#Extract the certificate:
+openssl pkcs12 -in swan-k8s-7w5vw3dlewud-minion-0.p12 -clcerts -nokeys -out hostcert.pem
+
+#Extract the encrypted private key. To avoid protecting the key with a passphrase, specify the -nodes option:
+openssl pkcs12 -in swan-k8s-7w5vw3dlewud-minion-0.p12 -nocerts -nodes -out hostkey.pem
+```
+
+Register for OAuth
+
+GOTO https://sso-management.web.cern.ch/OAuth/RegisterOAuthClient.aspx
+
+client_id: swan-k8s.cern.ch
+redirect_uri: https://swan-k8s.cern.ch/hub/oauth_callback
 
 Initialize helm
 
@@ -94,3 +114,8 @@ $ helm upgrade --install --namespace swandev01  \
 --set swan.secrets.sparkk8s.cred="$(base64 -b0 krb5cc)" \
 swandev01 swan-upstream-chart
 ```
+
+### Demo of upstream JupyterHub (no SWAN, no EOS, no CVMFS)
+This option uses upstream [JupyterHub Helm Chart](https://jupyterhub.github.io/helm-chart/)
+
+[JupyterHub Helm Chart](jupyterhub-upstream-chart/README.md)
