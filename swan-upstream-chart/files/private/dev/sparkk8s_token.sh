@@ -11,4 +11,5 @@ if [[ ! -f "/srv/jupyterhub/private/sparkk8s.cred" ]]; then
     exit 1;
 fi
 
-cat "/srv/jupyterhub/private/sparkk8s.cred" | base64 -w 0
+echo "Not supported"
+exit 1

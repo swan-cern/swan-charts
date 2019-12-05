@@ -158,7 +158,7 @@ jupyterhub:
   custom:
     # all swan custom helm values
     cvmfs:
-      storagePrivisioner: csi-cvmfsplugin
+      storageProvisioner: csi-cvmfsplugin
       repositories:
         - sft.cern.ch
         - sft-nightlies.cern.ch

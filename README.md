@@ -22,25 +22,11 @@ This repository serves as equivalent of `https://gitlab.cern.ch/ai/it-puppet-hos
 
 #### SWAN Deployment including dependencies
 
-<b>[1] Create cluster with `CSI 1.0`, ingress `traefik` and `kubernetes-1.14.6-2`. </b>
+<b>[1] Create cluster with `CSI 0.3.0`, ingress `traefik` and `kubernetes-1.13.10-1`. </b>
 
 ```bash
 $ openstack coe cluster create \
-  --cluster-template kubernetes-1.14.6-2 \
-  --labels cvmfs_csi_enabled=false \
-  --labels cephfs_csi_enabled=false \
-  --labels kube_csi_enabled=true \
-  --labels kube_csi_version=cern-csi-1.0-2 \
-  --labels influx_grafana_dashboard_enabled=false \
-  --labels manila_enabled=true \
-  --labels kube_tag=v1.14.6 \
-  --labels container_infra_prefix=gitlab-registry.cern.ch/cloud/atomic-system-containers/ \
-  --labels cgroup_driver=cgroupfs \
-  --labels flannel_backend=vxlan \
-  --labels admission_control_list=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,Priority \
-  --labels ingress_controller=traefik \
-  --labels manila_version=v0.3.0 \
-  --labels heat_container_agent_tag=stein-dev-1 \
+  --cluster-template kubernetes-1.13.10-1 \
   --master-flavor m2.medium \
   --node-count 2 \
   --flavor m2.large \
@@ -52,12 +38,12 @@ $ openstack coe cluster create \
 
 Add specific nodes to `swan-k8s.cern.ch` alias and label ingress nodes, retrieve certificates and OAuth client token
 
-Create DNS alias
+Create DNS alias for openstack servers running kubernetes nodes
 ```bash
 $ i=0;for node in $(kubectl get nodes --no-headers | grep -v master | awk '{print $1}'); do openstack server set --property landb-alias=swan-k8s--load-$i- $node; i=$(($i + 1)); done
 ```
 
-label nodes
+Create ingress labels for kubernetes nodes
 ```bash
 $ for node in $(kubectl get nodes --no-headers | grep -v master | awk '{print $1}'); do kubectl label node $node role=ingress; done
 ```
@@ -72,26 +58,26 @@ openssl pkcs12 -in swan-k8s-7w5vw3dlewud-minion-0.p12 -clcerts -nokeys -out host
 openssl pkcs12 -in swan-k8s-7w5vw3dlewud-minion-0.p12 -nocerts -nodes -out hostkey.pem
 ```
 
-Register for OAuth
+Register for OAuth - https://sso-management.web.cern.ch/OAuth/RegisterOAuthClient.aspx
 
-GOTO https://sso-management.web.cern.ch/OAuth/RegisterOAuthClient.aspx
-
+```bash
 client_id: swan-k8s.cern.ch
 redirect_uri: https://swan-k8s.cern.ch/hub/oauth_callback
+```
 
-Initialize helm
+<b>[3] Initialize helm</b>
 
 https://clouddocs.web.cern.ch/containers/tutorials/helm.html
 
 More in 
 https://clouddocs.web.cern.ch/clouddocs/containers/quickstart.html#kubernetes
 
-<b>[2] SWAN Helm Deployment</b>
+<b>[4] SWAN Helm Deployment</b>
 
 Dependencies:
 - EOS Fuse Chart [based on cern/eosxd]()
-- CVMFS CSI Chart [currently from openstack magnum]()
-- Fluentd Chart [currently from openstack magnum]()
+- CVMFS Chart [currently running in openstack magnum as label, should be based on IT provided chart]()
+- Fluentd Chart [FIXME: currently copied from openstack magnum, should be based on cern/fluentd]()
 - SWAN JupyterHub Chart [based on jupyterhub/jupyterhub]()
 
 Install Prod SWAN (`https://swan-k8s.cern.ch` and login with cern oauth)
@@ -103,16 +89,22 @@ $ /srv/swan-k8s/source/deploy_k8s.sh <qa|prod>
 Install Developer SWAN (`http://masterip:30080` and login with your krb5cc user)
 
 ```bash
-$ export KUBECONFIG=<path>
+# make sure eosxd and cvmfs are configured
+$ helm upgrade --install --namespace kube-system  \
+eosxd ./swan-eosxd-config-chart
+ 
+# authenticate to create krb5cc
 $ kinit -c krb5cc
+ 
+# install swan (linux example)
 $ helm upgrade --install --namespace swandev01  \
 --values swan-upstream-chart/swan.dev.values.yaml \
 --set jupyterhub.hub.annotations.version="release-$(date +%s)" \
 --set jupyterhub.auth.dummy.password=test \
---set swan.secrets.hadoop.cred="$(base64 -b0 krb5cc)" \
---set swan.secrets.eos.cred="$(base64 -b0 krb5cc)" \
---set swan.secrets.sparkk8s.cred="$(base64 -b0 krb5cc)" \
-swandev01 swan-upstream-chart
+--set swan.secrets.hadoop.cred="$(base64 -w0 krb5cc)" \
+--set swan.secrets.eos.cred="$(base64 -w0 krb5cc)" \
+--set swan.secrets.sparkk8s.cred="$(base64 -w0 krb5cc)" \
+swandev01 ./swan-upstream-chart
 ```
 
 ### Demo of upstream JupyterHub (no SWAN, no EOS, no CVMFS)

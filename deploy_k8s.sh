@@ -37,6 +37,9 @@ HADOOP_AUTH_KEYTAB_ENCODED=$(base64 -w 0 $HADOOP_AUTH_KEYTAB_PATH)
 SPARKK8S_AUTH_TOKEN_PATH=/srv/swan-k8s/private/sparkk8s.kubeconfig
 SPARKK8S_AUTH_TOKEN_ENCODED=$(base64 -w 0 $SPARKK8S_AUTH_TOKEN_PATH)
 
+helm upgrade --install --namespace kube-system  \
+eosxd $ROOT_DIR/swan-eosxd-config-chart
+
 helm upgrade --install --namespace swan  \
 --values $SWAN_PROD_VALUES_PATH \
 --values $SWAN_SECRET_VALUES_PATH \

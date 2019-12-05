@@ -1,0 +1,4 @@
+apiVersion: v1
+description: Wrapper for cvmfs chart that customizes configuration to SWAN@CERN
+name: swan-cvmfs-config-chart
+version: 0.1-cern1

@@ -10,4 +10,5 @@ if [[ ! -f "/srv/jupyterhub/private/hadoop.cred" ]]; then
     exit 1;
 fi
 
-cat "/srv/jupyterhub/private/hadoop.cred" | base64 -w 0
+echo "Not supported"
+exit 1

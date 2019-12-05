@@ -201,7 +201,7 @@ jupyterhub:
     enabled: true
   custom:
     cvmfs:
-      storagePrivisioner: csi-cvmfsplugin
+      storageProvisioner: csi-cvmfsplugin
       repositories:
         - sft.cern.ch
         - sft-nightlies.cern.ch
