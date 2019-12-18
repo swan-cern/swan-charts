@@ -13,4 +13,5 @@ if [[ $? -ne 0 ]]; then
     exit 1;
 fi
 
+# in dev, one can provide already generated token
 echo $(cat /srv/jupyterhub/private/eos.cred | base64 -w 0)

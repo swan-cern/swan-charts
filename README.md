@@ -93,7 +93,7 @@ Install Developer SWAN (`http://masterip:30080` and login with your krb5cc user)
 $ helm upgrade --install --namespace kube-system  \
 eosxd ./swan-eosxd-config-chart
  
-# authenticate to create krb5cc
+# authenticate to create  (you can also provide generated k8s and hadoop base64 tokens if needed)
 $ kinit -c krb5cc
  
 # install swan (linux example)
@@ -101,9 +101,9 @@ $ helm upgrade --install --namespace swandev01  \
 --values swan-upstream-chart/swan.dev.values.yaml \
 --set jupyterhub.hub.annotations.version="release-$(date +%s)" \
 --set jupyterhub.auth.dummy.password=test \
---set swan.secrets.hadoop.cred="$(base64 -w0 krb5cc)" \
 --set swan.secrets.eos.cred="$(base64 -w0 krb5cc)" \
---set swan.secrets.sparkk8s.cred="$(base64 -w0 krb5cc)" \
+--set swan.secrets.hadoop.cred="$(base64 -w0 /spark/hadoop.toks)" \
+--set swan.secrets.sparkk8s.cred="$(base64 -w0 /spark/k8s-user.config)" \
 swandev01 ./swan-upstream-chart
 ```
 

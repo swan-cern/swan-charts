@@ -1,13 +1,21 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: swan-prod
+  name: swan-scripts
   namespace: {{ .Release.Namespace }}
 data:
 {{ (.Files.Glob "files/jupyterhub_form.html").AsConfig | indent 2 }}
 {{ (.Files.Glob "files/swan_config.py").AsConfig | indent 2 }}
-{{ (.Files.Glob "files/private/check_ticket.sh").AsConfig | indent 2 }}
-{{ (.Files.Glob "files/private/delete_ticket.sh").AsConfig | indent 2 }}
+{{ (.Files.Glob "files/private/cull_check_ticket.sh").AsConfig | indent 2 }}
+{{ (.Files.Glob "files/private/cull_delete_ticket.sh").AsConfig | indent 2 }}
+{{ (.Files.Glob "files/private/side_container_tokens_perm.sh").AsConfig | indent 2 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: swan-scripts-env-prod
+  namespace: {{ .Release.Namespace }}
+data:
 {{ (.Files.Glob "files/private/prod/webhdfs_token.sh").AsConfig | indent 2 }}
 {{ (.Files.Glob "files/private/prod/hadoop_token.sh").AsConfig | indent 2 }}
 {{ (.Files.Glob "files/private/prod/sparkk8s_token.sh").AsConfig | indent 2 }}
@@ -16,13 +24,9 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: swan-dev
+  name: swan-scripts-env-dev
   namespace: {{ .Release.Namespace }}
 data:
-{{ (.Files.Glob "files/jupyterhub_form.html").AsConfig | indent 2 }}
-{{ (.Files.Glob "files/swan_config.py").AsConfig | indent 2 }}
-{{ (.Files.Glob "files/private/check_ticket.sh").AsConfig | indent 2 }}
-{{ (.Files.Glob "files/private/delete_ticket.sh").AsConfig | indent 2 }}
 {{ (.Files.Glob "files/private/dev/webhdfs_token.sh").AsConfig | indent 2 }}
 {{ (.Files.Glob "files/private/dev/hadoop_token.sh").AsConfig | indent 2 }}
 {{ (.Files.Glob "files/private/dev/sparkk8s_token.sh").AsConfig | indent 2 }}

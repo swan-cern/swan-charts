@@ -5,6 +5,7 @@ jupyterhub:
     storage:
       type: none
     image:
+      pullPolicy: Always
       name: "gitlab-registry.cern.ch/swan/docker-images/systemuser"
       tag: "daily"
     cloudMetadata:
@@ -45,6 +46,8 @@ jupyterhub:
       tag: "0.9.6-cern2"
       pullPolicy: "Always"
     extraVolumeMounts:
+      - name: cvmfs-sft-cern-ch
+        mountPath: /cvmfs/sft.cern.ch
       - name: swan-jh
         mountPath: /srv/jupyterhub/jupyterhub_form.html
         subPath: jupyterhub_form.html
@@ -60,24 +63,22 @@ jupyterhub:
       - name: swan-secrets
         mountPath: /srv/jupyterhub/private/sparkk8s.cred
         subPath: sparkk8s.cred
-      - name: swan-scripts
+      - name: swan-cull-scripts
         mountPath: /srv/jupyterhub/culler/check_ticket.sh
-        subPath: check_ticket.sh
-      - name: swan-scripts
+        subPath: cull_check_ticket.sh
+      - name: swan-cull-scripts
         mountPath: /srv/jupyterhub/culler/delete_ticket.sh
-        subPath: delete_ticket.sh
-      - name: cvmfs-sft-cern-ch
-        mountPath: /cvmfs/sft.cern.ch
-      - name: swan-scripts
+        subPath: cull_delete_ticket.sh
+      - name: swan-tokens-scripts
         mountPath: /srv/jupyterhub/private/eos_token.sh
         subPath: eos_token.sh
-      - name: swan-scripts
+      - name: swan-tokens-scripts
         mountPath: /srv/jupyterhub/private/hadoop_token.sh
         subPath: hadoop_token.sh
-      - name: swan-scripts
+      - name: swan-tokens-scripts
         mountPath: /srv/jupyterhub/private/webhdfs_token.sh
         subPath: webhdfs_token.sh
-      - name: swan-scripts
+      - name: swan-tokens-scripts
         mountPath: /srv/jupyterhub/private/sparkk8s_token.sh
         subPath: sparkk8s_token.sh
     extraVolumes:
@@ -86,20 +87,25 @@ jupyterhub:
           claimName: cvmfs-sft-cern-ch-pvc
       - name: swan-jh
         configMap:
-          name: swan-dev
+          name: swan-scripts
           items:
           - key: jupyterhub_form.html
             path: jupyterhub_form.html
           - key: swan_config.py
             path: swan_config.py
-      - name: swan-scripts
+      - name: swan-cull-scripts
         configMap:
-          name: swan-dev
+          name: swan-scripts
           items:
-          - key: check_ticket.sh
-            path: check_ticket.sh
-          - key: delete_ticket.sh
-            path: delete_ticket.sh
+          - key: cull_check_ticket.sh
+            path: cull_check_ticket.sh
+          - key: cull_delete_ticket.sh
+            path: cull_delete_ticket.sh
+          defaultMode: 356 # 0544 perm
+      - name: swan-tokens-scripts
+        configMap:
+          name: swan-scripts-env-dev
+          items:
           - key: hadoop_token.sh
             path: hadoop_token.sh
           - key: webhdfs_token.sh
@@ -138,7 +144,7 @@ jupyterhub:
   auth:
     type: dummy
     dummy:
-      password: test
+      password:
   rbac:
     enabled: true
   cull:
@@ -150,13 +156,18 @@ jupyterhub:
       enabled: false
   prePuller:
     hook:
-      enabled: false
+      enabled: true
     continuous:
       enabled: false
   debug:
     enabled: true
   custom:
     # all swan custom helm values
+    cull:
+      enabled: true
+      period: 600
+      checkEosAuth:
+        enabled: true
     cvmfs:
       storageProvisioner: csi-cvmfsplugin
       repositories:

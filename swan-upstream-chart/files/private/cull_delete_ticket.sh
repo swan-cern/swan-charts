@@ -5,13 +5,8 @@
 USER=$1
 
 TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
-USER_TOKENS_SECRET_NAMESPACE=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
-
-USER_TOKENS_SECRET_NAMESPACE="swan"
-USER_TOKENS_SECRET_PREFIX='user-tokens-'
-USER_TOKENS_SECRET_KEY='eosToken'
-
-SECRET_NAME="${USER_TOKENS_SECRET_PREFIX}${USER}"
+EOS_TOKENS_SECRET_NAMESPACE=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
+EOS_TOKENS_SECRET_NAME="eos-tokens-${USER}"
 
 # Delete user secret
 STATUS_DELETE=$(curl -ik \
@@ -22,8 +17,8 @@ STATUS_DELETE=$(curl -ik \
     -H 'Accept: application/json' \
     -H 'Content-Type: application/json' \
     -d '{}' \
-    https://kubernetes.default.svc/api/v1/namespaces/${USER_TOKENS_SECRET_NAMESPACE}/secrets/${SECRET_NAME})
-echo "Delete a previous secret ${USER_TOKENS_SECRET_NAMESPACE}/${SECRET_NAME} status: ${STATUS_DELETE}"
+    https://kubernetes.default.svc/api/v1/namespaces/${EOS_TOKENS_SECRET_NAMESPACE}/secrets/${EOS_TOKENS_SECRET_NAME})
+echo "Delete a previous secret ${EOS_TOKENS_SECRET_NAMESPACE}/${EOS_TOKENS_SECRET_NAME} status: ${STATUS_DELETE}"
 
 case "$STATUS_DELETE" in
     200)
