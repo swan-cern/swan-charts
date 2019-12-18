@@ -49,7 +49,7 @@ fluentd:
         grok_failure_key grok_failure
 
         <grok>
-          # jupyterhub hub message (cern/centos requires Zurich timezone)
+          # jupyterhub hub message
           pattern \[%{WORD:log_level} %{TIMESTAMP_ISO8601:log_time} %{DATA:log_source}\] %{GREEDYDATA:log_msg}
           time_format "%Y-%m-%d %H:%M:%S.%N"
           keep_time_key true
@@ -88,6 +88,7 @@ fluentd:
         producer "#{ENV['OUTPUT_PRODUCER']}"
         type "jupyterhub"
         timestamp ${(time.to_f * 1000).to_i}
+        log_char_size ${record["log"].size}
       </record>
       remove_keys []
     </filter>
