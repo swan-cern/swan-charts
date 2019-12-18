@@ -122,7 +122,7 @@ class PodHookHandler:
             notebook_container.env,
             client.V1EnvVar(
                 name='HOME',
-                value="/eos/home-%s/%s" % (username[0], username)
+                value="/eos/user/%s/%s" % (username[0], username)
             )
         )
 
@@ -616,6 +616,7 @@ c.SwanSpawner.volume_mounts = [
     client.V1VolumeMount(
         name='eos',
         mount_path='/eos',
+        mount_propagation='HostToContainer'
     ),
 ]
 c.SwanSpawner.volumes = [

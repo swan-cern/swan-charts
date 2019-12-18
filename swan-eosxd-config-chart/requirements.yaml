@@ -1,4 +1,4 @@
 dependencies:
   - name: eosxd
-    version: 0.1.0-cern-0.1.0-7+ba5e81d
+    version: 0.2.0
     repository: http://charts.cern.ch/cern
