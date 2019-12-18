@@ -1,0 +1,157 @@
+fluentd:
+  plugins:
+    - fluent-plugin-rewrite-tag-filter
+    - fluent-plugin-out-http
+    - fluent-plugin-grok-parser
+    - fluent-plugin-concat
+  output:
+    producer: swan
+    endpoint: http://monit-logs.cern.ch:10012/
+    includeInternal: false
+  parsingConfig: |
+    <match kubernetes.**>
+      @type rewrite_tag_filter
+      capitalize_regex_backreference yes
+      # jupyter notebook logs
+      <rule>
+        key $.kubernetes.pod_name
+        pattern ^(jupyter-)
+        tag jupyter
+      </rule>
+      <rule>
+        key $.kubernetes.pod_name
+        pattern ^(hub-|proxy-|cvmfs-prefetcher-)
+        tag jupyterhub
+      </rule>
+      <rule>
+        key $.kubernetes.pod_name
+        pattern (.?)
+        tag system
+      </rule>
+    </match>
+
+    # jupyterhub containers parser
+    # TODO: add metrics
+    # TODO: add user scope when possible to allow aggregation by user
+    <filter {jupyterhub}>
+      @type parser
+      key_name log
+
+      # keep original record data additionaly to parsed one
+      reserve_data true
+      emit_invalid_record_to_error false
+
+      # grok parsing
+      <parse>
+        @type grok
+
+        # keep unmatched logs
+        grok_failure_key grok_failure
+
+        <grok>
+          # jupyterhub hub message (cern/centos requires Zurich timezone)
+          pattern \[%{WORD:log_level} %{TIMESTAMP_ISO8601:log_time} %{DATA:log_source}\] %{GREEDYDATA:log_msg}
+          time_format "%Y-%m-%d %H:%M:%S.%N"
+          keep_time_key true
+          time_key log_time
+          timezone +0100
+        </grok>
+
+        <grok>
+          # jupyterhub culler message
+          pattern \[%{WORD:log_level} (?<log_time>%{YEAR}%{MONTHNUM}%{MONTHDAY} %{TIME}) %{DATA:log_source}\] %{GREEDYDATA:log_msg}
+          time_format "%Y%m%d %H:%M:%S"
+          keep_time_key true
+          time_key log_time
+          timezone +0100
+        </grok>
+
+        <grok>
+          # jupyterhub proxy message
+          pattern (?<log_time>%{TIME}.%{DATA}) \[%{DATA:log_source}\] %{DATA:log_level}: %{GREEDYDATA:log_msg}
+          time_format "%H:%M:%S.%N"
+          keep_time_key true
+          time_key log_time
+          timezone +0000
+        </grok>
+
+        <grok>
+          # jupyterhub generic message
+          pattern %{GREEDYDATA:log_msg}
+        </grok>
+      </parse>
+    </filter>
+    <filter {jupyterhub}>
+      @type record_transformer
+      enable_ruby
+      <record>
+        producer "#{ENV['OUTPUT_PRODUCER']}"
+        type "jupyterhub"
+        timestamp ${(time.to_f * 1000).to_i}
+      </record>
+      remove_keys []
+    </filter>
+
+    # jupyter containers parser
+    # TODO: add metrics
+    <filter {jupyter}>
+      @type parser
+      key_name log
+
+      # keep original record data additionaly to parsed one
+      reserve_data true
+      emit_invalid_record_to_error false
+
+      # grok parsing
+      <parse>
+        @type grok
+
+        # keep unmatched logs
+        grok_failure_key grok_failure
+
+        <grok>
+          # jupyter server and systemuser message
+          pattern \[%{WORD:log_level} %{TIMESTAMP_ISO8601:log_time} %{DATA:log_source}\] %{GREEDYDATA:log_msg}
+          time_format "%Y-%m-%d %H:%M:%S.%N"
+          keep_time_key true
+          time_key log_time
+          timezone +0100
+        </grok>
+
+        <grok>
+          # jupyter generic message
+          pattern %{GREEDYDATA:log_msg}
+        </grok>
+      </parse>
+    </filter>
+    <filter {jupyter}>
+      @type record_transformer
+      enable_ruby
+      <record>
+        producer "#{ENV['OUTPUT_PRODUCER']}"
+        type "jupyter"
+        timestamp ${(time.to_f * 1000).to_i}
+      </record>
+      remove_keys []
+    </filter>
+
+    # system containers parser
+    <filter {system}>
+      @type record_transformer
+      enable_ruby
+      <record>
+        producer "#{ENV['OUTPUT_PRODUCER']}"
+        type "system"
+        timestamp ${time.to_i * 1000}
+        log_msg ${record["log"].strip}
+      </record>
+      remove_keys []
+    </filter>
+
+    # output endpoint
+    <match {jupyter,jupyterhub,system}>
+      @type http
+      endpoint_url    "#{ENV['OUTPUT_ENDPOINT']}"
+      serializer      json
+      http_method     post
+    </match>

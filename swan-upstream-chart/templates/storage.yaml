@@ -22,31 +22,6 @@ spec:
 ---
 {{ end }}
 {{ if .Values.jupyterhub.custom.cvmfs.prefetcher.enabled }}
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: cvmfs-prefetcher-config
-  namespace: {{ .Release.Namespace }}
-data:
-  cvmfs_prefetch_modules.sh: |-
-    #!/bin/bash
-
-    while true; do
-        source /cvmfs/sft.cern.ch/lcg/views/LCG_96/x86_64-centos7-gcc8-opt/setup.sh && ( timeout 10s python -m ipykernel > /dev/null 2>&1 || true )
-        if [ $? -ne 0 ]; then
-            echo "Getting ipykernel failed"
-        fi
-
-        source /cvmfs/sft.cern.ch/lcg/views/LCG_96/x86_64-centos7-gcc8-opt/setup.sh && ( timeout 20s python -m JupyROOT.kernel.rootkernel > /dev/null 2>&1 || true )
-        if [ $? -ne 0 ]; then
-            echo "Getting JupyROOT.kernel.rootkernel failed"
-        fi
-
-        sleep 15m
-    done
-
-    exit 1
----
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -64,6 +39,8 @@ spec:
     metadata:
       labels:
         name: cvmfs-prefetcher
+      annotations:
+        checksum/prefetch-script: {{ .Files.Get "files/cvmfs/cvmfs_prefetch_modules.sh" | sha256sum }}
     spec:
       terminationGracePeriodSeconds: 0
       volumes:
@@ -74,7 +51,7 @@ spec:
       {{ end }}
       - name: cvmfs-prefetcher-config
         configMap:
-          name: cvmfs-prefetcher-config
+          name: swan-scripts
           items:
           - key: cvmfs_prefetch_modules.sh
             path: cvmfs_prefetch_modules.sh

@@ -75,10 +75,10 @@ https://clouddocs.web.cern.ch/clouddocs/containers/quickstart.html#kubernetes
 <b>[4] SWAN Helm Deployment</b>
 
 Dependencies:
-- EOS Fuse Chart [based on cern/eosxd]()
-- CVMFS Chart [currently running in openstack magnum as label, should be based on IT provided chart]()
-- Fluentd Chart [FIXME: currently copied from openstack magnum, should be based on cern/fluentd]()
-- SWAN JupyterHub Chart [based on jupyterhub/jupyterhub]()
+- EOS Fuse Chart [based on cern/eosxd](https://gitlab.cern.ch/helm/charts/cern/eosxd)
+- CVMFS CSI Chart [currently from openstack magnum](https://clouddocs.web.cern.ch/containers/tutorials/cvmfs.html)
+- Fluentd Chart [based on cern/fluentd](https://gitlab.cern.ch/helm/charts/cern/fluentd)
+- SWAN JupyterHub Chart [based on jupyterhub/jupyterhub](https://github.com/jupyterhub/helm-chart)
 
 Install Prod SWAN (`https://swan-k8s.cern.ch` and login with cern oauth)
 

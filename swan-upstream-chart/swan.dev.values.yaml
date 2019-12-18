@@ -174,7 +174,7 @@ jupyterhub:
         - sft.cern.ch
         - sft-nightlies.cern.ch
       prefetcher:
-        enable: true
+        enabled: true
         image:
           name: "gitlab-registry.cern.ch/swan/docker-images/cvmfs-prefetcher"
           tag: "v1.0"
