@@ -93,8 +93,18 @@ fluentd:
       remove_keys []
     </filter>
 
+
     # jupyter containers parser
     # TODO: add metrics
+     <filter {jupyter}>
+      @type concat
+      key log
+
+      # parse long json logs (swan env)
+      stream_identity_key container_id
+      multiline_end_regexp /\n$/
+      separator ""
+    </filter>
     <filter {jupyter}>
       @type parser
       key_name log
