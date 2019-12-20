@@ -54,6 +54,15 @@ fluentd:
       separator ""
     </filter>
     <filter {swan.logs}>
+      @type concat
+      key log
+
+      # parse exceptions and multiline debug logs
+      stream_identity_key container_id
+      multiline_start_regexp /^(\S)/
+      continuous_line_regext /^(\s)/
+    </filter>
+    <filter {swan.logs}>
       @type parser
       key_name log
 
@@ -72,7 +81,7 @@ fluentd:
           # jupyterhub hub message
           pattern \[%{WORD:log_level} %{TIMESTAMP_ISO8601:log_time} %{DATA:log_source}\] %{GREEDYDATA:log_msg}
           time_format "%Y-%m-%d %H:%M:%S.%N"
-          keep_time_key true
+          keep_time_key false
           time_key log_time
           timezone +0100
         </grok>
@@ -81,7 +90,7 @@ fluentd:
           # jupyterhub culler message
           pattern \[%{WORD:log_level} (?<log_time>%{YEAR}%{MONTHNUM}%{MONTHDAY} %{TIME}) %{DATA:log_source}\] %{GREEDYDATA:log_msg}
           time_format "%y%m%d %H:%M:%S"
-          keep_time_key true
+          keep_time_key false
           time_key log_time
           timezone +0100
         </grok>
@@ -90,7 +99,7 @@ fluentd:
           # jupyterhub proxy message
           pattern (?<log_time>%{TIME}.%{DATA}) \[%{DATA:log_source}\] (.*?)(?<log_level>(debug|info|error|warn))([^$]*): %{GREEDYDATA:log_msg}
           time_format "%H:%M:%S.%N"
-          keep_time_key true
+          keep_time_key false
           time_key log_time
           timezone +0000
         </grok>
@@ -118,10 +127,55 @@ fluentd:
         grok_failure_key grokfailure
 
         <grok>
-          # string type metric
-          pattern \[%{WORD} %{TIMESTAMP_ISO8601:metric_time} %{DATA}\] user: %{DATA:metric_user}, host: %{DATA}, metric: %{DATA:metric_key}, value: %{GREEDYDATA:metric_value_raw}
+          pattern \[%{WORD} %{TIMESTAMP_ISO8601:log_time} %{DATA}\] %{GREEDYDATA:log_msg}
+          time_format "%Y-%m-%d %H:%M:%S.%N"
+          keep_time_key false
+          time_key log_time
+          timezone +0100
         </grok>
       </parse>
+    </filter>
+    <filter {swan.metrics}>
+      @type parser
+      key_name log_msg
+
+      reserve_data true
+      emit_invalid_record_to_error true
+
+      # grok parsing
+      <parse>
+        @type grok
+
+        # keep unmatched logs
+        grok_failure_key grokfailure
+
+        <grok>
+          # string type metric_key.metric_context.metric_type
+          pattern user: %{DATA:_metric_user_}, host: %{DATA}, metric: (?<_metric_key_>(\w*))(\.)(?<_metric_context_>(.*)), value: %{GREEDYDATA:_metric_value_}
+          time_format "%Y-%m-%d %H:%M:%S.%N"
+          keep_time_key false
+          time_key metric_time
+          timezone +0100
+        </grok>
+        <grok>
+          # string type metric_key
+          pattern user: %{DATA:_metric_user_}, host: %{DATA}, metric: (?<_metric_key_>(.*))(?<_metric_context_>(.*)), value: %{GREEDYDATA:_metric_value_}
+          time_format "%Y-%m-%d %H:%M:%S.%N"
+          keep_time_key false
+          time_key metric_time
+          timezone +0100
+        </grok>
+      </parse>
+    </filter>
+    <filter {swan.metrics}>
+      @type record_transformer
+      enable_ruby
+      <record>
+        metric_user ${record['_metric_user_']}
+        metric.${record['_metric_key_']}.context ${record['_metric_context_']}
+        metric.${record['_metric_key_']}.value ${record['_metric_value_']}
+      </record>
+      remove_keys ["_metric_time_", "_metric_raw_msg_", "_metric_user_", "_metric_key_", "_metric_context_", "_metric_value_"]
     </filter>
 
     ### Define Producers ###
@@ -131,20 +185,20 @@ fluentd:
       enable_ruby
       <record>
         producer "#{ENV['OUTPUT_PRODUCER']}"
-        type "jupyter"
+        type "swanqa"
         timestamp ${(time.to_f * 1000).to_i}
       </record>
-      remove_keys []
+      remove_keys ["log"]
     </filter>
     <filter {swan.metrics}>
       @type record_transformer
       enable_ruby
       <record>
         producer "#{ENV['OUTPUT_PRODUCER']}"
-        type "jupyter"
+        type "metricsqa"
         timestamp ${(time.to_f * 1000).to_i}
       </record>
-      remove_keys []
+      remove_keys ["log"]
     </filter>
     <filter {system}>
       @type record_transformer
@@ -155,7 +209,7 @@ fluentd:
         timestamp ${time.to_i * 1000}
         log_msg ${record['log'].strip}
       </record>
-      remove_keys []
+      remove_keys ["log"]
     </filter>
 
     ### Define Output Endpoint ###
