@@ -9,6 +9,7 @@ fluentd:
     endpoint: http://monit-logs.cern.ch:10012/
     includeInternal: false
   parsingConfig: |
+    ### Define Classes of logs ###
     <match kubernetes.**>
       @type rewrite_tag_filter
       capitalize_regex_backreference true
@@ -39,6 +40,8 @@ fluentd:
         tag swan.logs
       </rule>
     </match>
+
+    ### Define Parsing of Jupyter/JupyterHub/Metrics logs ###
 
     # jupyter containers parser
     <filter {swan.logs}>
@@ -77,7 +80,7 @@ fluentd:
         <grok>
           # jupyterhub culler message
           pattern \[%{WORD:log_level} (?<log_time>%{YEAR}%{MONTHNUM}%{MONTHDAY} %{TIME}) %{DATA:log_source}\] %{GREEDYDATA:log_msg}
-          time_format "%Y%m%d %H:%M:%S"
+          time_format "%y%m%d %H:%M:%S"
           keep_time_key true
           time_key log_time
           timezone +0100
@@ -97,16 +100,6 @@ fluentd:
           pattern %{GREEDYDATA:log_msg}
         </grok>
       </parse>
-    </filter>
-    <filter {swan.logs}>
-      @type record_transformer
-      enable_ruby
-      <record>
-        producer "#{ENV['OUTPUT_PRODUCER']}"
-        type "jupyter"
-        timestamp ${(time.to_f * 1000).to_i}
-      </record>
-      remove_keys []
     </filter>
 
     # parse jupyter and jupyterhub metrics
@@ -130,6 +123,19 @@ fluentd:
         </grok>
       </parse>
     </filter>
+
+    ### Define Producers ###
+
+    <filter {swan.logs}>
+      @type record_transformer
+      enable_ruby
+      <record>
+        producer "#{ENV['OUTPUT_PRODUCER']}"
+        type "jupyter"
+        timestamp ${(time.to_f * 1000).to_i}
+      </record>
+      remove_keys []
+    </filter>
     <filter {swan.metrics}>
       @type record_transformer
       enable_ruby
@@ -140,8 +146,6 @@ fluentd:
       </record>
       remove_keys []
     </filter>
-
-    # system containers parser
     <filter {system}>
       @type record_transformer
       enable_ruby
@@ -154,6 +158,8 @@ fluentd:
       remove_keys []
     </filter>
 
+    ### Define Output Endpoint ###
+
     # rescue errors to fluentd pod stdout for debugging
     <label @ERROR>
       <match {swan.logs,swan.metrics,system}>
@@ -161,7 +167,7 @@ fluentd:
       </match>
     </label>
 
-    # output endpoint
+    # all correctly parsed, send to http endpoint
     <match {swan.logs,swan.metrics,system}>
       @type http
       endpoint_url    "#{ENV['OUTPUT_ENDPOINT']}"
