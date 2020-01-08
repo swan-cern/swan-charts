@@ -5,19 +5,25 @@ jupyterhub:
     storage:
       type: none
     image:
-      pullPolicy: Always
       name: "gitlab-registry.cern.ch/swan/docker-images/systemuser"
       tag: "daily"
     cloudMetadata:
       enabled: true
     networkPolicy:
       enabled: false
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: traefik
+      traefik.ingress.kubernetes.io/frontend-entry-points: http, https
+      traefik.ingress.kubernetes.io/redirect-entry-point: https
+    tls:
+      - secretName: swan-tls-cert
+    hosts:
+      - swan-k8s.cern.ch
   proxy:
     service:
-      type: NodePort
-      nodePorts:
-        http: 30080
-    secretToken: 9840739268135b56fc340d5c8b4b5962c489479eecfd0e1e7b6bbb108697b90a
+      type: ClusterIP
     chp:
       image:
         name: "jupyterhub/configurable-http-proxy"
@@ -27,6 +33,8 @@ jupyterhub:
         requests:
           cpu: 200m
           memory: 512Mi
+    # placeholder for hub secret token
+    secretToken:
   hub:
     uid: 0
     fsGid: 0
@@ -45,6 +53,12 @@ jupyterhub:
       name: "gitlab-registry.cern.ch/swan/docker-images/jupyterhub"
       tag: "0.9.6-cern2"
       pullPolicy: "Always"
+    extraEnv:
+      OAUTH2_AUTHORIZE_URL: https://oauth.web.cern.ch/OAuth/Authorize
+      OAUTH2_TOKEN_URL: https://oauth.web.cern.ch/OAuth/Token
+      OAUTH_CALLBACK_URL: https://swan-k8s.cern.ch/hub/oauth_callback
+      # placeholder for hub auth state cryptographic key
+      JUPYTERHUB_CRYPT_KEY:
     extraVolumeMounts:
       - name: cvmfs-sft-cern-ch
         mountPath: /cvmfs/sft.cern.ch
@@ -128,23 +142,52 @@ jupyterhub:
     extraConfig:
       swanConf: |
         exec(open('/srv/jupyterhub/swan_config.py').read())
-
-        def dummy_user(spawner):
-          username = spawner.user.name
-          os.system("useradd " + username + " -u 1000")
-        c.Spawner.pre_spawn_hook = dummy_user
     db:
-      type: sqlite-memory
-    cookieSecret: ca4ac8ac414707020a7db74341eaf25de01f6d0bd73f4ceb9d2a197f1e3b9f32
+      type: postgres
+      url: postgres+psycopg2://swanjh@dbod-jupyterhub.cern.ch:6602/swanjh
+      # placeholder for postgres password
+      password:
     annotations:
       prometheus.io/scrape: "true"
       prometheus.io/path: /hub/metrics
     networkPolicy:
       enabled: false
+    # placeholder for hub cookieSecret
+    cookieSecret:
   auth:
-    type: dummy
-    dummy:
-      password:
+    type: custom
+    admin:
+      users:
+        - pkothuri
+    whitelist:
+      users:
+        - pkothuri
+        - pmrowczy
+        - nbarros
+        - mmartinm
+        - jlunadur
+        - ekleszcz
+        - rcastell
+        - canali
+        - dalvesde
+        - ebocchi
+        - moscicki
+        - etejedor
+        - mato
+    custom:
+      className: oauthenticator.generic.GenericOAuthenticator
+      config:
+        client_id: "swan-k8s.cern.ch"
+        # placeholder for oauth secret to be filed by secrets.yaml
+        client_secret:
+        token_url: "https://oauth.web.cern.ch/OAuth/Token"
+        userdata_url: "https://oauthresource.web.cern.ch/api/User"
+        groupdata_url: "https://oauthresource.web.cern.ch/api/Group"
+        userdata_method: GET
+        userdata_params: {'state': 'state'}
+        username_key: username
+        group_whitelist:
+          - swan-admins
   rbac:
     enabled: true
   cull:
@@ -162,7 +205,6 @@ jupyterhub:
   debug:
     enabled: true
   custom:
-    # all swan custom helm values
     cull:
       enabled: true
       period: 600
@@ -173,8 +215,24 @@ jupyterhub:
       repositories:
         - sft.cern.ch
         - sft-nightlies.cern.ch
+        - cms.cern.ch
+        - atlas.cern.ch
+        - lhcb.cern.ch
+        - compass.cern.ch
       prefetcher:
-        enable: true
+        enabled: true
         image:
           name: "gitlab-registry.cern.ch/swan/docker-images/cvmfs-prefetcher"
           tag: "v1.0"
+# placeholders for swan credentials
+swan:
+  secrets:
+    eos:
+      cred:
+    hadoop:
+      cred:
+    sparkk8s:
+      cred:
+    ingress:
+      cert:
+      key:

@@ -10,6 +10,7 @@ fluentd:
     includeInternal: false
   parsingConfig: |
     ### Define Classes of logs ###
+
     <match kubernetes.**>
       @type rewrite_tag_filter
       capitalize_regex_backreference true
@@ -41,75 +42,125 @@ fluentd:
       </rule>
     </match>
 
-    ### Define Parsing of Jupyter/JupyterHub/Metrics logs ###
+    ### SWAN Jupyter/Jupyterhub logs parsing and output ###
 
     # jupyter containers parser
     <filter {swan.logs}>
       @type concat
       key log
 
-      # parse long json logs (swan env)
+      # concat long json logs (e.g. swan env debug)
       stream_identity_key container_id
       multiline_end_regexp /\n$/
       separator ""
+      timeout_label @swan.logs.multiline
     </filter>
     <filter {swan.logs}>
       @type concat
       key log
 
-      # parse exceptions and multiline debug logs
+      # parse jupyterhub multiline debug log with indent
       stream_identity_key container_id
-      multiline_start_regexp /^(\S)/
-      continuous_line_regext /^(\s)/
+      multiline_start_regexp /^(\[.*\] pod jupyter-\w+ events before launch)/
+      continuous_line_regexp /^(\s)/
+      separator ""
+      flush_interval 1
+      timeout_label @swan.logs.multiline
     </filter>
     <filter {swan.logs}>
-      @type parser
-      key_name log
+      @type concat
+      key log
 
-      # keep original record data additionaly to parsed one
-      reserve_data true
-      emit_invalid_record_to_error true
-
-      # grok parsing
-      <parse>
-        @type grok
-
-        # keep unmatched logs
-        grok_failure_key grok_failure
-
-        <grok>
-          # jupyterhub hub message
-          pattern \[%{WORD:log_level} %{TIMESTAMP_ISO8601:log_time} %{DATA:log_source}\] %{GREEDYDATA:log_msg}
-          time_format "%Y-%m-%d %H:%M:%S.%N"
-          keep_time_key false
-          time_key log_time
-          timezone +0100
-        </grok>
-
-        <grok>
-          # jupyterhub culler message
-          pattern \[%{WORD:log_level} (?<log_time>%{YEAR}%{MONTHNUM}%{MONTHDAY} %{TIME}) %{DATA:log_source}\] %{GREEDYDATA:log_msg}
-          time_format "%y%m%d %H:%M:%S"
-          keep_time_key false
-          time_key log_time
-          timezone +0100
-        </grok>
-
-        <grok>
-          # jupyterhub proxy message
-          pattern (?<log_time>%{TIME}.%{DATA}) \[%{DATA:log_source}\] (.*?)(?<log_level>(debug|info|error|warn))([^$]*): %{GREEDYDATA:log_msg}
-          time_format "%H:%M:%S.%N"
-          keep_time_key false
-          time_key log_time
-          timezone +0000
-        </grok>
-
-        <grok>
-          # jupyterhub generic message
-          pattern %{GREEDYDATA:log_msg}
-        </grok>
-      </parse>
+      # parse python multiline error logs with indent
+      # handle also timeout waiting for new log lines
+      stream_identity_key container_id
+      multiline_start_regexp /^(\[E.*\])/
+      continuous_line_regexp /^(\s)/
+      separator ""
+      flush_interval 1
+      timeout_label @swan.logs.multiline
     </filter>
+    <match {swan.logs}>
+      @type relabel
+      @label @swan.logs.multiline
+    </match>
+    <label @swan.logs.multiline>
+      # all logs that were parsed with multiline concat filter or got timeout waiting for new logs to parse multiline
+
+      <filter {swan.logs}>
+        @type parser
+        key_name log
+
+        # keep original record data additionaly to parsed one
+        reserve_data true
+        emit_invalid_record_to_error true
+
+        # grok parsing
+        <parse>
+          @type grok
+
+          # keep unmatched logs
+          grok_success_key grok_success
+          grok_failure_key grok_failure
+
+          <grok>
+            # jupyterhub hub message (including multiline)
+            pattern \[%{WORD:log_level} %{TIMESTAMP_ISO8601:log_time} %{DATA:log_source}\] (?<log_msg_multiline>(.|\r|\n)*)
+            time_format "%Y-%m-%d %H:%M:%S.%N"
+            keep_time_key false
+            time_key log_time
+            timezone +0100
+          </grok>
+
+          <grok>
+            # jupyterhub culler message (including multiline)
+            pattern \[%{WORD:log_level} (?<log_time>%{YEAR}%{MONTHNUM}%{MONTHDAY} %{TIME}) %{DATA:log_source}\] (?<log_msg_multiline>(.|\r|\n)*)
+            time_format "%y%m%d %H:%M:%S"
+            keep_time_key false
+            time_key log_time
+            timezone +0100
+          </grok>
+
+          <grok>
+            # jupyterhub proxy message (including multiline)
+            pattern (?<log_time>%{TIME}.%{DATA}) \[%{DATA:log_source}\] (.*?)(?<log_level>(debug|info|error|warn|critical))([^$]*): (?<log_msg_multiline>(.|\r|\n)*)
+            time_format "%H:%M:%S.%N"
+            keep_time_key false
+            time_key log_time
+            timezone +0000
+          </grok>
+
+          <grok>
+            # jupyterhub generic message (including multiline)
+            pattern (?<log_msg_multiline>(.|\r|\n)*)
+          </grok>
+        </parse>
+      </filter>
+      <filter {swan.logs}>
+        @type record_transformer
+        enable_ruby
+        <record>
+          # es wont search in string longer than 256
+          log_msg ${if record['log_msg_multiline'].length >= 250; record['log_msg_multiline'][0...250] + "..."; else; record['log_msg_multiline']; end;}
+          log_source ${if record['log_source'] != nil; record['log_source']; else; "log"; end;}
+          log_level ${if record['log_level'] != nil; record['log_level']; else; "info"; end;}
+          timestamp ${(time.to_f * 1000).to_i}
+
+          # define monit producer
+          producer "#{ENV['OUTPUT_PRODUCER']}"
+          type "swanqa"
+        </record>
+        remove_keys ["log"]
+      </filter>
+      <match {swan.logs}>
+        @type http
+        endpoint_url    "#{ENV['OUTPUT_ENDPOINT']}"
+        serializer      json
+        http_method     post
+      </match>
+    </label>
+
+    ### SWAN Metrics logs parsing and output ###
 
     # parse jupyter and jupyterhub metrics
     <filter {swan.metrics}>
@@ -171,24 +222,11 @@ fluentd:
       @type record_transformer
       enable_ruby
       <record>
-        metric_user ${record['_metric_user_']}
-        metric.${record['_metric_key_']}.context ${record['_metric_context_']}
-        metric.${record['_metric_key_']}.value ${record['_metric_value_']}
+        metrics.${record['_metric_key_']}.user ${record['_metric_user_']}
+        metrics.${record['_metric_key_']}.context ${record['_metric_context_']}
+        metrics.${record['_metric_key_']}.value ${record['_metric_value_']}
       </record>
       remove_keys ["_metric_time_", "_metric_raw_msg_", "_metric_user_", "_metric_key_", "_metric_context_", "_metric_value_"]
-    </filter>
-
-    ### Define Producers ###
-
-    <filter {swan.logs}>
-      @type record_transformer
-      enable_ruby
-      <record>
-        producer "#{ENV['OUTPUT_PRODUCER']}"
-        type "swanqa"
-        timestamp ${(time.to_f * 1000).to_i}
-      </record>
-      remove_keys ["log"]
     </filter>
     <filter {swan.metrics}>
       @type record_transformer
@@ -200,6 +238,15 @@ fluentd:
       </record>
       remove_keys ["log"]
     </filter>
+    <match {swan.metrics}>
+      @type http
+      endpoint_url    "#{ENV['OUTPUT_ENDPOINT']}"
+      serializer      json
+      http_method     post
+    </match>
+
+    ### System logs parsing and output ###
+
     <filter {system}>
       @type record_transformer
       enable_ruby
@@ -211,20 +258,19 @@ fluentd:
       </record>
       remove_keys ["log"]
     </filter>
-
-    ### Define Output Endpoint ###
-
-    # rescue errors to fluentd pod stdout for debugging
-    <label @ERROR>
-      <match {swan.logs,swan.metrics,system}>
-        @type stdout
-      </match>
-    </label>
-
-    # all correctly parsed, send to http endpoint
-    <match {swan.logs,swan.metrics,system}>
+    <match {system}>
       @type http
       endpoint_url    "#{ENV['OUTPUT_ENDPOINT']}"
       serializer      json
       http_method     post
     </match>
+
+
+    ### Common error handling ###
+
+    # rescue errors to fluentd pod stdout for debugging
+    <label @ERROR>
+      <match **>
+        @type stdout
+      </match>
+    </label>
