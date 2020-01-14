@@ -40,6 +40,9 @@ SPARKK8S_AUTH_TOKEN_ENCODED=$(base64 -w 0 $SPARKK8S_AUTH_TOKEN_PATH)
 helm upgrade --install --namespace kube-system  \
 eosxd $ROOT_DIR/swan-eosxd-config-chart
 
+helm upgrade --install --namespace kube-system  \
+fluentd $ROOT_DIR/swan-fluentd-config-chart
+
 helm upgrade --install --namespace swan  \
 --values $SWAN_PROD_VALUES_PATH \
 --values $SWAN_SECRET_VALUES_PATH \
