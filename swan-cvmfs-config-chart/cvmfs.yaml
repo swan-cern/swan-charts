@@ -1,0 +1,150 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: spark-rcastell
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  namespace: spark-rcastell
+  name: cvmfs-sft-cern-ch-pv
+  labels: 
+    type: local 
+spec:
+  claimRef:
+    namespace: spark-rcastell
+    name: cvmfs-sft-cern-ch-pvc
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadOnlyMany
+  hostPath: 
+    path: "/cvmfs/sft.cern.ch" 
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  namespace: spark-rcastell
+  name: cvmfs-sft-nightlies-cern-ch-pv
+  labels:
+    type: local
+spec:
+  claimRef:
+    namespace: spark-rcastell
+    name: cvmfs-sft-nightlies-cern-ch-pvc
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadOnlyMany
+  hostPath:
+    path: "/cvmfs/sft-nightlies.cern.ch"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cvmfs-sft-cern-ch-pvc
+  namespace: spark-rcastell
+spec:
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cvmfs-sft-nightlies-cern-ch-pvc
+  namespace: spark-rcastell
+spec:
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: &daemons swan-daemons
+  namespace: &namespace kube-system
+  labels:
+    app: *daemons
+spec:
+  template:
+    metadata:
+      labels:
+        app: *daemons
+        name: *daemons
+    spec:
+      hostPID: true
+      terminationGracePeriodSeconds: 60
+      #      nodeSelector:
+      #        nodeApp: "swan-users"
+      containers:
+      # 2. CVMFS
+      - name: cvmfs
+        image: gitlab-registry.cern.ch/cernbox/boxedhub/cvmfs:v0.5
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+          capabilities:
+            add: ["SYS_ADMIN"]
+        volumeMounts:
+        - name: &vm_devfuse devfuse
+          mountPath: /dev/fuse
+        - name: &vm_rdv-cvmfs rdv-cvmfs
+          mountPath: /cvmfs:shared
+        env:
+        - name: PODINFO_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: PODINFO_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: PODINFO_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: PODINFO_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: PODINFO_NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: THIS_CONTAINER
+          value: "CVMFS"
+        - name: DEPLOYMENT_TYPE
+          value: "kubernetes"
+        - name: CVMFS_FOLDER
+          value: "/cvmfs"
+        - name: CVMFS_UPSTREAM_CONNECTION
+          value: "direct"
+          #value" "cern"
+          #value: "squid"
+        - name: CVMFS_SQUID_HOSTNAME
+          value: "cvmfssquid.boxed.svc.cluster.local"
+        - name: CVMFS_SQUID_PORT
+          value: "3128"
+        - name: SOFTWARE_STACK
+          value: "LCG_96python3"
+        - name: PLATFORM
+          value: "x86_64-centos7-gcc8-opt"
+        lifecycle:
+          preStop:
+            exec:
+              command: ["bash", "/root/stop.sh"]
+      volumes:
+      - name: *vm_devfuse
+        hostPath:
+          path: /dev/fuse
+      - name: *vm_rdv-cvmfs
+        hostPath:
+          path: /cvmfs
