@@ -657,14 +657,16 @@ if swan_cull_idle:
         }
     )
 
-# Give notebook 45s to start a webserver and max 60 for whole spawn process
+# Give notebook 45s to start a webserver and max 60s for whole spawn process
 c.SwanSpawner.http_timeout = 45
 c.SwanSpawner.start_timeout = 60
 c.SwanSpawner.consecutive_failure_limit = 0
-c.JupyterHub.tornado_settings = {
-    'slow_spawn_timeout': 15
-}
 
+# Do not allow named servers and redirect to server features (swan handler takes care of this logic)
+c.JupyterHub.allow_named_servers = False
+
+# Allow notebooks to wait in stopping for max 10s
+c.SwanSpawner.delete_grace_period = 10
 
 # SwanKubeSpawner requires to add user to pwd after authentication
 auth_type = get_config('auth.type', None)

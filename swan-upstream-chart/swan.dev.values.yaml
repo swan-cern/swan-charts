@@ -40,10 +40,9 @@ jupyterhub:
       enabled: false
     readinessProbe:
       enabled: false
-    allowNamedServers: false
     image:
       name: "gitlab-registry.cern.ch/swan/docker-images/jupyterhub"
-      tag: "0.9.6-cern2"
+      tag: "1.1.0-cern1"
       pullPolicy: "Always"
     extraVolumeMounts:
       - name: cvmfs-sft-cern-ch
@@ -156,7 +155,7 @@ jupyterhub:
       enabled: false
   prePuller:
     hook:
-      enabled: true
+      enabled: false
     continuous:
       enabled: false
   debug:
