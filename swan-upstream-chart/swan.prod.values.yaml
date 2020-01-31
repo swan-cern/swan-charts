@@ -59,8 +59,6 @@ jupyterhub:
       # placeholder for hub auth state cryptographic key
       JUPYTERHUB_CRYPT_KEY:
     extraVolumeMounts:
-      - name: cvmfs-sft-cern-ch
-        mountPath: /cvmfs/sft.cern.ch
       - name: swan-jh
         mountPath: /srv/jupyterhub/jupyterhub_form.html
         subPath: jupyterhub_form.html
@@ -94,10 +92,13 @@ jupyterhub:
       - name: swan-tokens-scripts
         mountPath: /srv/jupyterhub/private/sparkk8s_token.sh
         subPath: sparkk8s_token.sh
+      - name: cvmfsd
+        mountPath: /cvmfs
+        mountPropagation: HostToContainer
     extraVolumes:
-      - name: cvmfs-sft-cern-ch
-        persistentVolumeClaim:
-          claimName: cvmfs-sft-cern-ch-pvc
+      - name: cvmfsd
+        hostPath:
+          path: /var/cvmfs
       - name: swan-jh
         configMap:
           name: swan-scripts
@@ -209,20 +210,6 @@ jupyterhub:
       period: 600
       checkEosAuth:
         enabled: true
-    cvmfs:
-      storageProvisioner: csi-cvmfsplugin
-      repositories:
-        - sft.cern.ch
-        - sft-nightlies.cern.ch
-        - cms.cern.ch
-        - atlas.cern.ch
-        - lhcb.cern.ch
-        - compass.cern.ch
-      prefetcher:
-        enabled: true
-        image:
-          name: "gitlab-registry.cern.ch/swan/docker-images/cvmfs-prefetcher"
-          tag: "v1.0"
 # placeholders for swan credentials
 swan:
   secrets:

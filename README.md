@@ -22,7 +22,7 @@ This repository serves as equivalent of `https://gitlab.cern.ch/ai/it-puppet-hos
 
 #### SWAN Deployment including dependencies
 
-<b>[1] Create cluster with `CSI 0.3.0`, ingress `traefik` and `kubernetes-1.13.10-1`. </b>
+<b>[1] Create cluster with ingress `traefik` and `kubernetes-1.13.10-1`. </b>
 
 ```bash
 $ openstack coe cluster create \
@@ -76,7 +76,7 @@ https://clouddocs.web.cern.ch/clouddocs/containers/quickstart.html#kubernetes
 
 Dependencies:
 - EOS Fuse Chart [based on cern/eosxd](https://gitlab.cern.ch/helm/charts/cern/eosxd)
-- CVMFS CSI Chart [currently from openstack magnum](https://clouddocs.web.cern.ch/containers/tutorials/cvmfs.html)
+- CVMFS Fuse Chart [based on boxed/cvmfs](https://gitlab.cern.ch/cernbox/boxed/tree/master/cvmfs.d)
 - Fluentd Chart [based on cern/fluentd](https://gitlab.cern.ch/helm/charts/cern/fluentd)
 - SWAN JupyterHub Chart [based on jupyterhub/jupyterhub](https://github.com/jupyterhub/helm-chart)
 
@@ -92,6 +92,8 @@ Install Developer SWAN (`http://masterip:30080` and login with your krb5cc user)
 # make sure eosxd and cvmfs are configured
 $ helm upgrade --install --namespace kube-system  \
 eosxd ./swan-eosxd-config-chart
+$ helm upgrade --install --namespace kube-system  \
+cvmfsd ./swan-cvmfsd-config-chart
  
 # authenticate to create  (you can also provide generated k8s and hadoop base64 tokens if needed)
 $ kinit -c krb5cc

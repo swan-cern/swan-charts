@@ -9,7 +9,6 @@ data:
 {{ (.Files.Glob "files/private/cull_check_ticket.sh").AsConfig | indent 2 }}
 {{ (.Files.Glob "files/private/cull_delete_ticket.sh").AsConfig | indent 2 }}
 {{ (.Files.Glob "files/private/side_container_tokens_perm.sh").AsConfig | indent 2 }}
-{{ (.Files.Glob "files/cvmfs/cvmfs_prefetch_modules.sh").AsConfig | indent 2 }}
 ---
 apiVersion: v1
 kind: ConfigMap

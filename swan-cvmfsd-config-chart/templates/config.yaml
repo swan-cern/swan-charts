@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cvmfs-config
+  namespace: {{ .Release.Namespace }}
+data:
+{{ (.Files.Glob "files/cvmfs/cvmfs_prefetch.sh").AsConfig | indent 2 }}
+{{ (.Files.Glob "files/cvmfs/default.local").AsConfig | indent 2 }}

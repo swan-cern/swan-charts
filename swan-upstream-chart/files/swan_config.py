@@ -695,6 +695,11 @@ c.SwanSpawner.volume_mounts = [
         mount_path='/eos',
         mount_propagation='HostToContainer'
     ),
+    client.V1VolumeMount(
+        name='cvmfs',
+        mount_path='/cvmfs',
+        mount_propagation='HostToContainer'
+    ),
 ]
 c.SwanSpawner.volumes = [
     client.V1Volume(
@@ -703,25 +708,10 @@ c.SwanSpawner.volumes = [
             path='/var/eos'
         )
     ),
+    client.V1Volume(
+        name='cvmfs',
+        host_path=client.V1HostPathVolumeSource(
+            path='/var/cvmfs'
+        )
+    ),
 ]
-
-# add CVMFS to notebook pods
-cvmfs_repos = get_config('custom.cvmfs.repositories', [])
-for cvmfs_repo_path in cvmfs_repos:
-    cvmfs_repo_id = cvmfs_repo_path.replace('.', '-')
-    c.SwanSpawner.volumes.append(
-        client.V1Volume(
-            name='cvmfs-'+cvmfs_repo_id,
-            persistent_volume_claim=client.V1PersistentVolumeClaimVolumeSource(
-                claim_name='cvmfs-'+cvmfs_repo_id+'-pvc'
-            )
-        )
-    )
-    c.SwanSpawner.volume_mounts.append(
-        client.V1VolumeMount(
-            name='cvmfs-'+cvmfs_repo_id,
-            mount_path='/cvmfs/'+cvmfs_repo_path,
-            read_only=True
-        )
-    )
-

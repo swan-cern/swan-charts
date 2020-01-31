@@ -75,6 +75,19 @@ then
 fi
 
 echo ""
+echo "Updating cvmfsd"
+echo ""
+
+helm upgrade --install --namespace kube-system  \
+cvmfsd $ROOT_DIR/swan-cvmfsd-config-chart
+
+if [[ $? -ne 0 ]]
+then
+    echo "failed"
+    exit 1
+fi
+
+echo ""
 echo "Updating swan env ${SWAN_ENV}, upgrade db ${UPGRADE_DB}"
 echo ""
 
