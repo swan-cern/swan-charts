@@ -2,109 +2,480 @@
 <style> .nbs{ font-weight:normal; font-size:small } </style>
 <script type="text/javascript">
 <!--
-   function toggle_visibility(id) {
-      var e = document.getElementById(id);
-      if(e.style.display == 'block')
-         e.style.display = 'none';
-      else
-         e.style.display = 'block';
-   }
+
+    var lcgFormData = [
+        {
+            type: "label",
+            label: {
+                value: "label1",
+                text: "Recommended releases (General Purpose)",
+            },
+        },
+        {
+            type: "selection",
+            lcg: {
+                value: "LCG_96python3",
+                text: "96 Python3",
+            },
+            platforms: [
+                {
+                    value: "x86_64-centos7-gcc8-opt",
+                    text: "CentOS 7 (gcc8)",
+                },
+                {
+                    value: "x86_64-centos7-gcc7-opt",
+                    text: "CentOS 7 (gcc7)",
+                },
+                {
+                    value: "x86_64-centos7-gcc62-opt",
+                    text: "CentOS 7 (gcc62)",
+                },
+            ],
+            cores: [
+                {
+                    value: "2",
+                    text: "2"
+                },
+                {
+                    value: "4",
+                    text: "4"
+                },
+            ],
+            memory: [
+                {
+                    value: "8",
+                    text: "8 GB"
+                },
+                {
+                    value: "10",
+                    text: "10 GB"
+                },
+            ],
+            clusters: [
+                {
+                    value: "none",
+                    text: "None",
+                },
+                {
+                    value: "analytix",
+                    text: "General Purpose (Analytix)",
+                },
+                {
+                    value: "hadoop-nxcals",
+                    text: "BE NXCALS (NXCals)",
+                },
+                {
+                    value: "k8s",
+                    text: "Cloud Containers",
+                },
+                {
+                    value: "hadoop-qa",
+                    text: "Hadoop QA",
+                },
+            ]
+        },
+        {
+            type: "selection",
+            lcg: {
+                value: "LCG_95apython3_nxcals",
+                text: "NXCals Python3",
+            },
+            platforms: [
+                {
+                    value: "x86_64-centos7-gcc7-opt",
+                    text: "CentOS 7 (gcc7)",
+                },
+            ],
+            cores: [
+                {
+                    value: "2",
+                    text: "2"
+                },
+            ],
+            memory: [
+                {
+                    value: "8",
+                    text: "8 GB"
+                },
+            ],
+            clusters: [
+                {
+                    value: "hadoop-nxcals",
+                    text: "BE NXCALS (NXCals)",
+                },
+            ]
+        },
+        {
+            type: "label",
+            label: {
+                value: "empty1",
+                text: "",
+            },
+        },
+        {
+            type: "label",
+            label: {
+                value: "label2",
+                text: "Development releases (might be unstable)",
+            },
+        },
+        {
+            type: "selection",
+            lcg: {
+                value: "dev3python3/latest",
+                text: "Bleeding Edge Python3",
+            },
+            platforms: [
+                {
+                    value: "x86_64-centos7-gcc8-opt",
+                    text: "CentOS 7 (gcc8)",
+                },
+            ],
+            cores: [
+                {
+                    value: "2",
+                    text: "2"
+                },
+            ],
+            memory: [
+                {
+                    value: "8",
+                    text: "8 GB"
+                },
+            ],
+            clusters: [
+                {
+                    value: "none",
+                    text: "None",
+                },
+                {
+                    value: "analytix",
+                    text: "General Purpose (Analytix)",
+                },
+                {
+                    value: "k8s",
+                    text: "Cloud Containers",
+                },
+                {
+                    value: "hadoop-qa",
+                    text: "Hadoop QA",
+                },
+            ]
+        },
+        {
+            type: "label",
+            label: {
+                value: "empty2",
+                text: "",
+            },
+        },
+        {
+            type: "label",
+            label: {
+                value: "label3",
+                text: "Development releases (GPU)",
+            },
+        },
+        {
+            type: "selection",
+            lcg: {
+                value: "LCG_96py3cu10",
+                text: "Cuda 10 Python3",
+            },
+            platforms: [
+                {
+                    value: "x86_64-centos7-gcc8-opt",
+                    text: "CentOS 7 (gcc8)",
+                },
+            ],
+            cores: [
+                {
+                    value: "4",
+                    text: "4CPU, 1GPU"
+                },
+            ],
+            memory: [
+                {
+                    value: "10",
+                    text: "10 GB"
+                },
+            ],
+            clusters: [
+                {
+                    value: "none",
+                    text: "None",
+                },
+            ]
+        },
+        {
+            type: "label",
+            label: {
+                value: "empty3",
+                text: "",
+            },
+        },
+        {
+            type: "label",
+            label: {
+                value: "label4",
+                text: "Other releases",
+            },
+        },
+        {
+            type: "selection",
+            lcg: {
+                value: "LCG_95a",
+                text: "95a",
+            },
+            platforms: [
+                {
+                    value: "x86_64-centos7-gcc7-opt",
+                    text: "CentOS 7 (gcc7)",
+                },
+            ],
+            cores: [
+                {
+                    value: "2",
+                    text: "2"
+                },
+            ],
+            memory: [
+                {
+                    value: "8",
+                    text: "8 GB"
+                },
+            ],
+            clusters: [
+                {
+                    value: "none",
+                    text: "None",
+                },
+                {
+                    value: "analytix",
+                    text: "General Purpose (Analytix)",
+                },
+                {
+                    value: "hadoop-qa",
+                    text: "Hadoop QA",
+                },
+            ]
+        },
+        {
+            type: "selection",
+            lcg: {
+                value: "LCG_95apython3",
+                text: "95a Python3",
+            },
+            platforms: [
+                {
+                    value: "x86_64-centos7-gcc7-opt",
+                    text: "CentOS 7 (gcc7)",
+                },
+            ],
+            cores: [
+                {
+                    value: "2",
+                    text: "2"
+                },
+            ],
+            memory: [
+                {
+                    value: "8",
+                    text: "8 GB"
+                },
+            ],
+            clusters: [
+                {
+                    value: "none",
+                    text: "None",
+                },
+                {
+                    value: "analytix",
+                    text: "General Purpose (Analytix)",
+                },
+                {
+                    value: "hadoop-qa",
+                    text: "Hadoop QA",
+                },
+            ]
+        },
+    ];
+
+    var formInitialized = false;
+
+    function findLcgData(lcgValue) {
+        var lcgData;
+        for (key in lcgFormData) {
+            lcgData = lcgFormData[key];
+            if (lcgData.type === "selection" && lcgData.lcg.value === lcgValue) {
+                return lcgData;
+            }
+        }
+
+        throw "LCG Data not found"
+    }
+
+    function toggle_visibility(id) {
+        var e = document.getElementById(id);
+        if(e.style.display == 'block')
+            e.style.display = 'none';
+        else
+            e.style.display = 'block';
+    }
+
+    function adjust_form() {
+        var selectLCG = document.getElementById('lcgReleaseOptions');
+        if (!formInitialized) {
+            formInitialized = true;
+
+            selectLCG.innerHTML = '';
+            var firstLCGSelected = false;
+            for( var i = 0 ; i < lcgFormData.length ; i++ ){
+                var lcgFormEntry = lcgFormData[i];
+
+                var selectLCGOption = document.createElement("option");
+                if (lcgFormEntry.type === "label") {
+                    selectLCGOption.disabled="disabled";
+                    selectLCGOption.style="border-bottom:1px solid rgba(153,153,153,.3); margin:-10px 0 4px 0";
+                    selectLCGOption.value=lcgFormEntry.label.value;
+                    selectLCGOption.text=lcgFormEntry.label.text;
+                } else {
+                    if (!firstLCGSelected) {
+                        firstLCGSelected = true;
+                        selectLCGOption.selected = true;
+                    }
+                    selectLCGOption.value=lcgFormEntry.lcg.value;
+                    selectLCGOption.text=lcgFormEntry.lcg.text;
+                }
+
+                selectLCG.add(selectLCGOption);
+            }
+        }
+
+        var lcgValue = selectLCG.value;
+        var lcgData = findLcgData(lcgValue);
+
+        // adjust platforms
+        var selectPlatform = document.getElementById('platformOptions');
+        selectPlatform.innerHTML = '';
+
+        for( var i = 0 ; i < lcgData.platforms.length ; i++ ){
+            var lcgPlatform = lcgData.platforms[i];
+
+            var selectPlatformOption = document.createElement("option");
+            selectPlatformOption.value = lcgPlatform.value;
+            selectPlatformOption.text = lcgPlatform.text;
+            if (i === 0) {
+                selectPlatformOption.selected = true;
+            }
+
+            selectPlatform.add(selectPlatformOption);
+        }
+
+        // adjust cores
+        var selectCores = document.getElementById('coresOptions');
+        selectCores.innerHTML = '';
+
+        for( var i = 0 ; i < lcgData.cores.length ; i++ ){
+            var lcgCores = lcgData.cores[i];
+
+            var selectCoresOption = document.createElement("option");
+            selectCoresOption.value = lcgCores.value;
+            selectCoresOption.text = lcgCores.text;
+            if (i === 0) {
+                selectCoresOption.selected = true;
+            }
+
+            selectCores.add(selectCoresOption);
+        }
+
+        // adjust memory
+        var selectMemory = document.getElementById('memoryOptions');
+        selectMemory.innerHTML = '';
+
+        for( var i = 0 ; i < lcgData.memory.length ; i++ ){
+            var lcgMemory = lcgData.memory[i];
+
+            var selectMemoryOption = document.createElement("option");
+            selectMemoryOption.value = lcgMemory.value;
+            selectMemoryOption.text = lcgMemory.text;
+            if (i === 0) {
+                selectMemoryOption.selected = true;
+            }
+
+            selectMemory.add(selectMemoryOption);
+        }
+
+        // adjust clusters
+        var selectCluster = document.getElementById('clusterOptions');
+        selectCluster.innerHTML = '';
+
+        for( var i = 0 ; i < lcgData.clusters.length ; i++ ){
+            var lcgCluster = lcgData.clusters[i];
+
+            var selectClusterOption = document.createElement("option");
+            selectClusterOption.value = lcgCluster.value;
+            selectClusterOption.text = lcgCluster.text;
+            if (i === 0) {
+                selectClusterOption.selected = true;
+            }
+
+            selectCluster.add(selectClusterOption);
+        }
+    }
+
+    window.onload = adjust_form;
 //-->
 </script>
-<br>
-<label for="placeholder">
-<span class='nb'>Specify the parameters that will be used to contextualise the container which is created for you. See <a target="_blank" href="https://swan.web.cern.ch">SWAN service website</a> for more details and contact to administrators.</span>
-<br>
-<br>
-<span class='nb'>Note: this server is in beta state, please report any encountered issues to swan-admins@cern.ch</span>
-</label>
-<br><br>
-<label for="LCG-rel">Software stack <a href="#" onclick="toggle_visibility('lcgReleaseDetails');"><span class='nbs'>more...</span></a>
-<div style="display:none;" id="lcgReleaseDetails">
-   <span class='nb'>The software stack to associate to the container. See the <a target="_blank" href="http://lcginfo.cern.ch/">LCG package info</a> page.</span>
+<div>
+    <br>
+    <label for="placeholder">
+    <span class='nb'>Specify the parameters that will be used to contextualise the container which is created for you. See <a target="_blank" href="https://swan.web.cern.ch">SWAN service website</a> for more details and contact to administrators.</span>
+    <br>
+    <br>
+    <span class='nb'>Note: this server is in beta state, please report any encountered issues to swan-admins@cern.ch</span>
+    </label>
+    <br><br>
+    <label for="LCG-rel">Software stack <a href="#" onclick="toggle_visibility('lcgReleaseDetails');"><span class='nbs'>more...</span></a>
+    <div style="display:none;" id="lcgReleaseDetails">
+       <span class='nb'>The software stack to associate to the container. See the <a target="_blank" href="http://lcginfo.cern.ch/">LCG package info</a> page.</span>
+    </div>
+    </label>
+    <select id="lcgReleaseOptions" name="LCG-rel" onchange="adjust_form();">
+    </select>
+    <br>
+    <label for="platform">Platform <a href="#" onclick="toggle_visibility('platformDetails');"><span class='nbs'>more...</span></a>
+    <div style="display:none;" id="platformDetails">
+       <span class='nb'>The combination of compiler version and flags.</span>
+    </div>
+    </label>
+    <select id="platformOptions" name="platform"></select>
+    <br>
+    <label for="scriptenv">Environment script <a href="#" onclick="toggle_visibility('scriptenvDetails');"><span class='nbs'>more...</span></a>
+    <div style="display:none;" id="scriptenvDetails">
+       <span class='nb'>User-provided bash script to define custom environment variables. The variable CERNBOX_HOME is resolved to the proper /eos/user/u/username directory.</span>
+    </div>
+    </label>
+    <input type="text" name="scriptenv" placeholder="e.g. $CERNBOX_HOME/MySWAN/myscript.sh">
+    <br>
+    <label for="ncores">Number of cores <a href="#" onclick="toggle_visibility('ncoresDetails');"><span class='nbs'>more...</span></a>
+    <div style="display:none;" id="ncoresDetails">
+       <span class='nb'>Number of cores to associate to the container.</span>
+    </div>
+    </label>
+    <select id="coresOptions" name="ncores"></select>
+    <br>
+    <label for="memory">Memory <a href="#" onclick="toggle_visibility('memoryDetails');"><span class='nbs'>more...</span></a>
+    <div style="display:none;" id="memoryDetails">
+       <span class='nb'>Amount of Memory allocated to the container.</span>
+    </div>
+    </label>
+    <select id="memoryOptions" name="memory"></select>
+    <br>
+    <label for="spark-cluster">Spark cluster <a href="#" onclick="toggle_visibility('sparkClusterDetails');"><span class='nbs'>more...</span></a>
+    <div style="display:none;" id="sparkClusterDetails">
+        <span class='nb'>Name of the Spark cluster where to offload computations.</span>
+    </div>
+    </label>
+    <select id="clusterOptions" name="spark-cluster"></select>
 </div>
-</label>
-<select name="LCG-rel">
-   <option style="border-bottom:1px solid rgba(153,153,153,.3); margin:-10px 0 4px 0" disabled="disabled">Recommended releases (General Purpose)</option>
-   <option value="LCG_96" selected="">96</option>
-   <option value="LCG_96python3">96 Python3</option>
-   <option style="border-bottom:1px solid rgba(153,153,153,.3); margin:-10px 0 4px 0" disabled="disabled"></option>
-   <option style="border-bottom:1px solid rgba(153,153,153,.3); margin:-10px 0 4px 0" disabled="disabled">Development releases (might be unstable)</option>
-   <option value="dev3/latest">Bleeding Edge</option>
-   <option value="dev3python3/latest">Bleeding Edge Python3</option>
-   <option style="border-bottom:1px solid rgba(153,153,153,.3); margin:-10px 0 4px 0" disabled="disabled"></option>
-   <option style="border-bottom:1px solid rgba(153,153,153,.3); margin:-10px 0 4px 0" disabled="disabled">Development releases (GPU)</option>
-   <option value="LCG_96py3cu10">Cuda 10 Python3</option>
-   <option style="border-bottom:1px solid rgba(153,153,153,.3); margin:-10px 0 4px 0" disabled="disabled"></option>
-   <option style="border-bottom:1px solid rgba(153,153,153,.3); margin:-10px 0 4px 0" disabled="disabled">Other releases</option>
-   <option value="LCG_95a">95a</option>
-   <option value="LCG_95apython3">95a Python3</option>
-   <option value="LCG_94">94</option>
-   <option value="LCG_94python3">94 Python3</option>
-   <option value="LCG_93">93</option>
-   <option value="LCG_93python3">93 Python3</option>
-   <option value="LCG_92">92</option>
-   <option value="LCG_92python3">92 Python3</option>
-   <option value="LCG_91">91</option>
-   <option value="LCG_91python3">91 Python3</option>
-   <option value="LCG_90">90</option>
-   <option value="LCG_90python3">90 Python3</option>
-   <option value="LCG_89">89</option>
-   <option value="LCG_89python3">89 Python3</option>
-   <option value="LCG_88">88</option>
-   <option value="LCG_88Py3">88 Python3</option>
-   <option value="LCG_87">87</option>
-   <option value="LCG_86">86</option>
-   <option value="LCG_85swan3">85 SWAN3</option>
-</select>
-<br>
-<label for="platform">Platform <a href="#" onclick="toggle_visibility('platformDetails');"><span class='nbs'>more...</span></a>
-<div style="display:none;" id="platformDetails">
-   <span class='nb'>The combination of compiler version and flags.</span>
-</div>
-</label>
-<select name="platform">
-   <option value="x86_64-centos7-gcc8-opt" selected="">CentOS 7 (gcc8)</option>
-   <option value="x86_64-centos7-gcc7-opt">CentOS 7 (gcc7)</option>
-   <option value="x86_64-centos7-gcc62-opt">CentOS 7 (gcc62)</option>
-</select>
-<br>
-<label for="scriptenv">Environment script <a href="#" onclick="toggle_visibility('scriptenvDetails');"><span class='nbs'>more...</span></a>
-<div style="display:none;" id="scriptenvDetails">
-   <span class='nb'>User-provided bash script to define custom environment variables. The variable CERNBOX_HOME is resolved to the proper /eos/user/u/username directory.</span>
-</div>
-</label>
-<input type="text" name="scriptenv" placeholder="e.g. $CERNBOX_HOME/MySWAN/myscript.sh">
-<br>
-<label for="ncores">Number of cores <a href="#" onclick="toggle_visibility('ncoresDetails');"><span class='nbs'>more...</span></a>
-<div style="display:none;" id="ncoresDetails">
-   <span class='nb'>Number of cores to associate to the container.</span>
-</div>
-</label>
-<select name="ncores">
-    <option value="2" selected>2</option>
-    <option value="4">4</option>
-</select>
-<br>
-<label for="memory">Memory <a href="#" onclick="toggle_visibility('memoryDetails');"><span class='nbs'>more...</span></a>
-<div style="display:none;" id="memoryDetails">
-   <span class='nb'>Amount of Memory allocated to the container.</span>
-</div>
-</label>
-<select name="memory">
-    <option value="8" selected>8 GB</option>
-    <option value="10">10 GB</option>
-</select>
-<br>
-<label for="spark-cluster">Spark cluster <a href="#" onclick="toggle_visibility('sparkClusterDetails');"><span class='nbs'>more...</span></a>
-<div style="display:none;" id="sparkClusterDetails">
-    <span class='nb'>Name of the Spark cluster where to offload computations.</span>
-</div>
-</label>
-<select name="spark-cluster">
-    <option value="none" selected>None</option>
-    <option value="analytix">General Purpose (Analytix)</option>
-    <option value="hadoop-nxcals">BE NXCALS (NXCals)</option>
-    <option value="k8s">Cloud Containers</option>
-    <option value="hadoop-qa">Hadoop QA</option>
-</select>
