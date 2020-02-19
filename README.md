@@ -22,16 +22,21 @@ This repository serves as equivalent of `https://gitlab.cern.ch/ai/it-puppet-hos
 
 #### SWAN Deployment including dependencies
 
-<b>[1] Create cluster with ingress `traefik` and `kubernetes-1.13.10-1`. </b>
+<b>[1] Create cluster with Openstack magnum </b>
 
 ```bash
+# Create cluster
 $ openstack coe cluster create \
-  --cluster-template kubernetes-1.13.10-1 \
-  --master-flavor m2.medium \
-  --node-count 2 \
-  --flavor m2.large \
-  --keypair k8s-spark \
-  swan-k8s
+  --cluster-template kubernetes-1.17.2-2 \
+  --master-flavor m2.xlarge \
+  --node-count 4 \
+  --flavor m2.xlarge \
+  --keypair swan \
+  swan
+# Add cluster
+$ openstack coe nodegroup create --node-count 1 --flavor g106.xlarge swan gpu
+# Obtain Configuration
+openstack coe cluster config swan > env.sh
 ```
 
 <b>[2] Create DNS alias, label nodes to run ingress and obtain ssl certificates. </b>
@@ -52,10 +57,10 @@ Obtain SSL
 Request from - https://ca.cern.ch/ca/host/Request.aspx?template=ee2host (automatic certificate generation) and unpack
 ```bash
 #Extract the certificate:
-openssl pkcs12 -in swan-k8s-7w5vw3dlewud-minion-0.p12 -clcerts -nokeys -out hostcert.pem
+openssl pkcs12 -in swan-jlhuibic74vm-node-0.p12 -clcerts -nokeys -out hostcert.pem
 
 #Extract the encrypted private key. To avoid protecting the key with a passphrase, specify the -nodes option:
-openssl pkcs12 -in swan-k8s-7w5vw3dlewud-minion-0.p12 -nocerts -nodes -out hostkey.pem
+openssl pkcs12 -in swan-jlhuibic74vm-node-0.p12 -nocerts -nodes -out hostkey.pem
 ```
 
 Register for OAuth - https://sso-management.web.cern.ch/OAuth/RegisterOAuthClient.aspx
@@ -74,17 +79,21 @@ https://clouddocs.web.cern.ch/clouddocs/containers/quickstart.html#kubernetes
 
 <b>[4] SWAN Helm Deployment</b>
 
-Dependencies:
+Install Prod SWAN (`https://swan-k8s.cern.ch` and login with cern oauth)
+
+This will install the following dependencies:
 - EOS Fuse Chart [based on cern/eosxd](https://gitlab.cern.ch/helm/charts/cern/eosxd)
 - CVMFS Fuse Chart [based on boxed/cvmfs](https://gitlab.cern.ch/cernbox/boxed/tree/master/cvmfs.d)
 - Fluentd Chart [based on cern/fluentd](https://gitlab.cern.ch/helm/charts/cern/fluentd)
 - SWAN JupyterHub Chart [based on jupyterhub/jupyterhub](https://github.com/jupyterhub/helm-chart)
 
-Install Prod SWAN (`https://swan-k8s.cern.ch` and login with cern oauth)
-
 ```bash
-$ /srv/swan-k8s/source/deploy_k8s.sh <qa|prod>
+# prerequisies - copy ssl certificates (hostkey.pem, hostcert.pem) and kubeconfig to swan-spare003:/srv/swan-k8s/private
+$ ssh swan-spare003.cern.ch
+$ /srv/swan-k8s/source/deploy_k8s.sh --env <qa|prod>
 ```
+
+
 
 Install Developer SWAN (`http://masterip:30080` and login with your krb5cc user)
 
