@@ -175,6 +175,8 @@ jupyterhub:
         - etejedor
         - mato
         - ozapatam
+        - rchatter
+        - lgray
     custom:
       className: oauthenticator.generic.GenericOAuthenticator
       config:
@@ -187,8 +189,6 @@ jupyterhub:
         userdata_method: GET
         userdata_params: {'state': 'state'}
         username_key: username
-        group_whitelist:
-          - swan-admins
   rbac:
     enabled: true
   cull:
