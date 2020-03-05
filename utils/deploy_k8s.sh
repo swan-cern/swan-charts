@@ -12,7 +12,7 @@ while [[ "$#" -gt 0 ]]; do case $1 in
   *) echo "Unknown parameter passed: $1"; exit 1;;
 esac; shift; done
 
-AVAILABLE_SWAN_ENV=" prod qa "
+AVAILABLE_SWAN_ENV=" prod"
 if ! [[ -n "${SWAN_ENV}" && " ${AVAILABLE_SWAN_ENV[@]} " =~ " ${SWAN_ENV} " ]]; then
     echo "ERROR: ${SWAN_ENV} is not available swan deployment environment"
 	exit 1
@@ -22,13 +22,6 @@ if [ -n "$(git status --porcelain)" ]; then
     echo "ERROR: Cannot proceed as repository has not commited changes"
     exit 1
 fi
-
-# allow to deploy to prod only from master
-if [[ $SWAN_ENV == "prod" && $(git symbolic-ref -q HEAD) != "refs/heads/master" ]]; then
-    echo "ERROR: Cannot deploy prod environment on branch other than master"
-    exit 1
-fi
-
 
 # kubernetes access based on environment
 export KUBECONFIG=/srv/swan-k8s/private/swan.$SWAN_ENV.kubeconfig
