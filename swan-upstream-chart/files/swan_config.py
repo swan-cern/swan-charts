@@ -1,4 +1,4 @@
-import os, subprocess, time
+import os, subprocess, time, pwd
 from kubernetes import client
 from kubernetes.client.rest import ApiException
 from oauthenticator.generic import GenericOAuthenticator
@@ -42,12 +42,18 @@ class CERNOAuthenticator(GenericOAuthenticator):
 
         return user_data
 
-    async def pre_spawn_start(self, user, spawner):
-        auth_state = await user.get_auth_state()
-        os.system("groupadd " + user.name + " -g " + auth_state['ldap_uid'])
-        os.system("useradd " + user.name + " -u " + auth_state['ldap_uid'] + " -g " + auth_state['ldap_uid'])
+    def add_user_to_pwd(self, username, uid):
+        try:
+            pwd.getpwnam(username)
+        except KeyError:
+            self.log.info("Adding user %s(%s) to pwd" % (uid, username))
+            os.system("groupadd " + username + " -g " + uid)
+            os.system("useradd " + username + " -u " + uid + " -g " + uid)
 
-        self.log.info("Added user %s(%s) to pwd" % (auth_state['ldap_uid'], user.name))
+    async def refresh_user(self, user, handler=None):
+        auth_state = await user.get_auth_state()
+        if auth_state:
+            self.add_user_to_pwd(user.name, auth_state['ldap_uid'])
 
     @staticmethod
     def __get_oauth_response_value(type, response):
