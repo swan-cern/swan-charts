@@ -17,6 +17,7 @@ fi
 
 # Create new secret with renewed token
 STATUS_REPLACE=$(curl -ik \
+    -s \
     -o /dev/null \
     -w "%{http_code}" \
     -X PUT \

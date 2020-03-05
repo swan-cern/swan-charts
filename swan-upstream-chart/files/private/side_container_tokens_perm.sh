@@ -29,26 +29,27 @@ if [[ -f "/srv/side-container/hadoop/webhdfs.toks" ]]; then
     echo "add hadoop.toks to user container"
     copy_token_to_notebook /srv/side-container/hadoop/webhdfs.toks /srv/notebook/tokens/webhdfs.toks
 else
-    echo "skip adding /srv/notebook/tokens/hadoop.toks to user container"
+    echo "webhdfs.toks not required, skipping"
 fi
 
 if [[ -f "/srv/side-container/hadoop/hadoop.toks" ]]; then
     echo "add hadoop.toks to user container"
     copy_token_to_notebook /srv/side-container/hadoop/hadoop.toks /srv/notebook/tokens/hadoop.toks
 else
-    echo "skip adding /srv/notebook/tokens/hadoop.toks to user container"
+    echo "hadoop.toks not required, skipping"
 fi
 
 if [[ -f "/srv/side-container/hadoop/k8s-user.config" ]]; then
     echo "add k8s-user.config to user container"
     copy_token_to_notebook /srv/side-container/hadoop/k8s-user.config /srv/notebook/tokens/k8s-user.config
 else
-    echo "skip adding /srv/notebook/tokens/k8s-user.config to user container"
+    echo "k8s-user.config not required, skipping"
 fi
 
 echo "start refreshing /srv/notebook/tokens/krb5cc in user container"
+copy_token_to_notebook /srv/side-container/eos/krb5cc /srv/notebook/tokens/krb5cc
+klist -c /srv/notebook/tokens/krb5cc
 while true; do
-    copy_token_to_notebook /srv/side-container/eos/krb5cc /srv/notebook/tokens/krb5cc
-    klist -c /srv/notebook/tokens/krb5cc
     sleep $CULL_PERIOD
+    copy_token_to_notebook /srv/side-container/eos/krb5cc /srv/notebook/tokens/krb5cc
 done
