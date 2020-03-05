@@ -1,6 +1,6 @@
 dependencies:
 - name: eosxd
-  repository: http://charts.cern.ch/cern
-  version: 0.2.0
-digest: sha256:cbd23116389c4c28ebbc00609b0ce7848df55db3d7fa52aae0f76ea81f50d061
-generated: 2019-12-18T17:24:38.493532129+01:00
+  repository: https://registry.cern.ch/chartrepo/cern
+  version: 0.2.1
+digest: sha256:72bddb97d9df4658721e2870050586e4a82d21bd61be8d11a85d7fb45dff123d
+generated: 2020-03-05T13:32:06.480300165+01:00
