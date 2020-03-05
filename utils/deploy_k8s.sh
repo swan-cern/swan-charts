@@ -1,8 +1,6 @@
-set -e
+ROOT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.."; pwd;)
 
-ROOT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )"; pwd;)
-
-echo "# USAGE: ${ROOT_DIR}/deploy_k8s.sh --env <qa/prod> (--upgrade-db)"
+echo "# USAGE: ${ROOT_DIR}/utils/deploy_k8s.sh --env <qa/prod> (--upgrade-db)"
 echo ""
 
 SWAN_ENV=""

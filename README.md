@@ -139,10 +139,16 @@ This will install the following dependencies:
 ```bash
 # prerequisies - copy ssl certificates (hostkey.pem, hostcert.pem) and kubeconfig to swan-spare003:/srv/swan-k8s/private
 $ ssh swan-spare003.cern.ch
-$ /srv/swan-k8s/source/deploy_k8s.sh --env <qa|prod>
+$ /srv/swan-k8s/source/utils/deploy_k8s.sh --env <qa|prod>
 ```
 
+### Utilities and development
 
+Authenticate to given environment to execute `helm`/`kubectl` commands
+
+```bash
+source ./utils/auth_k8s.sh --env prod
+```
 
 Install Developer SWAN (`http://masterip:30080` and login with your krb5cc user)
 
@@ -153,7 +159,7 @@ eosxd ./swan-eosxd-config-chart
 $ helm upgrade --install --namespace kube-system  \
 cvmfsd ./swan-cvmfsd-config-chart
  
-# authenticate to create  (you can also provide generated k8s and hadoop base64 tokens if needed)
+# authenticate to provide eos token (you can also provide generated k8s and hadoop base64 tokens if needed)
 $ kinit -c krb5cc
  
 # install swan (linux example)
