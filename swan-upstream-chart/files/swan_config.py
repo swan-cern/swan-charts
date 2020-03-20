@@ -2,8 +2,6 @@ import os, subprocess, time, pwd
 from kubernetes import client
 from kubernetes.client.rest import ApiException
 from oauthenticator.generic import GenericOAuthenticator
-from tornado.httpclient import HTTPRequest, AsyncHTTPClient
-import json
 
 """
 Classes handling authentication for SWAN at CERN
@@ -12,56 +10,28 @@ Classes handling authentication for SWAN at CERN
 
 class CERNOAuthenticator(GenericOAuthenticator):
 
-    CERN_OAUTH_ME_ENDPOINT = "https://oauthresource.web.cern.ch/api/Me"
-    CERN_OAUTH_LDAP_UID_TYPE = "http://schemas.xmlsoap.org/claims/uidNumber"
-    CERN_OAUTH_LDAP_GID_TYPE = "http://schemas.xmlsoap.org/claims/gidNumber"
-    CERN_OAUTH_LDAP_USERNAME_TYPE = "http://schemas.xmlsoap.org/claims/CommonName"
+    async def refresh_user(self, user, handler=None):
+        """
+        Make sure to add uset to pwd when there is auth refresh:
+        - every 360s by default
+        - when jupyterhub finds stale state (e.g. on jupyterhub restart)
+        """
 
-    async def authenticate(self, handler, data=None):
-        user_data = await super().authenticate(handler, data)
+        auth_state = await user.get_auth_state()
 
-        headers = {
-            "Accept": "application/json",
-            "User-Agent": "JupyterHub",
-            "Authorization": "Bearer {}".format(user_data['auth_state']['access_token'])
-        }
+        self.log.info("Refresh user (%s) with auth state" % user.name)
+        if auth_state:
+            self.add_user_to_pwd(user.name, auth_state['oauth_user']['cern_uid'])
 
-        http_client = AsyncHTTPClient()
-        req = HTTPRequest(self.CERN_OAUTH_ME_ENDPOINT,
-                          method=self.userdata_method,
-                          headers=headers,
-                          validate_cert=self.tls_verify,
-                          )
-        resp = await http_client.fetch(req)
-        resp_json = json.loads(resp.body.decode('utf8', 'replace'))
-
-        user_data['auth_state']['ldap_uid'] = self.__get_oauth_response_value(self.CERN_OAUTH_LDAP_UID_TYPE, resp_json)
-
-        self.log.info("Retrieved LDAP user %s(%s) info from OAuth"
-                      % (user_data['auth_state']['ldap_uid'], user_data['name']))
-
-        return user_data
+            return auth_state
 
     def add_user_to_pwd(self, username, uid):
         try:
             pwd.getpwnam(username)
         except KeyError:
             self.log.info("Adding user %s(%s) to pwd" % (uid, username))
-            os.system("groupadd " + username + " -g " + uid)
-            os.system("useradd " + username + " -u " + uid + " -g " + uid)
-
-    async def refresh_user(self, user, handler=None):
-        auth_state = await user.get_auth_state()
-        if auth_state:
-            self.add_user_to_pwd(user.name, auth_state['ldap_uid'])
-
-    @staticmethod
-    def __get_oauth_response_value(type, response):
-        for field in response:
-            if field['Type'] == type:
-                return field['Value']
-        return None
-
+            os.system("groupadd %s -g %s" % (username, uid))
+            os.system("useradd %s -u %s -g %s" % (username, uid, uid))
 
 """
 Class handling KubeSpawner.modify_pod_hook_call(spawner,pod) call
@@ -675,11 +645,7 @@ c.JupyterHub.allow_named_servers = False
 c.SwanSpawner.delete_grace_period = 10
 
 # SwanKubeSpawner requires to add user to pwd after authentication
-auth_type = get_config('auth.type', None)
-if auth_type == 'custom':
-    c.JupyterHub.authenticator_class = CERNOAuthenticator
-    c.Authenticator.enable_auth_state = True
-    c.Authenticator.auto_login = True
+c.JupyterHub.authenticator_class = CERNOAuthenticator
 
 """
 Configuration for Jupyter Notebook - general

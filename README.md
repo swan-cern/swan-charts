@@ -83,7 +83,7 @@ openssl pkcs12 -in swan-jlhuibic74vm-node-0.p12 -clcerts -nokeys -out hostcert.p
 openssl pkcs12 -in swan-jlhuibic74vm-node-0.p12 -nocerts -nodes -out hostkey.pem
 ```
 
-Register for OAuth - https://sso-management.web.cern.ch/OAuth/RegisterOAuthClient.aspx
+Register for KeyCloak - https://application-portal.web.cern.ch
 
 ```bash
 client_id: swan-k8s.cern.ch
@@ -162,15 +162,15 @@ cvmfsd ./swan-cvmfsd-config-chart
 # authenticate to provide eos token (you can also provide generated k8s and hadoop base64 tokens if needed)
 $ kinit -c krb5cc
  
-# install swan (linux example)
-$ helm upgrade --install --namespace swandev01  \
---values swan-upstream-chart/swan.dev.values.yaml \
+# install swan (linux example) e.g. swan-k8s-pmrowczy
+$ helm upgrade --install --namespace swan  \
+--values swan-upstream-chart/swan.pmrowczy.values.yaml \
 --set jupyterhub.hub.annotations.version="release-$(date +%s)" \
---set jupyterhub.auth.dummy.password=test \
+--set jupyterhub.auth.custom.config.client_secret="redacted" \
 --set swan.secrets.eos.cred="$(base64 -w0 krb5cc)" \
---set swan.secrets.hadoop.cred="$(base64 -w0 /spark/hadoop.toks)" \
---set swan.secrets.sparkk8s.cred="$(base64 -w0 /spark/k8s-user.config)" \
-swandev01 ./swan-upstream-chart
+--set swan.secrets.hadoop.cred="$(base64 -w0 hadoop.toks)" \
+--set swan.secrets.sparkk8s.cred="$(base64 -w0 k8s-user.config)" \
+swan ./swan-upstream-chart
 ```
 
 ### Demo of upstream JupyterHub (no SWAN, no EOS, no CVMFS)

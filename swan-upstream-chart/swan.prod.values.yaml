@@ -6,7 +6,7 @@ jupyterhub:
       type: none
     image:
       name: "gitlab-registry.cern.ch/swan/docker-images/systemuser"
-      tag: "daily"
+      tag: "v5.2.0"
     cloudMetadata:
       enabled: true
     networkPolicy:
@@ -52,12 +52,6 @@ jupyterhub:
       name: "gitlab-registry.cern.ch/swan/docker-images/jupyterhub"
       tag: "1.1.0-cern1"
       pullPolicy: "Always"
-    extraEnv:
-      OAUTH2_AUTHORIZE_URL: https://oauth.web.cern.ch/OAuth/Authorize
-      OAUTH2_TOKEN_URL: https://oauth.web.cern.ch/OAuth/Token
-      OAUTH_CALLBACK_URL: https://swan-k8s.cern.ch/hub/oauth_callback
-      # placeholder for hub auth state cryptographic key
-      JUPYTERHUB_CRYPT_KEY:
     extraVolumeMounts:
       - name: swan-jh
         mountPath: /srv/jupyterhub/jupyterhub_form.html
@@ -142,6 +136,12 @@ jupyterhub:
     extraConfig:
       swanConf: |
         exec(open('/srv/jupyterhub/swan_config.py').read())
+    extraEnv:
+      OAUTH2_AUTHORIZE_URL: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/auth
+      OAUTH2_TOKEN_URL: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/token
+      OAUTH_CALLBACK_URL: https://swan-k8s.cern.ch/hub/oauth_callback
+      # placeholder for hub auth state cryptographic key
+      JUPYTERHUB_CRYPT_KEY:
     db:
       type: postgres
       url: postgres+psycopg2://swanjh@dbod-jupyterhub.cern.ch:6602/swanjh
@@ -178,17 +178,21 @@ jupyterhub:
         - rchatter
         - lgray
     custom:
-      className: oauthenticator.generic.GenericOAuthenticator
+      className: CERNOAuthenticator
       config:
-        client_id: "swan-k8s.cern.ch"
-        # placeholder for oauth secret to be filed by secrets.yaml
-        client_secret:
-        token_url: "https://oauth.web.cern.ch/OAuth/Token"
-        userdata_url: "https://oauthresource.web.cern.ch/api/User"
-        groupdata_url: "https://oauthresource.web.cern.ch/api/Group"
+        login_service: keycloak
+        token_url: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/token
+        userdata_url: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/userinfo
+        groupdata_url: ""
         userdata_method: GET
         userdata_params: {'state': 'state'}
-        username_key: username
+        username_key: cern_upn
+        enable_auth_state: true
+        auto_login: true
+        refresh_pre_spawn: true
+        client_id: swan-k8s.cern.ch
+        # placeholder for oauth secret to be filed by secrets.yaml
+        client_secret:
   rbac:
     enabled: true
   cull:
