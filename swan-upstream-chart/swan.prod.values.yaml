@@ -190,7 +190,8 @@ jupyterhub:
         enable_auth_state: true
         auto_login: true
         refresh_pre_spawn: true
-        client_id: swan-k8s.cern.ch
+        # placeholder for oauth client_id to be filled by secrets.yaml
+        client_id:
         # placeholder for oauth secret to be filed by secrets.yaml
         client_secret:
   rbac:
