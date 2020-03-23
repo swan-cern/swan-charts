@@ -162,11 +162,13 @@ cvmfsd ./swan-cvmfsd-config-chart
 # authenticate to provide eos token (you can also provide generated k8s and hadoop base64 tokens if needed)
 $ kinit -c krb5cc
  
-# install swan (linux example) e.g. swan-k8s-pmrowczy
+# install swan (linux example)
 $ helm upgrade --install --namespace swan  \
---values swan-upstream-chart/swan.pmrowczy.values.yaml \
+--values swan-upstream-chart/swan.dev.values.yaml \
 --set jupyterhub.hub.annotations.version="release-$(date +%s)" \
+--set jupyterhub.auth.custom.config.client_id="redacted" \
 --set jupyterhub.auth.custom.config.client_secret="redacted" \
+--set jupyterhub.hub.extraEnv.OAUTH_CALLBACK_URL="http://<url>:30080/hub/oauth_callback" \
 --set swan.secrets.eos.cred="$(base64 -w0 krb5cc)" \
 --set swan.secrets.hadoop.cred="$(base64 -w0 hadoop.toks)" \
 --set swan.secrets.sparkk8s.cred="$(base64 -w0 k8s-user.config)" \

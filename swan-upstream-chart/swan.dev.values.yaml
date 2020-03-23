@@ -137,18 +137,13 @@ jupyterhub:
     networkPolicy:
       enabled: false
     extraEnv:
+      JUPYTERHUB_CRYPT_KEY: ca4ac8ac414707020a7db74341eaf25de01f6d0bd73f4ceb9d2a197f1e3b9f32
       OAUTH2_AUTHORIZE_URL: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/auth
       OAUTH2_TOKEN_URL: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/token
-      OAUTH_CALLBACK_URL: http://swan-k8s-pmrowczy-r37tohqawnsm-master-0.cern.ch:30080/hub/oauth_callback
-      JUPYTERHUB_CRYPT_KEY: ca4ac8ac414707020a7db74341eaf25de01f6d0bd73f4ceb9d2a197f1e3b9f32
+      # Details in https://application-portal.web.cern.ch
+      OAUTH_CALLBACK_URL:
   auth:
     type: custom
-    admin:
-      users:
-        - pmrowczy
-    whitelist:
-      users:
-        - pmrowczy
     custom:
       className: CERNOAuthenticator
       config:
@@ -162,8 +157,8 @@ jupyterhub:
         enable_auth_state: true
         auto_login: true
         refresh_pre_spawn: true
-        client_id: swan-k8s-pmrowczy
         # Details in https://application-portal.web.cern.ch
+        client_id:
         client_secret:
   rbac:
     enabled: true
