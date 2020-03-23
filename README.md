@@ -51,6 +51,7 @@ $ openstack coe cluster create \
   --labels ingress_controller="traefik" \
   --labels autoscaler_tag="v1.15.2" \
   --labels cephfs_csi_version="cern-csi-1.0-2" \
+  --labels tiller_enabled="true" \
   --labels monitoring_enabled="true" \
   swan
 # Add cluster
@@ -83,10 +84,10 @@ openssl pkcs12 -in swan-jlhuibic74vm-node-0.p12 -clcerts -nokeys -out hostcert.p
 openssl pkcs12 -in swan-jlhuibic74vm-node-0.p12 -nocerts -nodes -out hostkey.pem
 ```
 
-Register for KeyCloak - https://application-portal.web.cern.ch
+Register application with KeyCloak - https://application-portal.web.cern.ch - and get its secret
 
 ```bash
-client_id: swan-k8s.cern.ch
+client_id: swan-k8s
 redirect_uri: https://swan-k8s.cern.ch/hub/oauth_callback
 ```
 
