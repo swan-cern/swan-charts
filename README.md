@@ -127,7 +127,25 @@ rmmod nouveau
 kubectl create -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/1.0.0-beta4/nvidia-device-plugin.yml
 ```
 
-<b>[5] SWAN Helm Deployment</b>
+
+<b>[5] Expose prometheus datasource and update datasource in grafana instance</b>
+##### 7. 
+
+```bash
+kubectl expose service prometheus-prometheus \
+--namespace kube-system \
+--name prometheus-datasource \
+--port=9090 \
+--target-port=9090 \
+--type=NodePort
+ 
+kubectl get service/prometheus-datasource -n kube-system -o json | jq -r '.spec.ports[0].nodePort' | xargs -I{} echo "prometheus data source at http://master-ip:{}"
+```
+
+Check in `https://monit-grafana.cern.ch/d/2/swan-cluster-status?orgId=53` 
+that dashboard is accessible and data source configured
+
+<b>[6] SWAN Helm Deployment</b>
 
 Install Prod SWAN (`https://swan-k8s.cern.ch` and login with cern oauth)
 
