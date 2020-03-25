@@ -189,6 +189,7 @@ jupyterhub:
         username_key: cern_upn
         enable_auth_state: true
         auto_login: true
+        auth_refresh_age: 3600
         refresh_pre_spawn: true
         # placeholder for oauth client_id to be filled by secrets.yaml
         client_id:
