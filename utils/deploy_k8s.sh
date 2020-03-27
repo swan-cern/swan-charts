@@ -12,14 +12,24 @@ while [[ "$#" -gt 0 ]]; do case $1 in
   *) echo "Unknown parameter passed: $1"; exit 1;;
 esac; shift; done
 
-AVAILABLE_SWAN_ENV=" prod"
+AVAILABLE_SWAN_ENV=" prod qa"
 if ! [[ -n "${SWAN_ENV}" && " ${AVAILABLE_SWAN_ENV[@]} " =~ " ${SWAN_ENV} " ]]; then
     echo "ERROR: ${SWAN_ENV} is not available swan deployment environment"
-	exit 1
+    exit 1
 fi
 
 if [ -n "$(git status --porcelain)" ]; then
     echo "ERROR: Cannot proceed as repository has not commited changes"
+    exit 1
+fi
+
+if [ "${SWAN_ENV}" == 'qa' ] && [ $(git rev-parse --abbrev-ref HEAD) != 'qa' ]; then
+    echo "ERROR: ${SWAN_ENV} can be deployed from qa branch"
+    exit 1
+fi  
+
+if [ "${SWAN_ENV}" == 'prod' ] && [ $(git rev-parse --abbrev-ref HEAD) != 'master' ]; then
+    echo "ERROR: ${SWAN_ENV} can be deployed from master branch"
     exit 1
 fi
 
@@ -28,7 +38,7 @@ export KUBECONFIG=/srv/swan-k8s/private/swan.$SWAN_ENV.kubeconfig
 
 # values and secrets based on environment
 SWAN_PROD_RELEASE_NAME=swan
-SWAN_PROD_VALUES_PATH=$ROOT_DIR/swan-upstream-chart/swan.$SWAN_ENV.values.yaml
+SWAN_PROD_VALUES_PATH=$ROOT_DIR/swan-upstream-chart/swan.values.yaml
 SWAN_SECRET_VALUES_PATH=/srv/swan-k8s/private/swan.$SWAN_ENV.secrets.yaml
 
 # secret files

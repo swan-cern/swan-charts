@@ -19,8 +19,8 @@ jupyterhub:
       traefik.ingress.kubernetes.io/redirect-entry-point: https
     tls:
       - secretName: swan-tls-cert
+    # placeholder for hostname
     hosts:
-      - swan-k8s.cern.ch
   proxy:
     service:
       type: ClusterIP
@@ -139,12 +139,14 @@ jupyterhub:
     extraEnv:
       OAUTH2_AUTHORIZE_URL: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/auth
       OAUTH2_TOKEN_URL: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/token
-      OAUTH_CALLBACK_URL: https://swan-k8s.cern.ch/hub/oauth_callback
+      # placeholder for callback url
+      OAUTH_CALLBACK_URL: 
       # placeholder for hub auth state cryptographic key
       JUPYTERHUB_CRYPT_KEY:
     db:
       type: postgres
-      url: postgres+psycopg2://swanjh@dbod-jupyterhub.cern.ch:6602/swanjh
+      # placeholder for postgres connection url
+      url: 
       # placeholder for postgres password
       password:
     annotations:
