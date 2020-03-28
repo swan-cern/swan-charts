@@ -1,4 +1,4 @@
-import os, subprocess, time, pwd
+import os, subprocess, time, pwd, jwt
 from kubernetes import client
 from kubernetes.client.rest import ApiException
 from oauthenticator.generic import GenericOAuthenticator
@@ -20,6 +20,7 @@ class CERNOAuthenticator(GenericOAuthenticator):
         auth_state = await user.get_auth_state()
 
         self.log.info("Refresh user (%s) with auth state" % user.name)
+        self.log.info(auth_state)
         if auth_state and 'oauth_user' in auth_state and 'cern_uid' in auth_state['oauth_user']:
             self.add_user_to_pwd(user.name, auth_state['oauth_user']['cern_uid'])
 
@@ -33,6 +34,12 @@ class CERNOAuthenticator(GenericOAuthenticator):
             self.log.info("Adding user %s(%s) to pwd" % (uid, username))
             os.system("groupadd %s -g %s" % (username, uid))
             os.system("useradd %s -u %s -g %s" % (username, uid, uid))
+
+
+def auth_state_hook(spawner, auth_state):
+    auth_decoded = jwt.decode(auth_state['access_token'], verify=False, algorithms='RS256')
+    spawner.auth_decoded = auth_decoded
+
 
 """
 Class handling KubeSpawner.modify_pod_hook_call(spawner,pod) call
@@ -127,6 +134,11 @@ class PodHookHandler:
             "cpu": 1,
             "memory": '2G'
         }
+
+        # check if the user is granted access to GPUs
+        if "cu" in spawner.get_lcg_release() and "swan-gpu" not in spawner.auth_decoded.get('cern_roles','no_roles'):
+           raise ValueError("Access to GPUs is not granted; please contact swan-admins@cern.ch")
+
 
         # add resource requirements for GPUs if available (this cluster has nvidia gpu's)
         if "cu" in spawner.get_lcg_release():
@@ -647,6 +659,9 @@ c.SwanSpawner.delete_grace_period = 10
 
 # SwanKubeSpawner requires to add user to pwd after authentication
 c.JupyterHub.authenticator_class = CERNOAuthenticator
+
+# function that you can to pass auth_state to the spawner 
+c.Spawner.auth_state_hook = auth_state_hook
 
 """
 Configuration for Jupyter Notebook - general
