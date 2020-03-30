@@ -20,7 +20,6 @@ class CERNOAuthenticator(GenericOAuthenticator):
         auth_state = await user.get_auth_state()
 
         self.log.info("Refresh user (%s) with auth state" % user.name)
-        self.log.info(auth_state)
         if auth_state and 'oauth_user' in auth_state and 'cern_uid' in auth_state['oauth_user']:
             self.add_user_to_pwd(user.name, auth_state['oauth_user']['cern_uid'])
 
