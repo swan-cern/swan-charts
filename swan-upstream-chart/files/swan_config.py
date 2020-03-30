@@ -135,7 +135,8 @@ class PodHookHandler:
         }
 
         # check if the user is granted access to GPUs
-        if "cu" in spawner.get_lcg_release() and "swan-gpu" not in spawner.auth_decoded.get('cern_roles','no_roles'):
+        swan_roles = spawner.auth_decoded.get('resource_access',{'app':''}).get(os.environ.get('APP_CLIENT_ID'),{'roles_list':''}).get('roles','no_roles')
+        if "cu" in spawner.get_lcg_release() and "swan-gpu" not in swan_roles:
            raise ValueError("Access to GPUs is not granted; please contact swan-admins@cern.ch")
 
 

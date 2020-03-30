@@ -139,6 +139,8 @@ jupyterhub:
     extraEnv:
       OAUTH2_AUTHORIZE_URL: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/auth
       OAUTH2_TOKEN_URL: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/token
+      # placeholder for client id
+      APP_CLIENT_ID:
       # placeholder for callback url
       OAUTH_CALLBACK_URL: 
       # placeholder for hub auth state cryptographic key
