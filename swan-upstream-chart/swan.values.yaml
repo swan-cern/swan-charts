@@ -163,24 +163,7 @@ jupyterhub:
     admin:
       users:
         - pkothuri
-    whitelist:
-      users:
-        - pkothuri
         - pmrowczy
-        - nbarros
-        - mmartinm
-        - jlunadur
-        - ekleszcz
-        - rcastell
-        - canali
-        - dalvesde
-        - ebocchi
-        - moscicki
-        - etejedor
-        - mato
-        - ozapatam
-        - rchatter
-        - lgray
     custom:
       className: CERNOAuthenticator
       config:
