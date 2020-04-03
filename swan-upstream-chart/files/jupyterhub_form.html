@@ -14,21 +14,17 @@
         {
             type: "selection",
             lcg: {
-                value: "LCG_96python3",
-                text: "96 Python3",
+                value: "LCG_97python3",
+                text: "97 Python3",
             },
             platforms: [
                 {
+                    value: "x86_64-centos7-gcc9-opt",
+                    text: "CentOS 7 (gcc9)",
+                },
+                {
                     value: "x86_64-centos7-gcc8-opt",
                     text: "CentOS 7 (gcc8)",
-                },
-                {
-                    value: "x86_64-centos7-gcc7-opt",
-                    text: "CentOS 7 (gcc7)",
-                },
-                {
-                    value: "x86_64-centos7-gcc62-opt",
-                    text: "CentOS 7 (gcc62)",
                 },
             ],
             cores: [
@@ -179,7 +175,7 @@
         {
             type: "selection",
             lcg: {
-                value: "LCG_96py3cu10",
+                value: "LCG_97py3cu10",
                 text: "Cuda 10 Python3",
             },
             platforms: [
@@ -220,6 +216,69 @@
                 value: "label4",
                 text: "Other releases",
             },
+        },
+        {
+            type: "selection",
+            lcg: {
+                value: "LCG_96python3",
+                text: "96 Python3",
+            },
+            platforms: [
+                {
+                    value: "x86_64-centos7-gcc8-opt",
+                    text: "CentOS 7 (gcc8)",
+                },
+                {
+                    value: "x86_64-centos7-gcc7-opt",
+                    text: "CentOS 7 (gcc7)",
+                },
+                {
+                    value: "x86_64-centos7-gcc62-opt",
+                    text: "CentOS 7 (gcc62)",
+                },
+            ],
+            cores: [
+                {
+                    value: "2",
+                    text: "2"
+                },
+                {
+                    value: "4",
+                    text: "4"
+                },
+            ],
+            memory: [
+                {
+                    value: "8",
+                    text: "8 GB"
+                },
+                {
+                    value: "10",
+                    text: "10 GB"
+                },
+            ],
+            clusters: [
+                {
+                    value: "none",
+                    text: "None",
+                },
+                {
+                    value: "analytix",
+                    text: "General Purpose (Analytix)",
+                },
+                {
+                    value: "hadoop-nxcals",
+                    text: "BE NXCALS (NXCals)",
+                },
+                {
+                    value: "k8s",
+                    text: "Cloud Containers",
+                },
+                {
+                    value: "hadoop-qa",
+                    text: "Hadoop QA",
+                },
+            ]
         },
         {
             type: "selection",
