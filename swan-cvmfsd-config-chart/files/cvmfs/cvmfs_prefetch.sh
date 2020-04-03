@@ -9,50 +9,50 @@ log_error() {
 
 log_info "Started cvmfs lcg prefetching.."
 
-LCG_96_SETUP="/cvmfs/sft.cern.ch/lcg/views/LCG_96/x86_64-centos7-gcc8-opt/setup.sh"
-if [ -f "$LCG_96_SETUP" ]; then
+LATEST_LCG="/cvmfs/sft.cern.ch/lcg/views/LCG_97/x86_64-centos7-gcc8-opt/setup.sh"
+if [ -f "$LATEST_LCG" ]; then
     # Get ipykernel in subshell and get return code
-    (source $LCG_96_SETUP && (timeout 10s python -m ipykernel > /dev/null 2>&1 || true ))
+    (source $LATEST_LCG && (timeout 10s python -m ipykernel > /dev/null 2>&1 || true ))
     if [ $? -ne 0 ]; then
-        log_error "Getting $LCG_96_SETUP ipykernel failed"
+        log_error "Getting $LATEST_LCG ipykernel failed"
     fi
 
     # Get JupyROOT.kernel.rootkernel in subshell and get return code
-    (source $LCG_96_SETUP && ( timeout 20s python -m JupyROOT.kernel.rootkernel > /dev/null 2>&1 || true ))
+    (source $LATEST_LCG && ( timeout 20s python -m JupyROOT.kernel.rootkernel > /dev/null 2>&1 || true ))
     if [ $? -ne 0 ]; then
-        log_error "Getting $LCG_96_SETUP JupyROOT.kernel.rootkernel failed"
+        log_error "Getting $LATEST_LCG JupyROOT.kernel.rootkernel failed"
     fi
 
     # Get Spark in subshell and get return code
-    (source $LCG_96_SETUP && ( timeout 20s python -c "import pyspark" > /dev/null 2>&1 || true ))
+    (source $LATEST_LCG && ( timeout 20s python -c "import pyspark" > /dev/null 2>&1 || true ))
     if [ $? -ne 0 ]; then
-        log_error "Getting $LCG_96_SETUP pyspark failed"
+        log_error "Getting $LATEST_LCG pyspark failed"
     fi
 else
-    log_error "Sourcing $LCG_96_SETUP failed, path not accessible"
+    log_error "Sourcing $LATEST_LCG failed, path not accessible"
 fi
 
-LCG_96Python3_SETUP="/cvmfs/sft.cern.ch/lcg/views/LCG_96python3/x86_64-centos7-gcc8-opt/setup.sh"
-if [ -f "$LCG_96Python3_SETUP" ]; then
+LATEST_LCGPython3="/cvmfs/sft.cern.ch/lcg/views/LCG_97python3/x86_64-centos7-gcc8-opt/setup.sh"
+if [ -f "$LATEST_LCGPython3" ]; then
     # Get ipykernel in subshell and get return code
-    (source $LCG_96Python3_SETUP && (timeout 10s python -m ipykernel > /dev/null 2>&1 || true ))
+    (source $LATEST_LCGPython3 && (timeout 10s python -m ipykernel > /dev/null 2>&1 || true ))
     if [ $? -ne 0 ]; then
-        log_error "Getting $LCG_96Python3_SETUP ipykernel failed"
+        log_error "Getting $LATEST_LCGPython3 ipykernel failed"
     fi
 
     # Get JupyROOT.kernel.rootkernel in subshell and get return code
-    (source $LCG_96Python3_SETUP && ( timeout 20s python -m JupyROOT.kernel.rootkernel > /dev/null 2>&1 || true ))
+    (source $LATEST_LCGPython3 && ( timeout 20s python -m JupyROOT.kernel.rootkernel > /dev/null 2>&1 || true ))
     if [ $? -ne 0 ]; then
-        log_error "Getting $LCG_96Python3_SETUP JupyROOT.kernel.rootkernel failed"
+        log_error "Getting $LATEST_LCGPython3 JupyROOT.kernel.rootkernel failed"
     fi
 
     # Get Spark in subshell and get return code
-    (source $LCG_96Python3_SETUP && ( timeout 20s python -c "import pyspark" > /dev/null 2>&1 || true ))
+    (source $LATEST_LCGPython3 && ( timeout 20s python -c "import pyspark" > /dev/null 2>&1 || true ))
     if [ $? -ne 0 ]; then
-        log_error "Getting $LCG_96Python3_SETUP pyspark failed"
+        log_error "Getting $LATEST_LCGPython3 pyspark failed"
     fi
 else
-    log_error "Sourcing $LCG_96Python3_SETUP failed, path not accessible"
+    log_error "Sourcing $LATEST_LCGPython3 failed, path not accessible"
 fi
 
 LCG_NXCALS_SETUP="/cvmfs/sft.cern.ch/lcg/views/LCG_95apython3_nxcals/x86_64-centos7-gcc7-opt/setup.sh"
