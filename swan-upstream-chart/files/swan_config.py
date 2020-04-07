@@ -38,6 +38,7 @@ class CERNOAuthenticator(GenericOAuthenticator):
 def auth_state_hook(spawner, auth_state):
     auth_decoded = jwt.decode(auth_state['access_token'], verify=False, algorithms='RS256')
     spawner.auth_decoded = auth_decoded
+    spawner.swan_roles = auth_decoded.get('resource_access',{'app':''}).get(os.environ.get('APP_CLIENT_ID'),{'roles_list':''}).get('roles','no_roles')
 
 
 """
@@ -62,7 +63,7 @@ class PodHookHandler:
 
         start_time_pod_hook = time.time()
 
-        if spawner.get_spark_cluster() != 'none':
+        if PodHookHandler.enable_spark(spawner):
             pod_definition = PodHookHandler._init_spark(spawner, pod_definition)
         pod_definition = PodHookHandler._init_resource_requirements(spawner, pod_definition)
         pod_definition = PodHookHandler._init_swan_container_env(spawner, pod_definition)
@@ -73,6 +74,31 @@ class PodHookHandler:
                            time.time() - start_time_pod_hook)
 
         return pod_definition
+
+    @staticmethod
+    def enable_spark(spawner):
+        """
+        Helper function to determine if spark related configuration is necessary
+        raise exception if user has not access to the selected spark cluster
+        return True if spark cluster is selected and user has access to the selected spark cluster
+        return False if spark cluster is not selected
+        """
+        if spawner.get_spark_cluster() == "analytix" and "analytix" not in spawner.swan_roles:
+           raise ValueError(
+              """
+              Access to the Analytix cluster is not granted. 
+              Please <a href="https://cern.service-now.com/service-portal/report-ticket.do?name=request&fe=Hadoop-Components" target="_blank">request access</a>
+              """)
+        elif spawner.get_spark_cluster() == "hadoop-nxcals" and "hadoop-nxcals" not in spawner.swan_roles:
+           raise ValueError(
+              """
+              Access to the NXCALS cluster is not granted. 
+              Please <a href="https://wikis.cern.ch/display/NXCALS/Data+Access+User+Guide#DataAccessUserGuide-nxcals_access" target="_blank">request access</a>
+              """)
+        elif spawner.get_spark_cluster() != "none":
+            return True
+        else:
+            return False
 
     @staticmethod
     def _init_pod_affinity(spawner, pod):
@@ -135,8 +161,7 @@ class PodHookHandler:
         }
 
         # check if the user is granted access to GPUs
-        swan_roles = spawner.auth_decoded.get('resource_access',{'app':''}).get(os.environ.get('APP_CLIENT_ID'),{'roles_list':''}).get('roles','no_roles')
-        if "cu" in spawner.get_lcg_release() and "swan-gpu" not in swan_roles:
+        if "cu" in spawner.get_lcg_release() and "swan-gpu" not in spawner.swan_roles:
            raise ValueError("Access to GPUs is not granted; please contact swan-admins@cern.ch")
 
 
