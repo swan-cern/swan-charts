@@ -46,8 +46,8 @@ jupyterhub:
       pullPolicy: "Always"
     extraVolumeMounts:
       - name: swan-jh
-        mountPath: /srv/jupyterhub/jupyterhub_form.html
-        subPath: jupyterhub_form.html
+        mountPath: /srv/jupyterhub/options_form_config.json
+        subPath: options_form_config.json
       - name: swan-jh
         mountPath: /srv/jupyterhub/swan_config.py
         subPath: swan_config.py
@@ -89,8 +89,8 @@ jupyterhub:
         configMap:
           name: swan-scripts
           items:
-          - key: jupyterhub_form.html
-            path: jupyterhub_form.html
+          - key: options_form_config.json
+            path: options_form_config.json
           - key: swan_config.py
             path: swan_config.py
       - name: swan-cull-scripts

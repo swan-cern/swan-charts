@@ -6,7 +6,8 @@ jupyterhub:
       type: none
     image:
       name: "gitlab-registry.cern.ch/swan/docker-images/systemuser"
-      tag: "v5.3.1"
+      tag: "swandb"
+      pullPolicy: "Always"
     cloudMetadata:
       enabled: true
     networkPolicy:
@@ -28,7 +29,7 @@ jupyterhub:
       image:
         name: "jupyterhub/configurable-http-proxy"
         tag: "4.2.0"
-        pullPolicy: IfNotPresent
+        pullPolicy: "IfNotPresent"
       resources:
         requests:
           cpu: 200m
@@ -50,12 +51,12 @@ jupyterhub:
       enabled: false
     image:
       name: "gitlab-registry.cern.ch/swan/docker-images/jupyterhub"
-      tag: "1.1.0-cern2"
+      tag: "1.1.0-cern3"
       pullPolicy: "Always"
     extraVolumeMounts:
       - name: swan-jh
-        mountPath: /srv/jupyterhub/jupyterhub_form.html
-        subPath: jupyterhub_form.html
+        mountPath: /srv/jupyterhub/options_form_config.json
+        subPath: options_form_config.json
       - name: swan-jh
         mountPath: /srv/jupyterhub/swan_config.py
         subPath: swan_config.py
@@ -97,8 +98,8 @@ jupyterhub:
         configMap:
           name: swan-scripts
           items:
-          - key: jupyterhub_form.html
-            path: jupyterhub_form.html
+          - key: options_form_config.json
+            path: options_form_config.json
           - key: swan_config.py
             path: swan_config.py
       - name: swan-cull-scripts
@@ -175,7 +176,7 @@ jupyterhub:
         userdata_params: {'state': 'state'}
         username_key: cern_upn
         enable_auth_state: true
-        auto_login: true
+        auto_login: false
         auth_refresh_age: 3600
         refresh_pre_spawn: true
         # placeholder for oauth client_id to be filled by secrets.yaml
@@ -184,8 +185,6 @@ jupyterhub:
         client_secret:
   rbac:
     enabled: true
-  cull:
-    enabled: false
   scheduling:
     userScheduler:
       enabled: false
@@ -198,6 +197,9 @@ jupyterhub:
       enabled: false
   debug:
     enabled: true
+  # disable upstream cull, but enable custom one
+  cull:
+    enabled: false
   custom:
     cull:
       enabled: true
