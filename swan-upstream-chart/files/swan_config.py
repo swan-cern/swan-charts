@@ -233,6 +233,8 @@ class PodHookHandler:
                 )
             )
 
+
+        # ITHADOOP-819 - Ports need to be opened using service creation, and later assigning allocated service nodeport to a pod 
         try:
             spark_ports_env = []
 
