@@ -2,7 +2,6 @@ import os, subprocess, time, pwd, jwt
 
 from kubernetes import client
 from kubernetes.client.rest import ApiException
-from oauthenticator.generic import GenericOAuthenticator
 
 import swanspawner
 
@@ -581,10 +580,11 @@ c.JupyterHub.spawner_class = swanspawner.SwanKubeSpawner
 
 # Authenticator
 c.JupyterHub.authenticator_class = 'keycloakauthenticator.KeyCloakAuthenticator'
+c.KeyCloakAuthenticator.accepted_roles = set()
 c.KeyCloakAuthenticator.auto_login = True
 c.KeyCloakAuthenticator.admin_role = 'swan-admins'
 c.KeyCloakAuthenticator.enable_auth_state = True
-c.KeyCloakAuthenticator.keycloak_logout_url = 'https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/logout?redirect_uri=https://swan-k8s.cern.ch'
+c.KeyCloakAuthenticator.keycloak_logout_url = os.environ.get('KEYCLOAK_LOGOUT_URL')
 
 
 # https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html

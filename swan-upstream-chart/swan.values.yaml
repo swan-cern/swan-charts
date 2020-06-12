@@ -140,8 +140,6 @@ jupyterhub:
     extraEnv:
       OAUTH2_AUTHORIZE_URL: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/auth
       OAUTH2_TOKEN_URL: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/token
-      # placeholder for client id
-      APP_CLIENT_ID:
       # placeholder for callback url
       OAUTH_CALLBACK_URL: 
       # placeholder for hub auth state cryptographic key
@@ -166,7 +164,7 @@ jupyterhub:
         - pkothuri
         - pmrowczy
     custom:
-      className: CERNOAuthenticator
+      className: keycloakauthenticator.KeyCloakAuthenticator
       config:
         login_service: keycloak
         token_url: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/token
@@ -174,7 +172,7 @@ jupyterhub:
         groupdata_url: ""
         userdata_method: GET
         userdata_params: {'state': 'state'}
-        username_key: cern_upn
+        username_key: preferred_username
         enable_auth_state: true
         auto_login: false
         auth_refresh_age: 3600
