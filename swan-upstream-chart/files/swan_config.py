@@ -7,49 +7,6 @@ from oauthenticator.generic import GenericOAuthenticator
 import swanspawner
 
 """
-Classes handling authentication for SWAN at CERN
-"""
-
-
-class CERNOAuthenticator(GenericOAuthenticator):
-
-    async def refresh_user(self, user, handler=None):
-        """
-        Make sure to add uset to pwd when there is auth refresh:
-        - every 360s by default
-        - when jupyterhub finds stale state (e.g. on jupyterhub restart)
-
-        :type user: User
-        :type handler: tornado.web.RequestHandler
-        """
-
-        auth_state = await user.get_auth_state()
-
-        self.log.info("Refresh user (%s) with auth state" % user.name)
-        if auth_state and 'oauth_user' in auth_state and 'cern_uid' in auth_state['oauth_user']:
-            self._add_user_to_pwd(user.name, auth_state['oauth_user']['cern_uid'])
-
-            return auth_state
-        return False
-
-    async def pre_spawn_start(self, user, spawner):
-        auth_state = await user.get_auth_state()
-        auth_decoded = jwt.decode(auth_state['access_token'], verify=False, algorithms='RS256')
-
-        spawner.user_cern_roles = auth_decoded.\
-            get('resource_access', {'app': ''}).\
-            get(os.environ.get('APP_CLIENT_ID'), {'roles_list': ''}).\
-            get('roles', 'no_roles')
-
-    def _add_user_to_pwd(self, username, uid):
-        try:
-            pwd.getpwnam(username)
-        except KeyError:
-            self.log.info("Adding user %s(%s) to pwd" % (uid, username))
-            os.system("groupadd %s -g %s" % (username, uid))
-            os.system("useradd %s -u %s -g %s" % (username, uid, uid))
-
-"""
 Class handling KubeSpawner.modify_pod_hook(spawner,pod) call
 """
 
@@ -385,16 +342,16 @@ class PodHookHandler:
         return False if spark cluster is not selected
         """
 
-        user_cern_roles = self.spawner.user_cern_roles
+        user_roles = self.spawner.user_roles
         cluster = self.spawner.user_options[self.spawner.spark_cluster_field]
 
-        if cluster == "analytix" and "analytix" not in user_cern_roles:
+        if cluster == "analytix" and "analytix" not in user_roles:
            raise ValueError(
               """
               Access to the Analytix cluster is not granted. 
               Please <a href="https://cern.service-now.com/service-portal/report-ticket.do?name=request&fe=Hadoop-Components" target="_blank">request access</a>
               """)
-        elif cluster == "hadoop-nxcals" and "hadoop-nxcals" not in user_cern_roles:
+        elif cluster == "hadoop-nxcals" and "hadoop-nxcals" not in user_roles:
            raise ValueError(
               """
               Access to the NXCALS cluster is not granted. 
@@ -412,10 +369,10 @@ class PodHookHandler:
         return False if gpu is not selected
         """
 
-        user_cern_roles = self.spawner.user_cern_roles
+        user_roles = self.spawner.user_roles
         lcg_rel = self.spawner.user_options[self.spawner.lcg_rel_field]
 
-        if "cu" in lcg_rel and "swan-gpu" not in user_cern_roles:
+        if "cu" in lcg_rel and "swan-gpu" not in user_roles:
             raise ValueError("Access to GPUs is not granted; please contact swan-admins@cern.ch")
         elif "cu" in lcg_rel:
             return True
@@ -622,8 +579,13 @@ Configuration for JupyterHub
 # Spawn single-user's servers in the Kubernetes cluster
 c.JupyterHub.spawner_class = swanspawner.SwanKubeSpawner
 
-# SwanKubeSpawner requires to add user to pwd after authentication
-c.JupyterHub.authenticator_class = CERNOAuthenticator
+# Authenticator
+c.JupyterHub.authenticator_class = 'keycloakauthenticator.KeyCloakAuthenticator'
+c.KeyCloakAuthenticator.auto_login = True
+c.KeyCloakAuthenticator.admin_role = 'swan-admins'
+c.KeyCloakAuthenticator.enable_auth_state = True
+c.KeyCloakAuthenticator.keycloak_logout_url = 'https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/logout?redirect_uri=https://swan-k8s.cern.ch'
+
 
 # https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html
 c.SwanKubeSpawner.modify_pod_hook = modify_pod_hook
@@ -689,8 +651,8 @@ c.JupyterHub.tornado_settings = {
     'slow_spawn_timeout': 15
 }
 
-# Do not allow named servers and redirect to server features (swan handler takes care of this logic)
-c.JupyterHub.allow_named_servers = False
+# Enble namedservers
+c.JupyterHub.allow_named_servers = True
 
 # Required for swan systemuser.sh
 c.SwanKubeSpawner.cmd = None
