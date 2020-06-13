@@ -21,6 +21,17 @@ class PodHookHandler:
 
     def get_swan_user_pod(self):
 
+        # pod labels
+        pod_labels = dict(
+            lcg_release = self.spawner.user_options[self.spawner.lcg_rel_field],
+            swan_user = self.spawner.user.name
+        )
+
+        # update pod labels
+        self.pod.metadata.labels.update(
+            pod_labels
+        )
+
         # get eos token
         eos_secret_name = self._init_eos_secret()
 
@@ -29,11 +40,14 @@ class PodHookHandler:
         if self._spark_enabled():
             # cern customisation for spark clusters
             hadoop_secret_name = self._init_hadoop_secret()
-            self._init_spark()
+            self._init_spark(pod_labels)
 
         if self._gpu_enabled():
             # currently no cern customisation required
             pass
+
+        # init pod affinity
+        self._init_pod_affinity(pod_labels)
 
         # init user containers (notebook and side-container)
         self._init_user_containers(eos_secret_name, hadoop_secret_name)
@@ -377,7 +391,7 @@ class PodHookHandler:
             return True
         return False
 
-    def _init_spark(self):
+    def _init_spark(self, pod_labels):
         """
         Set cern related configuration for spark cluster and open ports
         """
@@ -391,10 +405,6 @@ class PodHookHandler:
             return
 
         spark_ports_service = "spark-ports" + "-" + username
-        spark_ports_label = {'spark-ports-pod': username}
-        self.pod.metadata.labels.update(
-            spark_ports_label
-        )
 
         # add basic spark envs
 
@@ -471,7 +481,7 @@ class PodHookHandler:
                     name=spark_ports_service
                 ),
                 spec=client.V1ServiceSpec(
-                    selector=spark_ports_label,  # attach this service to the pod with label {spark_pod_label}
+                    selector=pod_labels,  # attach this service to the pod with label {spark_pod_label}
                     ports=service_template_ports,
                     type="NodePort"
                 )
@@ -524,15 +534,28 @@ class PodHookHandler:
         except ApiException as e:
             raise Exception("Could not create required user ports: %s\n" % e)
 
-    def _init_pod_affinity(self):
+    def _init_pod_affinity(self, pod_labels):
         """
-        TODO: to be finished
+        schedule pods to nodes that satisfy the specified label/affinity expressions 
         """
-        spec = client.V1PodSpec()
+        try:
+            del pod_labels["swan_user"]
+        except KeyError:
+            pass
         aff = client.V1Affinity()
-        aff.node_affinity
-        spec.affinity(aff)
-        #pod.spec(spec)
+        pod_affinity = client.V1PodAffinity(
+            preferred_during_scheduling_ignored_during_execution=[client.V1WeightedPodAffinityTerm(
+                pod_affinity_term=client.V1PodAffinityTerm(
+                    label_selector=client.V1LabelSelector(
+                        match_labels=pod_labels
+                    ),
+                    topology_key="kubernetes.io/hostname"
+                ),
+                weight=100
+            )]
+        )
+        aff.pod_affinity = pod_affinity
+        self.pod.spec.affinity = aff
 
     def _get_pod_container(self, container_name):
         """
