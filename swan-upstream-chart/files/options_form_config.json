@@ -58,10 +58,6 @@
           "text": "Cloud Containers (K8s)"
         },
         {
-          "value": "hadalytic",
-          "text": "Development (Hadalytic)"
-        },
-        {
           "value": "hadoop-qa",
           "text": "QA"
         }
@@ -130,8 +126,39 @@
       ],
       "cores": [
         {
-          "value": "4",
-          "text": "4CPU, 1GPU"
+          "value": "2",
+          "text": "2CPU, 1GPU"
+        }
+      ],
+      "memory": [
+        {
+          "value": "16",
+          "text": "16 GB"
+        }
+      ],
+      "clusters": [
+        {
+          "value": "none",
+          "text": "None"
+        }
+      ]
+    },
+    {
+      "type": "selection",
+      "lcg": {
+        "value": "dev4cuda/latest",
+        "text": "Bleeding Edge Cuda 10"
+      },
+      "platforms": [
+        {
+          "value": "x86_64-centos7-gcc8-opt",
+          "text": "CentOS 7 (gcc8)"
+        }
+      ],
+      "cores": [
+        {
+          "value": "2",
+          "text": "2CPU, 1GPU"
         }
       ],
       "memory": [
@@ -199,10 +226,6 @@
           "text": "Cloud Containers (K8s)"
         },
         {
-          "value": "hadalytic",
-          "text": "Development (Hadalytic)"
-        },
-        {
           "value": "hadoop-qa",
           "text": "QA"
         }
@@ -244,10 +267,6 @@
         {
           "value": "k8s",
           "text": "Cloud Containers (K8s)"
-        },
-        {
-          "value": "hadalytic",
-          "text": "Development (Hadalytic)"
         },
         {
           "value": "hadoop-qa",
@@ -316,10 +335,6 @@
           "text": "Cloud Containers (K8s)"
         },
         {
-          "value": "hadalytic",
-          "text": "Development (Hadalytic)"
-        },
-        {
           "value": "hadoop-qa",
           "text": "QA"
         }
@@ -371,10 +386,6 @@
           "text": "Cloud Containers (K8s)"
         },
         {
-          "value": "hadalytic",
-          "text": "Development (Hadalytic)"
-        },
-        {
           "value": "hadoop-qa",
           "text": "QA"
         }
@@ -412,10 +423,6 @@
         {
           "value": "analytix",
           "text": "General Purpose (Analytix)"
-        },
-        {
-          "value": "hadalytic",
-          "text": "Development (Hadalytic)"
         },
         {
           "value": "hadoop-qa",
@@ -457,10 +464,6 @@
           "text": "General Purpose (Analytix)"
         },
         {
-          "value": "hadalytic",
-          "text": "Development (Hadalytic)"
-        },
-        {
           "value": "hadoop-qa",
           "text": "QA"
         }
@@ -498,10 +501,6 @@
         {
           "value": "analytix",
           "text": "General Purpose (Analytix)"
-        },
-        {
-          "value": "hadalytic",
-          "text": "Development (Hadalytic)"
         },
         {
           "value": "hadoop-qa",
@@ -543,10 +542,6 @@
           "text": "General Purpose (Analytix)"
         },
         {
-          "value": "hadalytic",
-          "text": "Development (Hadalytic)"
-        },
-        {
           "value": "hadoop-qa",
           "text": "QA"
         }
@@ -586,10 +581,6 @@
           "text": "General Purpose (Analytix)"
         },
         {
-          "value": "hadalytic",
-          "text": "Development (Hadalytic)"
-        },
-        {
           "value": "hadoop-qa",
           "text": "QA"
         }
@@ -627,10 +618,6 @@
         {
           "value": "analytix",
           "text": "General Purpose (Analytix)"
-        },
-        {
-          "value": "hadalytic",
-          "text": "Development (Hadalytic)"
         },
         {
           "value": "hadoop-qa",
