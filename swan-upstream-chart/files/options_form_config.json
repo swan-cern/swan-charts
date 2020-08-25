@@ -115,6 +115,37 @@
     {
       "type": "selection",
       "lcg": {
+        "value": "LCG_98py3cu10",
+        "text": "Cuda 10 Python3"
+      },
+      "platforms": [
+        {
+          "value": "x86_64-centos7-gcc8-opt",
+          "text": "CentOS 7 (gcc8)"
+        }
+      ],
+      "cores": [
+        {
+          "value": "2",
+          "text": "2CPU, 1GPU"
+        }
+      ],
+      "memory": [
+        {
+          "value": "16",
+          "text": "16 GB"
+        }
+      ],
+      "clusters": [
+        {
+          "value": "none",
+          "text": "None"
+        }
+      ]
+    },
+    {
+      "type": "selection",
+      "lcg": {
         "value": "LCG_97py3cu10",
         "text": "Cuda 10 Python3"
       },
