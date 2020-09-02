@@ -116,7 +116,7 @@
       "type": "selection",
       "lcg": {
         "value": "LCG_98py3cu10",
-        "text": "Cuda 10 Python3"
+        "text": "98 Cuda 10 Python3"
       },
       "platforms": [
         {
@@ -147,7 +147,7 @@
       "type": "selection",
       "lcg": {
         "value": "LCG_97py3cu10",
-        "text": "Cuda 10 Python3"
+        "text": "97 Cuda 10 Python3"
       },
       "platforms": [
         {

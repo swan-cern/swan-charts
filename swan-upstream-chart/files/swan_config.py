@@ -56,6 +56,7 @@ class PodHookHandler:
 
     def _init_eos_secret(self):
         username = self.spawner.user.name
+        user_uid = self.spawner.user_uid
         eos_secret_name ='eos-tokens-%s' % username
 
         try:
@@ -603,11 +604,20 @@ c.JupyterHub.spawner_class = swanspawner.SwanKubeSpawner
 
 # Authenticator
 c.JupyterHub.authenticator_class = 'keycloakauthenticator.KeyCloakAuthenticator'
+c.KeyCloakAuthenticator.enable_auth_state = True
+c.KeyCloakAuthenticator.username_key = 'preferred_username'
+c.KeyCloakAuthenticator.logout_redirect_uri = 'https://cern.ch/swan'
+c.KeyCloakAuthenticator.oauth_callback_url = os.environ.get('OAUTH_CALLBACK_URL')
+
+def get_uid_hook(spawner, auth_state):
+    spawner.user_uid = str(auth_state['oauth_user']['cern_uid'])
+c.KeyCloakAuthenticator.get_uid_hook = get_uid_hook
+
+c.KeyCloakAuthenticator.oidc_issuer = 'https://auth.cern.ch/auth/realms/cern'
+
 c.KeyCloakAuthenticator.accepted_roles = set()
 c.KeyCloakAuthenticator.auto_login = True
 c.KeyCloakAuthenticator.admin_role = 'swan-admins'
-c.KeyCloakAuthenticator.enable_auth_state = True
-c.KeyCloakAuthenticator.keycloak_logout_url = os.environ.get('KEYCLOAK_LOGOUT_URL')
 
 
 # https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html

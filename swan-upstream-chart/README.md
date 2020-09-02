@@ -2,9 +2,9 @@
 
 Dependencies:
 - upstream JupyterHub Helm Chart `https://jupyterhub.github.io/helm-chart/`
-- [jupyterhub spawner/handler customized for SWAN on branch sciencebox](https://gitlab.cern.ch/swan/jupyterhub/tree/sciencebox)
-- [jupyterhub docker image on branch swan_k8s](https://gitlab.cern.ch/swan/docker-images/jupyterhub/tree/swan_k8s)
-- [system user image from this commit] (https://gitlab.cern.ch/swan/jupyter/commit/fc44790348c0ac9987dc204709160d4273b96fec)- 
+- SWAN Spawner `https://github.com/swan-cern/jupyterhub-extensions/tree/master`
+- jupyterhub docker image `https://github.com/swan-cern/jupyterhub-image/tree/master/`
+- system user image `https://github.com/swan-cern/systemuser-image/`
 
 Build chart dependency based on `requirements.yaml`
 
