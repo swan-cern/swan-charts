@@ -8,12 +8,6 @@ if [[ ! -f "/srv/jupyterhub/private/hadoop.cred" ]]; then
     exit 1;
 fi
 
-THEUID=`id -u "$USER"`
-if [[ $? -ne 0 ]]; then
-    exit 1;
-fi
-
-THEUID=`id -u "$USER"`
 USER_GROUP="$USER":def-cg
 
 # Generate HDFS, YARN, HIVE tokens
@@ -23,7 +17,7 @@ export OVERRIDE_HADOOP_MAPRED_HOME=$LCG_VIEW
 source $LCG_VIEW/setup.sh
 source /cvmfs/sft.cern.ch/lcg/etc/hadoop-confext/hadoop-swan-setconf.sh $CLUSTER
 kinit -V -kt /srv/jupyterhub/private/hadoop.cred hswan@CERN.CH -c $KRB5CCNAME >/dev/null 2>&1
-/usr/hdp/hadoop-fetchdt-0.1.0/hadoop-fetchdt -proxyuser $USER -tokenfile /tmp/hadoop_$THEUID >/dev/null 2>&1
-echo $(cat /tmp/hadoop_$THEUID | base64 -w 0)
+/usr/hdp/hadoop-fetchdt-0.2.0/hadoop-fetchdt -required hdfs,yarn -optional hive -proxyuser $USER -tokenfile /tmp/hadoop_$USER >/dev/null 2>&1
+echo $(cat /tmp/hadoop_$USER | base64 -w 0)
 
 kdestroy -c $KRB5CCNAME

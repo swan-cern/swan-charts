@@ -19,11 +19,6 @@ fi
 USERNAME="$1"
 SERVICE_ACCOUNT="spark"
 
-THEUID=`id -u "$USERNAME"`
-if [[ $? -ne 0 ]]; then
-    exit 1;
-fi
-
 KUBECONFIG="/srv/jupyterhub/private/sparkk8s.cred"
 SERVER=$(awk -F"server: " '{print $2}' ${KUBECONFIG} | sed '/^$/d')
 
@@ -66,7 +61,7 @@ CA=$(kubectl --kubeconfig="${KUBECONFIG}" \
 get secret "${SECRET}" -o json \
 | python -c 'import json,sys;obj=json.load(sys.stdin);print(obj["data"]["ca.crt"])')
 
-cat > /tmp/k8s-user.config.$THEUID <<EOF
+cat > /tmp/k8s-user.config.$USERNAME <<EOF
 apiVersion: v1
 clusters:
 - cluster:
@@ -88,5 +83,5 @@ users:
     token: $TOKEN
 EOF
 
-echo $(cat /tmp/k8s-user.config.$THEUID | base64 -w 0)
+echo $(cat /tmp/k8s-user.config.$USERNAME | base64 -w 0)
 
