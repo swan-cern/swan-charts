@@ -44,7 +44,21 @@ class PodHookHandler:
 
         if self._gpu_enabled():
             # currently no cern customisation required
-            pass
+            self.pod.spec.volumes.append(
+                client.V1Volume(
+                    host_path=client.V1HostPathVolumeSource(path="/opt/nvidia-driver"),
+                    name='nvidia-driver'
+                )
+            )
+
+            notebook_container = self._get_pod_container('notebook')
+
+            notebook_container.volume_mounts.append(
+                client.V1VolumeMount(
+                name='nvidia-driver',
+                mount_path='/opt/nvidia-driver'
+                )
+            )
 
         # init pod affinity
         self._init_pod_affinity(pod_labels)
