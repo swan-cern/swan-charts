@@ -35,6 +35,14 @@ spec:
             add:
               - SYS_ADMIN
               - NET_ADMIN
+        livenessProbe:
+          exec:
+            command:
+              - "/bin/sh"
+              - "-c"
+              - "find /cvmfs/ -mindepth 1 -maxdepth 1 | xargs -I{} sh -c 'ls {} && mountpoint {}'" 
+          initialDelaySeconds: 60
+          periodSeconds: 5
         volumeMounts:
           - name: cvmfs-config
             mountPath: /root/cvmfs_default.local # should be /etc/cvmfs/default.local but sciencebox overwrites it
