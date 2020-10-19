@@ -60,6 +60,22 @@ class PodHookHandler:
                 )
             )
 
+            notebook_container.env = self._add_or_replace_by_name(
+                notebook_container.env,
+                client.V1EnvVar(
+                    name='NVIDIA_LIB_PATH',
+                    value='/opt/nvidia-driver/lib64'
+                ),
+            )
+
+            notebook_container.env = self._add_or_replace_by_name(
+                notebook_container.env,
+                client.V1EnvVar(
+                    name='NVIDIA_PATH',
+                    value='/opt/nvidia-driver/bin'
+                ),
+            )
+
         # init pod affinity
         self._init_pod_affinity(pod_labels)
 
