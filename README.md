@@ -3,16 +3,14 @@
 ### How is it built
 
 Helm Chart to deploy SWAN (from upstream https://zero-to-jupyterhub.readthedocs.io/en/latest/)  
-CERN jupyterhub image (from https://gitlab.cern.ch/swan/jupyterhub/tree/sciencebox)  
+Jupyterhub image developed by CERN IT (https://gitlab.cern.ch/swan/docker-images/jupyterhub) 
 User session image developed by CERN IT (https://gitlab.cern.ch/swan/docker-images/systemuser)  
   
 Integrations  
 
-- SSO (OAuth) 
+- SSO (Keycloak) 
 - Authentication Tokens for CERNBox, Hadoop and Spark k8s and refresh mechanism  
 - Podspec customization to run Spark with IT Hadoop clusters and user home being CERNBox and software  
-- Extensions  
-	All can be reused from current SWAN production  
   
 This repository serves as equivalent of `https://gitlab.cern.ch/ai/it-puppet-hostgroup-swan` in magnum k8s
 
@@ -28,34 +26,19 @@ This repository serves as equivalent of `https://gitlab.cern.ch/ai/it-puppet-hos
 # Create cluster
 $ export OS_PROJECT_NAME="SWAN"
 $ openstack coe cluster create \
-  --cluster-template kubernetes-1.15.3-3 \
+  --cluster-template kubernetes-1.18.6-3 \
   --master-flavor m2.xlarge \
   --node-count 4 \
   --flavor m2.xlarge \
   --keypair swan \
+  --merge-labels \
+  --labels nvidia_gpu_enabled="true" \
   --labels influx_grafana_dashboard_enabled="true" \
-  --labels kube_csi_enabled="true" \
-  --labels kube_csi_version="cern-csi-1.0-2" \
-  --labels cloud_provider_tag="v1.15.0" \
-  --labels container_infra_prefix="gitlab-registry.cern.ch/cloud/atomic-system-containers/" \
-  --labels manila_enabled="true" \
-  --labels heat_container_agent_tag="stein-dev-2" \
-  --labels cgroup_driver="cgroupfs" \
-  --labels cephfs_csi_enabled="true" \
-  --labels cvmfs_csi_version="v1.0.0" \
-  --labels admission_control_list="NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,Priority" \
-  --labels kube_tag="v1.15.3" \
-  --labels flannel_backend="vxlan" \
-  --labels manila_version="v0.3.0" \
-  --labels cvmfs_csi_enabled="true" \
-  --labels ingress_controller="traefik" \
-  --labels autoscaler_tag="v1.15.2" \
-  --labels cephfs_csi_version="cern-csi-1.0-2" \
-  --labels tiller_enabled="true" \
   --labels monitoring_enabled="true" \
   swan
-# Add cluster
+# Add nodegroups
 $ openstack coe nodegroup create --node-count 1 --flavor g106.xlarge swan gpu
+$ openstack coe nodegroup create --node-count 4 --flavor g112.xlarge swan gpu-v1
 # Obtain Configuration
 openstack coe cluster config swan > env.sh
 ```
@@ -72,6 +55,15 @@ $ i=0;for node in $(kubectl get nodes --no-headers | grep -v master | awk '{prin
 Create ingress labels for kubernetes nodes
 ```bash
 $ for node in $(kubectl get nodes --no-headers | grep -v master | awk '{print $1}'); do kubectl label node $node role=ingress; done
+```
+
+Create gpu lables for kubernetes nodes with GPU capability
+```bash
+# patch once per cluster (not needed when magnum is fixed)
+$ kubectl -n kube-system patch ds nvidia-gpu-device-plugin -p '{"spec":{"template":{"spec":{"initContainers":[{"name":"nvidia-driver-installer","image":"gitlab-registry.cern.ch/cloud/atomic-system-containers/nvidia-driver-installer:31-5.4.8-200.fc31.x86_64-440.64"}]}}}}'
+
+# label the node
+$ for node in $(kubectl get nodes --no-headers | grep -v gpu| awk '{print $1}'); do kubectl label node $node node-role.kubernetes.io/gpu=true; done
 ```
 
 Obtain SSL
@@ -98,37 +90,8 @@ https://clouddocs.web.cern.ch/containers/tutorials/helm.html
 More in 
 https://clouddocs.web.cern.ch/clouddocs/containers/quickstart.html#kubernetes
 
-<b>[4] Enable GPUs in Kubernetes cluster</b>
 
-This is a manual process until Cloud Team boots the GPU machine with required prerequisites (NVIDIA drivers, nvidia-docker etc)
-
-```bash
-# install lshw
-rpm-ostree install lshw
-# ensure the node has a GPU
-lshw -C display
-# download the driver from NVidia appropriate for the model in our case Tesla V100 PCIe 32GB
-curl http://us.download.nvidia.com/tesla/440.33.01/NVIDIA-Linux-x86_64-440.33.01.run -o NVIDIA-Linux-x86_64-440.33.01.run
-# install the driver (ref https://www.if-not-true-then-false.com/2015/fedora-nvidia-guide/)
-# upgrade kernel
-rpm-ostree upgrade
-# install dependencies
-rpm-ostree install kernel-devel kernel-headers gcc make dkms acpid libglvnd-glx libglvnd-opengl libglvnd-devel pkgconfig
-# Add repos.
-rpm-ostree install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.repo | tee /etc/yum.repos.d/nvidia-docker.repo
-# install NVIDIA GPU stuff
-rpm-ostree install akmod-nvidia xorg-x11-drv-nvidia-cuda nvidia-docker2
-# fixes for GPU to work
-rpm-ostree kargs --append=systemd.legacy_systemd_cgroup_controller=yes
-rpm-ostree kargs --append=rd.driver.blacklist=nouveau
-rmmod nouveau
-# deployment to enable GPUs
-kubectl create -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/1.0.0-beta4/nvidia-device-plugin.yml
-```
-
-
-<b>[5] Expose prometheus datasource and update datasource in grafana instance</b>
+<b>[4] Expose prometheus datasource and update datasource in grafana instance</b>
 ##### 7. 
 
 ```bash
@@ -145,7 +108,7 @@ kubectl get service/prometheus-datasource -n kube-system -o json | jq -r '.spec.
 Check in `https://monit-grafana.cern.ch/d/2/swan-cluster-status?orgId=53` 
 that dashboard is accessible and data source configured
 
-<b>[6] SWAN Helm Deployment</b>
+<b>[5] SWAN Helm Deployment</b>
 
 Install Prod SWAN (`https://swan-k8s.cern.ch` and login with cern oauth)
 
@@ -160,6 +123,19 @@ This will install the following dependencies:
 $ ssh swan-spare003.cern.ch
 $ /srv/swan-k8s/source/utils/deploy_k8s.sh --env <qa|prod>
 ```
+
+### Monitoring
+
+Cluster Monitoring
+- Prometheus, provided by Container service
+- Visualization, grafana - https://monit-grafana.cern.ch/d/2/swan-cluster-status 
+
+SWAN Application Monitoring
+- Custom developed, fluentd chart
+- Storage - ElasticSearch
+- Visualization, kibana - https://es-timber-swan.cern.ch/kibana/app/kibana
+- Access control to kibana (e-groups) - es-timber-swan_kibana, es-timber-swan_kibana_rw
+
 
 ### Utilities and development
 
@@ -192,6 +168,34 @@ $ helm upgrade --install --namespace swan  \
 --set swan.secrets.hadoop.cred="$(base64 -w0 hadoop.toks)" \
 --set swan.secrets.sparkk8s.cred="$(base64 -w0 k8s-user.config)" \
 swan ./swan-upstream-chart
+```
+<b>Enable GPUs in Kubernetes cluster</b>
+
+This is a manual process until Cloud Team boots the GPU machine with required prerequisites (NVIDIA drivers, nvidia-docker etc)
+
+```bash
+# install lshw
+rpm-ostree install lshw
+# ensure the node has a GPU
+lshw -C display
+# download the driver from NVidia appropriate for the model in our case Tesla V100 PCIe 32GB
+curl http://us.download.nvidia.com/tesla/440.33.01/NVIDIA-Linux-x86_64-440.33.01.run -o NVIDIA-Linux-x86_64-440.33.01.run
+# install the driver (ref https://www.if-not-true-then-false.com/2015/fedora-nvidia-guide/)
+# upgrade kernel
+rpm-ostree upgrade
+# install dependencies
+rpm-ostree install kernel-devel kernel-headers gcc make dkms acpid libglvnd-glx libglvnd-opengl libglvnd-devel pkgconfig
+# Add repos.
+rpm-ostree install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.repo | tee /etc/yum.repos.d/nvidia-docker.repo
+# install NVIDIA GPU stuff
+rpm-ostree install akmod-nvidia xorg-x11-drv-nvidia-cuda nvidia-docker2
+# fixes for GPU to work
+rpm-ostree kargs --append=systemd.legacy_systemd_cgroup_controller=yes
+rpm-ostree kargs --append=rd.driver.blacklist=nouveau
+rmmod nouveau
+# deployment to enable GPUs
+kubectl create -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/1.0.0-beta4/nvidia-device-plugin.yml
 ```
 
 ### Demo of upstream JupyterHub (no SWAN, no EOS, no CVMFS)
