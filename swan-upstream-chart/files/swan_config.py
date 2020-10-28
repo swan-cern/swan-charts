@@ -727,11 +727,6 @@ c.SwanKubeSpawner.volume_mounts = [
         mount_path='/eos',
         mount_propagation='HostToContainer'
     ),
-    client.V1VolumeMount(
-        name='cvmfs',
-        mount_path='/cvmfs',
-        mount_propagation='HostToContainer'
-    ),
 ]
 
 # set home directory to EOS
@@ -744,10 +739,24 @@ c.SwanKubeSpawner.volumes = [
             path='/var/eos'
         )
     ),
-    client.V1Volume(
-        name='cvmfs',
-        host_path=client.V1HostPathVolumeSource(
-            path='/var/cvmfs'
-        )
-    ),
 ]
+
+# add CVMFS to notebook pods
+cvmfs_repos = get_config('custom.cvmfs.repositories', [])
+for cvmfs_repo_path in cvmfs_repos:
+    cvmfs_repo_id = cvmfs_repo_path.replace('.', '-')
+    c.SwanKubeSpawner.volumes.append(
+        client.V1Volume(
+            name='cvmfs-'+cvmfs_repo_id,
+            persistent_volume_claim=client.V1PersistentVolumeClaimVolumeSource(
+                claim_name='cvmfs-'+cvmfs_repo_id+'-pvc'
+            )
+        )
+    )
+    c.SwanKubeSpawner.volume_mounts.append(
+        client.V1VolumeMount(
+            name='cvmfs-'+cvmfs_repo_id,
+            mount_path='/cvmfs/'+cvmfs_repo_path,
+            read_only=True
+        )
+    )

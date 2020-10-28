@@ -78,13 +78,7 @@ jupyterhub:
       - name: swan-tokens-scripts
         mountPath: /srv/jupyterhub/private/sparkk8s_token.sh
         subPath: sparkk8s_token.sh
-      - name: cvmfsd
-        mountPath: /cvmfs
-        mountPropagation: HostToContainer
     extraVolumes:
-      - name: cvmfsd
-        hostPath:
-          path: /var/cvmfs
       - name: swan-jh
         configMap:
           name: swan-scripts
@@ -183,3 +177,13 @@ jupyterhub:
       period: 600
       checkEosAuth:
         enabled: true
+    cvmfs:
+      storageProvisioner: csi-cvmfsplugin
+      repositories:
+        - sft.cern.ch
+        - sft-nightlies.cern.ch
+      prefetcher:
+        enabled: false
+        image:
+          name: "gitlab-registry.cern.ch/swan/docker-images/cvmfs-prefetcher"
+          tag: "v1.0"
