@@ -225,6 +225,8 @@ fluentd:
         metrics.${record['_metric_key_']}.user ${record['_metric_user_']}
         metrics.${record['_metric_key_']}.context ${record['_metric_context_']}
         metrics.${record['_metric_key_']}.value ${record['_metric_value_']}
+        #the gsub is needed to match the indexes in ES, the split [-1] to remove lcg version from exception message
+        metric.${record['_metric_key_']}_${record['_metric_context_'].gsub('-','_').split('.')[-1]} ${record['_metric_value_']}
       </record>
       remove_keys ["_metric_time_", "_metric_raw_msg_", "_metric_user_", "_metric_key_", "_metric_context_", "_metric_value_"]
     </filter>
