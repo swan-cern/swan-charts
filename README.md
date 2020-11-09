@@ -114,7 +114,7 @@ Install Prod SWAN (`https://swan-k8s.cern.ch` and login with cern oauth)
 
 This will install the following dependencies:
 - EOS Fuse Chart [based on cern/eosxd](https://gitlab.cern.ch/helm/charts/cern/eosxd)
-- CVMFS Fuse Chart [based on boxed/cvmfs](https://gitlab.cern.ch/cernbox/boxed/tree/master/cvmfs.d)
+- CVMFS CSI resources [](https://github.com/cernops/cvmfs-csi)
 - Fluentd Chart [based on cern/fluentd](https://gitlab.cern.ch/helm/charts/cern/fluentd)
 - SWAN JupyterHub Chart [based on jupyterhub/jupyterhub](https://github.com/jupyterhub/helm-chart)
 
@@ -152,7 +152,7 @@ Install Developer SWAN (`http://masterip:30080` and login with your krb5cc user)
 $ helm upgrade --install --namespace kube-system  \
 eosxd ./swan-eosxd-config-chart
 $ helm upgrade --install --namespace kube-system  \
-cvmfsd ./swan-cvmfsd-config-chart
+cvmfs ./swan-cvmfs-config-chart
  
 # authenticate to provide eos token (you can also provide generated k8s and hadoop base64 tokens if needed)
 $ kinit -c krb5cc

@@ -76,11 +76,11 @@ then
 fi
 
 echo ""
-echo "Updating cvmfsd"
+echo "Updating cvmfs"
 echo ""
 
 helm upgrade --install --namespace kube-system  \
-cvmfsd $ROOT_DIR/swan-cvmfsd-config-chart
+cvmfs $ROOT_DIR/swan-cvmfs-config-chart
 
 if [[ $? -ne 0 ]]
 then

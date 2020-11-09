@@ -1,0 +1,23 @@
+{{- range .Values.repositories }}
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: csi-cvmfs-{{(split "." .)._0 }}
+provisioner: cvmfs.csi.cern.ch
+parameters:
+  repository: {{ . }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cvmfs-{{. | replace "." "-"}}-pvc
+  namespace: swan
+spec:
+  accessModes:
+  - ReadOnlyMany
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: csi-cvmfs-{{(split "." .)._0 }}
+---
+{{- end }}

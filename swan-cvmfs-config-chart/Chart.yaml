@@ -1,0 +1,8 @@
+apiVersion: v2
+name: swan-cvmfs
+description: A Helm chart to create the cvmfs resources necessary to Swan
+
+type: application
+
+version: 0.1.0
+
