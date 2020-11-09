@@ -274,7 +274,7 @@
       "type": "selection",
       "lcg": {
         "value": "dev3/latest",
-        "text": "Bleeding Edge"
+        "text": "Bleeding Edge Python3"
       },
       "platforms": [
         {
@@ -316,8 +316,8 @@
     {
       "type": "selection",
       "lcg": {
-        "value": "dev3python3/latest",
-        "text": "Bleeding Edge Python3"
+        "value": "dev3python2/latest",
+        "text": "Bleeding Edge Python2"
       },
       "platforms": [
         {
