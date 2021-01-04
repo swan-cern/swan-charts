@@ -688,7 +688,7 @@ if swan_cull_idle:
     else:
         cull_command_local_home = "True"
 
-    cull_command = 'python3 /srv/jupyterhub/jh_gitlab/scripts/cull_idle_servers.py ' \
+    cull_command = 'python3 /etc/jupyterhub/cull_idle_servers.py ' \
                    '--cull_every=%d ' \
                    '--timeout=%d ' \
                    '--local_home=%s ' \
