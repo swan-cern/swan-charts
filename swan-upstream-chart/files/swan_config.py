@@ -688,10 +688,10 @@ if swan_cull_idle:
     else:
         cull_command_local_home = "True"
 
-    cull_command = 'python3 /etc/jupyterhub/cull_idle_servers.py ' \
+    cull_command = 'swanculler ' \
                    '--cull_every=%d ' \
                    '--timeout=%d ' \
-                   '--local_home=%s ' \
+                   '--disable_hooks=%s ' \
                    '--cull_users=True' % (swan_cull_period, swan_cull_timeout, cull_command_local_home)
     print(cull_command)
     c.JupyterHub.services.append(
