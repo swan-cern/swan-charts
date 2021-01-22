@@ -11,13 +11,13 @@
     {
       "type": "selection",
       "lcg": {
-        "value": "LCG_97python3",
-        "text": "97 Python3"
+        "value": "LCG_99",
+        "text": "99 Python3"
       },
       "platforms": [
         {
-          "value": "x86_64-centos7-gcc9-opt",
-          "text": "CentOS 7 (gcc9)"
+          "value": "x86_64-centos7-gcc10-opt",
+          "text": "CentOS 7 (gcc10)"
         },
         {
           "value": "x86_64-centos7-gcc8-opt",
@@ -162,6 +162,37 @@
         "value": "label-drg",
         "text": "Development releases (GPU)"
       }
+    },
+    {
+      "type": "selection",
+      "lcg": {
+        "value": "LCG_99cuda",
+        "text": "99 Cuda 10.1 Python3"
+      },
+      "platforms": [
+        {
+          "value": "x86_64-centos7-gcc8-opt",
+          "text": "CentOS 7 (gcc8)"
+        }
+      ],
+      "cores": [
+        {
+          "value": "2",
+          "text": "2CPU, 1GPU"
+        }
+      ],
+      "memory": [
+        {
+          "value": "16",
+          "text": "16 GB"
+        }
+      ],
+      "clusters": [
+        {
+          "value": "none",
+          "text": "None"
+        }
+      ]
     },
     {
       "type": "selection",
@@ -413,7 +444,116 @@
         "text": "Other releases"
       }
     },
-
+    {
+      "type": "selection",
+      "lcg": {
+        "value": "LCG_97a",
+        "text": "97a"
+      },
+      "platforms": [
+        {
+          "value": "x86_64-centos7-gcc9-opt",
+          "text": "CentOS 7 (gcc9)"
+        },
+        {
+          "value": "x86_64-centos7-gcc8-opt",
+          "text": "CentOS 7 (gcc8)"
+        }
+      ],
+      "cores": [
+        {
+          "value": "2",
+          "text": "2"
+        },
+        {
+          "value": "4",
+          "text": "4"
+        }
+      ],
+      "memory": [
+        {
+          "value": "8",
+          "text": "8 GB"
+        },
+        {
+          "value": "10",
+          "text": "10 GB"
+        }
+      ],
+      "clusters": [
+        {
+          "value": "none",
+          "text": "None"
+        },
+        {
+          "value": "analytix",
+          "text": "General Purpose (Analytix)"
+        },
+        {
+          "value": "k8s",
+          "text": "Cloud Containers (K8s)"
+        },
+        {
+          "value": "hadoop-qa",
+          "text": "QA"
+        }
+      ]
+    },
+    {
+      "type": "selection",
+      "lcg": {
+        "value": "LCG_97apython3",
+        "text": "97a Python3"
+      },
+      "platforms": [
+        {
+          "value": "x86_64-centos7-gcc9-opt",
+          "text": "CentOS 7 (gcc9)"
+        },
+        {
+          "value": "x86_64-centos7-gcc8-opt",
+          "text": "CentOS 7 (gcc8)"
+        }
+      ],
+      "cores": [
+        {
+          "value": "2",
+          "text": "2"
+        },
+        {
+          "value": "4",
+          "text": "4"
+        }
+      ],
+      "memory": [
+        {
+          "value": "8",
+          "text": "8 GB"
+        },
+        {
+          "value": "10",
+          "text": "10 GB"
+        }
+      ],
+      "clusters": [
+        {
+          "value": "none",
+          "text": "None"
+        },
+        {
+          "value": "analytix",
+          "text": "General Purpose (Analytix)"
+        },
+        {
+          "value": "k8s",
+          "text": "Cloud Containers (K8s)"
+        },
+        {
+          "value": "hadoop-qa",
+          "text": "QA"
+        }
+      ]
+    },
     {
       "type": "selection",
       "lcg": {
