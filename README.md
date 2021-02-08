@@ -149,7 +149,7 @@ Install Developer SWAN (`http://masterip:30080` and login with your krb5cc user)
 
 ```bash
 # make sure eosxd and cvmfs are configured
-$ helm upgrade --install --namespace kube-system  \
+$ helm upgrade --install --namespace kube-system --disable-openapi-validation \
 eosxd ./swan-eosxd-config-chart
 $ helm upgrade --install --namespace kube-system  \
 cvmfs ./swan-cvmfs-config-chart
@@ -164,11 +164,16 @@ $ helm upgrade --install --namespace swan  \
 --set jupyterhub.auth.custom.config.client_id="redacted" \
 --set jupyterhub.auth.custom.config.client_secret="redacted" \
 --set jupyterhub.hub.extraEnv.OAUTH_CALLBACK_URL="http://<url>:30080/hub/oauth_callback" \
+--set jupyterhub.hub.extraEnv.OAUTH_CLIENT_ID="redacted" \
+--set jupyterhub.hub.extraEnv.OAUTH_CLIENT_SECRET="redacted" \
 --set swan.secrets.eos.cred="$(base64 -w0 krb5cc)" \
 --set swan.secrets.hadoop.cred="$(base64 -w0 hadoop.toks)" \
 --set swan.secrets.sparkk8s.cred="$(base64 -w0 k8s-user.config)" \
 swan ./swan-upstream-chart
 ```
+
+- Depending on the size of the dev cluster, you may need to adjust `swan-upstream-chart/files/options_form_config.json` so that user session pods have enough resources to spawn.
+
 <b>Enable GPUs in Kubernetes cluster</b>
 
 This is a manual process until Cloud Team boots the GPU machine with required prerequisites (NVIDIA drivers, nvidia-docker etc)
