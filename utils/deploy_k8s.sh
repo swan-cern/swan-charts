@@ -42,9 +42,9 @@ SWAN_PROD_VALUES_PATH=$ROOT_DIR/swan-upstream-chart/swan.values.yaml
 SWAN_SECRET_VALUES_PATH=/srv/swan-k8s/private/swan.$SWAN_ENV.secrets.yaml
 
 # secret files
-EOS_AUTH_KEYTAB_PATH=/srv/jupyterhub/private/constrdt.keytab
+EOS_AUTH_KEYTAB_PATH=/srv/swan-k8s/private/constrdt.keytab
 EOS_AUTH_KEYTAB_ENCODED=$(base64 -w 0 $EOS_AUTH_KEYTAB_PATH)
-HADOOP_AUTH_KEYTAB_PATH=/srv/jupyterhub/private/hadoop.keytab
+HADOOP_AUTH_KEYTAB_PATH=/srv/swan-k8s/private/hswan.keytab
 HADOOP_AUTH_KEYTAB_ENCODED=$(base64 -w 0 $HADOOP_AUTH_KEYTAB_PATH)
 SPARKK8S_AUTH_TOKEN_PATH=/srv/swan-k8s/private/sparkk8s.kubeconfig
 SPARKK8S_AUTH_TOKEN_ENCODED=$(base64 -w 0 $SPARKK8S_AUTH_TOKEN_PATH)
