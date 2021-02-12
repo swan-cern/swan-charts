@@ -53,7 +53,7 @@ echo ""
 echo "Updating eosxd"
 echo ""
 
-helm3 upgrade --install --namespace kube-system --disable-openapi-validation  \
+helm upgrade --install --namespace kube-system --disable-openapi-validation  \
 eosxd $ROOT_DIR/swan-eosxd-config-chart
 
 if [[ $? -ne 0 ]]
@@ -66,7 +66,7 @@ echo ""
 echo "Updating fluentd"
 echo ""
 
-helm3 upgrade --install --namespace kube-system  \
+helm upgrade --install --namespace kube-system  \
 fluentd $ROOT_DIR/swan-fluentd-config-chart
 
 if [[ $? -ne 0 ]]
@@ -79,7 +79,7 @@ echo ""
 echo "Updating cvmfs"
 echo ""
 
-helm3 upgrade --install --namespace kube-system  \
+helm upgrade --install --namespace kube-system  \
 cvmfs $ROOT_DIR/swan-cvmfs-config-chart
 
 if [[ $? -ne 0 ]]
@@ -93,7 +93,7 @@ echo "Updating swan env ${SWAN_ENV}, upgrade db ${UPGRADE_DB}"
 echo ""
 
 # Annotation is required in order to restart jupyterhub server on swan_config.py or jupyterhub_form.html changes
-helm3 upgrade --install --namespace swan  \
+helm upgrade --install --namespace swan  \
 --values $SWAN_PROD_VALUES_PATH \
 --values $SWAN_SECRET_VALUES_PATH \
 --set jupyterhub.hub.annotations.version="release-$(date +%s)" \
