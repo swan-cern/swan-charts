@@ -18,8 +18,9 @@ jupyterhub:
       kubernetes.io/ingress.class: traefik
       traefik.ingress.kubernetes.io/frontend-entry-points: http, https
       traefik.ingress.kubernetes.io/redirect-entry-point: https
-    tls:
-      - secretName: swan-tls-cert
+    # tls-cert is commented out, using lets encrypt certificates
+    #tls:
+    #  - secretName: swan-tls-cert
     # placeholder for hostname
     hosts:
   proxy:
