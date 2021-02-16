@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/tls
+metadata:
+  name: swan-binder-cern-ch
+  namespace: binder
+data:
+  #Extract the certificate: - openssl pkcs12 -in swan-binder--load-0-.p12 -clcerts -nokeys -out hostcert.pem
+  tls.crt: 
+  #Extract the encrypted private key. - openssl pkcs12 -in swan-binder--load-0-.p12 -nocerts -nodes -out hostkey.pem
+  tls.key: 
