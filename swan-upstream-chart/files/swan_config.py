@@ -671,11 +671,21 @@ c.SpawnHandlersConfigs.metrics_on = False
 c.SpawnHandlersConfigs.local_home = True
 
 # Add SWAN look&feel
-c.JupyterHub.template_paths = ['/srv/jupyterhub/jh_gitlab/templates']
 c.JupyterHub.logo_file = '/usr/local/share/jupyterhub/static/swan/logos/logo_swan_cloudhisto.png'
 
 # Configure swan spawn form
 c.SwanSpawner.options_form_config = '/srv/jupyterhub/options_form_config.json'
+
+c.JupyterHub.cleanup_servers = False
+
+# Hub services
+c.JupyterHub.services = [
+    {
+        'name': 'notifications',
+        'command': 'swannotificationsservice --port 8989'.split(),
+        'url': 'http://127.0.0.1:8989'
+    }
+]
 
 # Culling of users and ticket refresh
 swan_cull_idle = get_config('custom.cull.enabled', False)
@@ -715,7 +725,7 @@ c.JupyterHub.tornado_settings = {
 }
 
 # Enble namedservers
-c.JupyterHub.allow_named_servers = True
+c.JupyterHub.allow_named_servers = False
 
 # Required for swan systemuser.sh
 c.SwanKubeSpawner.cmd = None
