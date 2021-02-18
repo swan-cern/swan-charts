@@ -479,7 +479,7 @@ class PodHookHandler:
         # add spark config env
 
         if cluster == 'k8s':
-            spark_conf_script = '/cvmfs/sft.cern.ch/lcg/etc/hadoop-confext/hadoop-swan-setconf.sh'
+            spark_conf_script = '/cvmfs/sft.cern.ch/lcg/etc/hadoop-confext/k8s-swan-setconf.sh'
         else:
             spark_conf_script = '/cvmfs/sft.cern.ch/lcg/etc/hadoop-confext/hadoop-swan-setconf.sh'
 

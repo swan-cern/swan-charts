@@ -12,7 +12,7 @@
       "type": "selection",
       "lcg": {
         "value": "LCG_99",
-        "text": "99 Python3"
+        "text": "99"
       },
       "platforms": [
         {
@@ -42,10 +42,6 @@
         {
           "value": "10",
           "text": "10 GB"
-        },
-        {
-          "value": "16",
-          "text": "16 GB"
         }
       ],
       "clusters": [
@@ -70,8 +66,8 @@
     {
       "type": "selection",
       "lcg": {
-        "value": "LCG_98python3spark3",
-        "text": "98 Python3 Spark3"
+        "value": "LCG_99python2",
+        "text": "99 Python2"
       },
       "platforms": [
         {
@@ -97,10 +93,57 @@
         {
           "value": "10",
           "text": "10 GB"
+        }
+      ],
+      "clusters": [
+        {
+          "value": "none",
+          "text": "None"
         },
         {
-          "value": "16",
-          "text": "16 GB"
+          "value": "analytix",
+          "text": "General Purpose (Analytix)"
+        },
+        {
+          "value": "k8s",
+          "text": "Cloud Containers (K8s)"
+        },
+        {
+          "value": "hadoop-qa",
+          "text": "QA"
+        }
+      ]
+    },
+    {
+      "type": "selection",
+      "lcg": {
+        "value": "LCG_97apython3",
+        "text": "97 Spark2"
+      },
+      "platforms": [
+        {
+          "value": "x86_64-centos7-gcc8-opt",
+          "text": "CentOS 7 (gcc8)"
+        }
+      ],
+      "cores": [
+        {
+          "value": "2",
+          "text": "2"
+        },
+        {
+          "value": "4",
+          "text": "4"
+        }
+      ],
+      "memory": [
+        {
+          "value": "8",
+          "text": "8 GB"
+        },
+        {
+          "value": "10",
+          "text": "10 GB"
         }
       ],
       "clusters": [
@@ -144,10 +187,6 @@
         {
           "value": "10",
           "text": "10 GB"
-        },
-        {
-          "value": "16",
-          "text": "16 GB"
         }
       ],
       "clusters": [
@@ -195,14 +234,6 @@
       ],
       "memory": [
         {
-          "value": "8",
-          "text": "8 GB"
-        },
-        {
-          "value": "10",
-          "text": "10 GB"
-        },
-        {
           "value": "16",
           "text": "16 GB"
         }
@@ -233,14 +264,6 @@
         }
       ],
       "memory": [
-        {
-          "value": "8",
-          "text": "8 GB"
-        },
-        {
-          "value": "10",
-          "text": "10 GB"
-        },
         {
           "value": "16",
           "text": "16 GB"
@@ -273,14 +296,6 @@
       ],
       "memory": [
         {
-          "value": "8",
-          "text": "8 GB"
-        },
-        {
-          "value": "10",
-          "text": "10 GB"
-        },
-        {
           "value": "16",
           "text": "16 GB"
         }
@@ -311,14 +326,6 @@
         }
       ],
       "memory": [
-        {
-          "value": "8",
-          "text": "8 GB"
-        },
-        {
-          "value": "10",
-          "text": "10 GB"
-        },
         {
           "value": "16",
           "text": "16 GB"
@@ -367,14 +374,6 @@
         {
           "value": "8",
           "text": "8 GB"
-        },
-        {
-          "value": "10",
-          "text": "10 GB"
-        },
-        {
-          "value": "16",
-          "text": "16 GB"
         }
       ],
       "clusters": [
@@ -418,14 +417,6 @@
         {
           "value": "8",
           "text": "8 GB"
-        },
-        {
-          "value": "10",
-          "text": "10 GB"
-        },
-        {
-          "value": "16",
-          "text": "16 GB"
         }
       ],
       "clusters": [
@@ -469,14 +460,6 @@
         {
           "value": "8",
           "text": "8 GB"
-        },
-        {
-          "value": "10",
-          "text": "10 GB"
-        },
-        {
-          "value": "16",
-          "text": "16 GB"
         }
       ],
       "clusters": [
@@ -546,10 +529,6 @@
         {
           "value": "10",
           "text": "10 GB"
-        },
-        {
-          "value": "16",
-          "text": "16 GB"
         }
       ],
       "clusters": [
@@ -605,10 +584,6 @@
         {
           "value": "10",
           "text": "10 GB"
-        },
-        {
-          "value": "16",
-          "text": "16 GB"
         }
       ],
       "clusters": [
@@ -660,10 +635,6 @@
         {
           "value": "10",
           "text": "10 GB"
-        },
-        {
-          "value": "16",
-          "text": "16 GB"
         }
       ],
       "clusters": [
@@ -715,10 +686,6 @@
         {
           "value": "10",
           "text": "10 GB"
-        },
-        {
-          "value": "16",
-          "text": "16 GB"
         }
       ],
       "clusters": [
@@ -762,14 +729,6 @@
         {
           "value": "8",
           "text": "8 GB"
-        },
-        {
-          "value": "10",
-          "text": "10 GB"
-        },
-        {
-          "value": "16",
-          "text": "16 GB"
         }
       ],
       "clusters": [
@@ -809,14 +768,6 @@
         {
           "value": "8",
           "text": "8 GB"
-        },
-        {
-          "value": "10",
-          "text": "10 GB"
-        },
-        {
-          "value": "16",
-          "text": "16 GB"
         }
       ],
       "clusters": [
@@ -856,14 +807,6 @@
         {
           "value": "8",
           "text": "8 GB"
-        },
-        {
-          "value": "10",
-          "text": "10 GB"
-        },
-        {
-          "value": "16",
-          "text": "16 GB"
         }
       ],
       "clusters": [
@@ -903,14 +846,6 @@
         {
           "value": "8",
           "text": "8 GB"
-        },
-        {
-          "value": "10",
-          "text": "10 GB"
-        },
-        {
-          "value": "16",
-          "text": "16 GB"
         }
       ],
       "clusters": [
@@ -950,14 +885,6 @@
         {
           "value": "8",
           "text": "8 GB"
-        },
-        {
-          "value": "10",
-          "text": "10 GB"
-        },
-        {
-          "value": "16",
-          "text": "16 GB"
         }
       ],
       "clusters": [
@@ -997,14 +924,6 @@
         {
           "value": "8",
           "text": "8 GB"
-        },
-        {
-          "value": "10",
-          "text": "10 GB"
-        },
-        {
-          "value": "16",
-          "text": "16 GB"
         }
       ],
       "clusters": [
