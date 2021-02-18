@@ -38,7 +38,7 @@ if [[ -z "${user_exists// }" ]]; then
     --kubeconfig "${KUBECONFIG}" \
     --set namespace="${USERNAME}" \
     --set cvmfs.enable=true \
-    --name "spark-user-${USERNAME}" https://gitlab.cern.ch/db/spark-service/spark-service-charts/raw/master/cern-spark-user-1.0.1.tgz > /dev/null 2>&1
+    --name "spark-user-${USERNAME}" https://gitlab.cern.ch/db/spark-service/spark-service-charts/raw/master/cern-spark-user-1.0.2.tgz > /dev/null 2>&1
 fi
 
 # Retrieve service account secret
