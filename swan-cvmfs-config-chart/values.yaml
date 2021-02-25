@@ -1,3 +1,46 @@
+namespace: swan
 repositories:
-  - sft.cern.ch
-  - sft-nightlies.cern.ch
+  - mount: sft.cern.ch
+    proxy: 'http://ca-proxy-sft.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+  - mount: sft-nightlies.cern.ch
+    proxy: 'http://ca-proxy-sft.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+  - mount: alice.cern.ch
+    proxy: 'http://ca-proxy-alice.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+  - mount: alice-ocdb.cern.ch
+    proxy: 'http://ca-proxy-alice.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+  - mount: alice-nightlies.cern.ch
+    proxy: 'http://ca-proxy-alice.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+  - mount: atlas.cern.ch
+    proxy: 'http://ca-proxy-atlas.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+  - mount: atlas-condb.cern.ch
+    proxy: 'http://ca-proxy-atlas.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+  - mount: atlas-nightlies.cern.ch
+    proxy: 'http://ca-proxy-atlas.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+  - mount: cms.cern.ch
+    proxy: 'http://cmsmeyproxy.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+  - mount: cms-ib.cern.ch
+    proxy: 'http://cmsmeyproxy.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+  - mount: cms-bril.cern.ch
+    proxy: 'http://cmsmeyproxy.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+  - mount: lhcb.cern.ch
+    proxy: 'http://ca-proxy-lhcb.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+  - mount: lhcb-condb.cern.ch
+    proxy: 'http://ca-proxy-lhcb.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+  - mount: lhcbdev.cern.ch
+    proxy: 'http://ca-proxy-lhcb.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+  - mount: fcc.cern.ch
+  - mount: geant4.cern.ch
+  - mount: clicbp.cern.ch
+  - mount: ams.cern.ch
+  - mount: compass.cern.ch
+    proxy: 'http://ca-proxy-compass.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+  - mount: compass-condb.cern.ch
+    proxy: 'http://ca-proxy-compass.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+  - mount: na62.cern.ch
+  - mount: ganga.cern.ch
+  - mount: na61.cern.ch
+  - mount: projects.cern.ch
+  - mount: alpha.cern.ch
+  - mount: cvmfs-config.cern.ch
+  - mount: sw.hsf.org
+  - mount: singularity.opensciencegrid.org
