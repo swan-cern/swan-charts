@@ -393,7 +393,7 @@ class PodHookHandler:
            raise ValueError(
               """
               Access to the Analytix cluster is not granted. 
-              Please <a href="https://cern.service-now.com/service-portal/report-ticket.do?name=request&fe=Hadoop-Components" target="_blank">request access</a>
+              Please <a href="https://hadoop.web.cern.ch/" target="_blank">request access</a>
               """)
         elif cluster == "hadoop-nxcals" and "hadoop-nxcals" not in user_roles:
            raise ValueError(
@@ -659,12 +659,15 @@ swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
 SPAWN_ERROR_MESSAGE = """SWAN could not start a session for your user, please try again. If the problem persists, please check:
 <ul>
     <li>Do you have a CERNBox account? If not, click <a href="https://cernbox.cern.ch" target="_blank">here</a>.</li>
-    <li>Is there a problem with the service? Find information <a href="https://cern.service-now.com/service-portal/ssb.do" target="_blank">here</a>.</li>
-    <li>If none of the options apply, please open a <a href="https://cern.service-now.com/service-portal/function.do?name=swan" target="_blank">Support Ticket</a>.</li>
+    <li>Is there a problem with the service? Find information <a href="https://cern.service-now.com/service-portal?id=service_status_board" target="_blank">here</a>.</li>
+    <li>If none of the options apply, please open a <a href="https://cern.service-now.com/service-portal?id=functional_element&name=swan" target="_blank">Support Ticket</a>.</li>
 </ul>"""
 
 # SWAN@CERN error message
 c.SpawnHandlersConfigs.spawn_error_message = SPAWN_ERROR_MESSAGE
+
+#SwanHelp
+c.SwanHelp.support = 'https://cern.service-now.com/service-portal?id=functional_element&name=swan'
 
 # disable some defaults of swanspawner that do now work for kube-spawner
 c.SpawnHandlersConfigs.metrics_on = False
