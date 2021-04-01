@@ -27,5 +27,4 @@ repositories:
   - mount: alpha.cern.ch
   - mount: cvmfs-config.cern.ch
   - mount: sw.hsf.org
-  - mount: singularity.opensciencegrid.org
 

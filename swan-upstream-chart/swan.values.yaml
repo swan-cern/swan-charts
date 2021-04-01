@@ -234,7 +234,6 @@ jupyterhub:
         - alpha.cern.ch
         - cvmfs-config.cern.ch
         - sw.hsf.org
-        - singularity.opensciencegrid.org
       prefetcher:
         enabled: false
         image:
