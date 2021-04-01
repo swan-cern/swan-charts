@@ -28,7 +28,9 @@ jupyterhub:
           cpu: 200m
           memory: 512Mi
   hub:
-    uid: 0
+    containerSecurityContext:
+      runAsUser: 0
+      runAsGroup: 0
     fsGid: 0
     deploymentStrategy:
       type: RollingUpdate
@@ -124,6 +126,24 @@ jupyterhub:
             path: hadoop.cred
           - key: sparkk8s.cred
             path: sparkk8s.cred
+    config:
+      KeyCloakAuthenticator:
+        admin_access: true
+        admin_users:
+          - rcastell
+        login_service: keycloak
+        token_url: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/token
+        userdata_url: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/userinfo
+        groupdata_url: ""
+        userdata_method: GET
+        userdata_params: {'state': 'state'}
+        username_key: preferred_username
+        enable_auth_state: true
+        auto_login: false
+        auth_refresh_age: 3600
+        refresh_pre_spawn: true
+      JupyterHub:
+        authenticator_class: keycloakauthenticator.KeyCloakAuthenticator
     extraConfig:
       swanConf: |
         exec(open('/srv/jupyterhub/swan_config.py').read())
@@ -141,24 +161,6 @@ jupyterhub:
       OAUTH2_TOKEN_URL: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/token
       # Details in https://application-portal.web.cern.ch
       OAUTH_CALLBACK_URL:
-  auth:
-    type: custom
-    custom:
-      className: CERNOAuthenticator
-      config:
-        login_service: keycloak
-        token_url: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/token
-        userdata_url: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/userinfo
-        groupdata_url: ""
-        userdata_method: GET
-        userdata_params: {'state': 'state'}
-        username_key: cern_upn
-        enable_auth_state: true
-        auto_login: true
-        refresh_pre_spawn: true
-        # Details in https://application-portal.web.cern.ch
-        client_id:
-        client_secret:
   rbac:
     enabled: true
   cull:
