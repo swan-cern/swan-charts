@@ -51,6 +51,9 @@ jupyterhub:
         mountPath: /srv/jupyterhub/options_form_config.json
         subPath: options_form_config.json
       - name: swan-jh
+        mountPath: /srv/jupyterhub/swan_spark_config.py
+        subPath: swan_spark_config.py
+      - name: swan-jh
         mountPath: /srv/jupyterhub/swan_config.py
         subPath: swan_config.py
       - name: swan-secrets
@@ -94,6 +97,8 @@ jupyterhub:
             path: options_form_config.json
           - key: swan_config.py
             path: swan_config.py
+          - key: swan_spark_config.py
+            path: swan_spark_config.py
       - name: swan-cull-scripts
         configMap:
           name: swan-scripts
@@ -147,6 +152,8 @@ jupyterhub:
     extraConfig:
       swanConf: |
         exec(open('/srv/jupyterhub/swan_config.py').read())
+        exec(open('/srv/jupyterhub/swan_spark_config.py').read())
+        c.SwanKubeSpawner.modify_pod_hook = spark_modify_pod_hook
     db:
       type: sqlite-memory
     cookieSecret: ca4ac8ac414707020a7db74341eaf25de01f6d0bd73f4ceb9d2a197f1e3b9f32
