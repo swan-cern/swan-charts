@@ -141,17 +141,24 @@ jupyterhub:
         userdata_url: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/userinfo
         groupdata_url: ""
         userdata_method: GET
-        userdata_params: {'state': 'state'}
+        userdata_params: { "state": "state" }
         username_key: preferred_username
         enable_auth_state: true
-        auto_login: false
+        auto_login: true
         auth_refresh_age: 3600
         refresh_pre_spawn: true
+        logout_redirect_uri: https://cern.ch/swan
+        oidc_issuer: https://auth.cern.ch/auth/realms/cern
       JupyterHub:
         authenticator_class: keycloakauthenticator.KeyCloakAuthenticator
     extraConfig:
-      swanConf: |
+      00-authConf: |
+        def get_uid_hook(spawner, auth_state):
+          spawner.user_uid = str(auth_state['oauth_user']['cern_uid'])
+        c.KeyCloakAuthenticator.get_uid_hook = get_uid_hook
+      01-swanConf: |
         exec(open('/srv/jupyterhub/swan_config.py').read())
+      10-sparkConf: |
         exec(open('/srv/jupyterhub/swan_spark_config.py').read())
         c.SwanKubeSpawner.modify_pod_hook = spark_modify_pod_hook
     db:
