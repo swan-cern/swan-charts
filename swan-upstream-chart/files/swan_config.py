@@ -322,23 +322,6 @@ Configuration for JupyterHub
 # Spawn single-user's servers in the Kubernetes cluster
 c.JupyterHub.spawner_class = swanspawner.SwanKubeSpawner
 
-# Authenticator
-c.JupyterHub.authenticator_class = 'keycloakauthenticator.KeyCloakAuthenticator'
-c.KeyCloakAuthenticator.enable_auth_state = True
-c.KeyCloakAuthenticator.username_key = 'preferred_username'
-c.KeyCloakAuthenticator.logout_redirect_uri = 'https://cern.ch/swan'
-c.KeyCloakAuthenticator.oauth_callback_url = os.environ.get('OAUTH_CALLBACK_URL')
-
-def get_uid_hook(spawner, auth_state):
-    spawner.user_uid = str(auth_state['oauth_user']['cern_uid'])
-c.KeyCloakAuthenticator.get_uid_hook = get_uid_hook
-
-c.KeyCloakAuthenticator.oidc_issuer = 'https://auth.cern.ch/auth/realms/cern'
-
-c.KeyCloakAuthenticator.accepted_roles = set()
-c.KeyCloakAuthenticator.auto_login = True
-c.KeyCloakAuthenticator.admin_role = 'swan-admins'
-
 # Get configuration parameters from environment variables
 swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
 
