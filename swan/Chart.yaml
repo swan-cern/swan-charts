@@ -1,0 +1,33 @@
+apiVersion: v2
+#
+name: swan
+type: application
+version: 0.0.1
+appVersion: 0.0.3 # Using swanhub version
+#
+description: A fully-fledge SWAN instance with jupyterhub, EOS, and CVMFS
+icon: https://swan.docs.cern.ch/images/logos/logo_swan_letters.png
+#
+dependencies:
+  - name: jupyterhub
+    version: 0.11.1
+    repository: https://jupyterhub.github.io/helm-chart/
+#
+#   - name: eosxd
+#     version: 0.0.1
+#     repository: https://registry.cern.ch/chartrepo/eos
+#     condition: eosClient.daemonSet
+#   - name: eosxd
+#     version: 0.2.8
+#     repository: http://registry.cern.ch/chartrepo/cern
+#     condition: eosClient.csiDriver
+#
+#   - name: cvmfs
+#     version: 0.0.1
+#     repository: https://registry.cern.ch/chartrepo/tbd
+#     condition: cvmfsClient.daemonSet
+#   - name: swan-cvmfs
+#     version: 0.1.0
+#     repository: file://../swan-cvmfs-config-chart
+#     condition: cvmfsClient.csiDriver
+

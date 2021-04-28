@@ -297,3 +297,35 @@ swan:
     ingress:
       cert:
       key:
+      
+#
+# Decide which client to use for accessing EOS
+# - daemonSet deploys eosxd pods exposing `/eos` path on the host.
+#     Other pods can access `/eos` bind-mounting from the host.
+# - CSI driver configures a cluster-wide storage driver for EOS.
+#     Access to EOS is provided by persistnt volume claims.
+#
+# By setting both to false, no eosxd client pods will be deployed
+#   and access to EOS will not be possible.
+#
+# Warning: It is discouraged to enable both at the same time.
+#
+eosClient:
+  daemonSet: true
+  csiDriver: false
+
+#
+# Decide which client to use for accessing CVMFS
+# - daemonSet deploys cvmfs pods exposing `/cvmfs` path on the host.
+#     Other pods can access `/cvmfs` bind-mounting from the host.
+# - CSI driver configures a cluster-wide storage driver for CVMFS.
+#     Access to CVMFS is provided by persistnt volume claims.
+#
+# By setting both to false, no cvmfs client pods will be deployed
+#   and access to CVMFS will not be possible.
+#
+# Warning: It is discouraged to enable both at the same time.
+#
+cvmfsClient:
+  daemonSet: true
+  csiDriver: false
