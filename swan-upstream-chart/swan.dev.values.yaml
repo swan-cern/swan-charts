@@ -9,13 +9,12 @@ jupyterhub:
         http: 30080
     secretToken: ca4ac8ac414707020a7db74341eaf25de01f6d0bd73f4ceb9d2a197f1e3b9f32
   hub:
-    # TODO waiting for new JH image with latest keycloakauth which supports a list instead of set
-    # config:
-    #   KeyCloakAuthenticator:
-    #     allowed_roles:
-    #       - swan-admins
-    #       - swan-qa
-    #       - swan-devs
+    config:
+      KeyCloakAuthenticator:
+        allowed_roles:
+          - swan-admins
+          - swan-qa
+          - swan-devs
     extraVolumes:
       - name: swan-tokens-scripts
         configMap:
