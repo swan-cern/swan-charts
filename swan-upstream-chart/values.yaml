@@ -61,8 +61,11 @@ jupyterhub:
         mountPath: /srv/jupyterhub/options_form_config.json
         subPath: options_form_config.json
       - name: swan-jh
-        mountPath: /srv/jupyterhub/swan_config.py
+        mountPath: /usr/local/etc/jupyterhub/jupyterhub_config.d/1_swan_config.py
         subPath: swan_config.py
+      - name: swan-jh
+        mountPath: /usr/local/etc/jupyterhub/jupyterhub_config.d/2_swan_spark_config.py
+        subPath: swan_spark_config.py
       - name: swan-secrets
         mountPath: /srv/jupyterhub/private/eos.cred
         subPath: eos.cred
@@ -104,6 +107,8 @@ jupyterhub:
             path: options_form_config.json
           - key: swan_config.py
             path: swan_config.py
+          - key: swan_spark_config.py
+            path: swan_spark_config.py
       - name: swan-cull-scripts
         configMap:
           name: swan-scripts
@@ -158,10 +163,13 @@ jupyterhub:
         def get_uid_hook(spawner, auth_state):
           spawner.user_uid = str(auth_state['oauth_user']['cern_uid'])
         c.KeyCloakAuthenticator.get_uid_hook = get_uid_hook
+      # TODO delete this once we upgrade to newer upstream (which loads files from this path automatically)
       01-swanConf: |
-        exec(open('/srv/jupyterhub/swan_config.py').read())
+        exec(open('/usr/local/etc/jupyterhub/jupyterhub_config.d/1_swan_config.py').read())
+      # TODO move this into separate chart
+      # TODO delete this once we upgrade to newer upstream (which loads files from this path automatically)
       10-sparkConf: |
-        exec(open('/srv/jupyterhub/swan_spark_config.py').read())
+        exec(open('/usr/local/etc/jupyterhub/jupyterhub_config.d/2_swan_spark_config.py').read()) 
         c.SwanKubeSpawner.modify_pod_hook = spark_modify_pod_hook
     extraEnv:
       OAUTH2_AUTHORIZE_URL: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/auth
