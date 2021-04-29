@@ -1,113 +1,15 @@
 jupyterhub:
   singleuser:
-    uid: 0
-    fsGid: 0
-    storage:
-      type: none
     image:
       pullPolicy: Always
-      name: "gitlab-registry.cern.ch/swan/docker-images/systemuser"
-      tag: "v5.6.1"
-    cloudMetadata:
-      enabled: true
-    networkPolicy:
-      enabled: false
   proxy:
     service:
       type: NodePort
       nodePorts:
         http: 30080
     secretToken: ca4ac8ac414707020a7db74341eaf25de01f6d0bd73f4ceb9d2a197f1e3b9f32
-    chp:
-      image:
-        name: "jupyterhub/configurable-http-proxy"
-        tag: "4.2.0"
-        pullPolicy: IfNotPresent
-      resources:
-        requests:
-          cpu: 200m
-          memory: 512Mi
   hub:
-    containerSecurityContext:
-      runAsUser: 0
-      runAsGroup: 0
-    fsGid: 0
-    deploymentStrategy:
-      type: RollingUpdate
-    resources:
-      requests:
-        cpu: 200m
-        memory: 512Mi
-    livenessProbe:
-      enabled: false
-    readinessProbe:
-      enabled: false
-    image:
-      name: "gitlab-registry.cern.ch/swan/docker-images/jupyterhub"
-      tag: "v1.12"
-      pullPolicy: "Always"
-    extraVolumeMounts:
-      - name: swan-jh
-        mountPath: /srv/jupyterhub/options_form_config.json
-        subPath: options_form_config.json
-      - name: swan-jh
-        mountPath: /srv/jupyterhub/swan_spark_config.py
-        subPath: swan_spark_config.py
-      - name: swan-jh
-        mountPath: /srv/jupyterhub/swan_config.py
-        subPath: swan_config.py
-      - name: swan-secrets
-        mountPath: /srv/jupyterhub/private/eos.cred
-        subPath: eos.cred
-      - name: swan-secrets
-        mountPath: /srv/jupyterhub/private/hadoop.cred
-        subPath: hadoop.cred
-      - name: swan-secrets
-        mountPath: /srv/jupyterhub/private/sparkk8s.cred
-        subPath: sparkk8s.cred
-      - name: swan-cull-scripts
-        mountPath: /srv/jupyterhub/culler/check_ticket.sh
-        subPath: cull_check_ticket.sh
-      - name: swan-cull-scripts
-        mountPath: /srv/jupyterhub/culler/delete_ticket.sh
-        subPath: cull_delete_ticket.sh
-      - name: swan-tokens-scripts
-        mountPath: /srv/jupyterhub/private/eos_token.sh
-        subPath: eos_token.sh
-      - name: swan-tokens-scripts
-        mountPath: /srv/jupyterhub/private/hadoop_token.sh
-        subPath: hadoop_token.sh
-      - name: swan-tokens-scripts
-        mountPath: /srv/jupyterhub/private/webhdfs_token.sh
-        subPath: webhdfs_token.sh
-      - name: swan-tokens-scripts
-        mountPath: /srv/jupyterhub/private/sparkk8s_token.sh
-        subPath: sparkk8s_token.sh
-      - name: cvmfs-sft-cern-ch
-        mountPath: /cvmfs/sft.cern.ch
     extraVolumes:
-      - name: cvmfs-sft-cern-ch
-        persistentVolumeClaim:
-          claimName: cvmfs-sft-cern-ch-pvc
-      - name: swan-jh
-        configMap:
-          name: swan-scripts
-          items:
-          - key: options_form_config.json
-            path: options_form_config.json
-          - key: swan_config.py
-            path: swan_config.py
-          - key: swan_spark_config.py
-            path: swan_spark_config.py
-      - name: swan-cull-scripts
-        configMap:
-          name: swan-scripts
-          items:
-          - key: cull_check_ticket.sh
-            path: cull_check_ticket.sh
-          - key: cull_delete_ticket.sh
-            path: cull_delete_ticket.sh
-          defaultMode: 356 # 0544 perm
       - name: swan-tokens-scripts
         configMap:
           name: swan-scripts-env-dev
@@ -121,90 +23,14 @@ jupyterhub:
           - key: sparkk8s_token.sh
             path: sparkk8s_token.sh
           defaultMode: 356 # 0544 perm
-      - name: swan-secrets
-        secret:
-          secretName: swan
-          items:
-          - key: eos.cred
-            path: eos.cred
-          - key: hadoop.cred
-            path: hadoop.cred
-          - key: sparkk8s.cred
-            path: sparkk8s.cred
-    config:
-      KeyCloakAuthenticator:
-        admin_access: true
-        admin_users:
-          - rcastell
-        login_service: keycloak
-        token_url: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/token
-        userdata_url: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/userinfo
-        groupdata_url: ""
-        userdata_method: GET
-        userdata_params: { "state": "state" }
-        username_key: preferred_username
-        enable_auth_state: true
-        auto_login: true
-        auth_refresh_age: 3600
-        refresh_pre_spawn: true
-        logout_redirect_uri: https://cern.ch/swan
-        oidc_issuer: https://auth.cern.ch/auth/realms/cern
-      JupyterHub:
-        authenticator_class: keycloakauthenticator.KeyCloakAuthenticator
-    extraConfig:
-      00-authConf: |
-        def get_uid_hook(spawner, auth_state):
-          spawner.user_uid = str(auth_state['oauth_user']['cern_uid'])
-        c.KeyCloakAuthenticator.get_uid_hook = get_uid_hook
-      01-swanConf: |
-        exec(open('/srv/jupyterhub/swan_config.py').read())
-      10-sparkConf: |
-        exec(open('/srv/jupyterhub/swan_spark_config.py').read())
-        c.SwanKubeSpawner.modify_pod_hook = spark_modify_pod_hook
     db:
       type: sqlite-memory
     cookieSecret: ca4ac8ac414707020a7db74341eaf25de01f6d0bd73f4ceb9d2a197f1e3b9f32
-    annotations:
-      prometheus.io/scrape: "true"
-      prometheus.io/path: /hub/metrics
-    networkPolicy:
-      enabled: false
-    extraEnv:
-      JUPYTERHUB_CRYPT_KEY: ca4ac8ac414707020a7db74341eaf25de01f6d0bd73f4ceb9d2a197f1e3b9f32
-      OAUTH2_AUTHORIZE_URL: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/auth
-      OAUTH2_TOKEN_URL: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/token
-      # Details in https://application-portal.web.cern.ch
-      OAUTH_CALLBACK_URL:
-  rbac:
-    enabled: true
-  cull:
-    enabled: false
-  scheduling:
-    userScheduler:
-      enabled: false
-    podPriority:
-      enabled: false
   prePuller:
     hook:
       enabled: false
-    continuous:
-      enabled: false
-  debug:
-    enabled: true
   custom:
-    # all swan custom helm values
-    cull:
-      enabled: true
-      period: 600
-      checkEosAuth:
-        enabled: true
     cvmfs:
-      storageProvisioner: csi-cvmfsplugin
       repositories:
         - sft.cern.ch
         - sft-nightlies.cern.ch
-      prefetcher:
-        enabled: false
-        image:
-          name: "gitlab-registry.cern.ch/swan/docker-images/cvmfs-prefetcher"
-          tag: "v1.0"
