@@ -143,26 +143,32 @@ jupyterhub:
             path: sparkk8s.cred
     config:
       KeyCloakAuthenticator:
-        admin_access: true
+        oidc_issuer: https://auth.cern.ch/auth/realms/cern
         admin_role: swan-admins
-        login_service: keycloak
-        token_url: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/token
-        userdata_url: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/userinfo
-        groupdata_url: ""
-        userdata_method: GET
-        userdata_params: {'state': 'state'}
+        scope:
+          - profile
+          - email
+          - offline_access
+        exchange_tokens:
+          - eos-service
+          - cernbox-service
+        logout_redirect_uri: https://cern.ch/swan
+        auto_login: True
         username_key: preferred_username
-        enable_auth_state: true
-        auto_login: false
-        auth_refresh_age: 3600
-        refresh_pre_spawn: true
+        client_id: # placeholder, check secrets
+        client_secret: # placeholder, check secrets
+        oauth_callback_url: # placeholder, check secrets
       JupyterHub:
         authenticator_class: keycloakauthenticator.KeyCloakAuthenticator
     extraConfig:
       00-authConf: |
-        def get_uid_hook(spawner, auth_state):
-          spawner.user_uid = str(auth_state['oauth_user']['cern_uid'])
-        c.KeyCloakAuthenticator.get_uid_hook = get_uid_hook
+        def pre_spawn_hook(authenticator, spawner, auth_state):
+          spawner.environment['ACCESS_TOKEN'] = auth_state['exchanged_tokens']['eos-service']
+          spawner.environment['OAUTH_INSPECTION_ENDPOINT'] = authenticator.userdata_url.replace('https://', '')
+          spawner.user_uid = str(str(auth_state['oauth_user']['cern_uid'])) # k8s only supports values as strings!
+          decoded_token = authenticator._decode_token(auth_state['access_token'])
+          spawner.user_roles = authenticator.claim_roles_key(authenticator, decoded_token)
+        c.KeyCloakAuthenticator.pre_spawn_hook = pre_spawn_hook
       # TODO delete this once we upgrade to newer upstream (which loads files from this path automatically)
       01-swanConf: |
         exec(open('/usr/local/etc/jupyterhub/jupyterhub_config.d/1_swan_config.py').read())
@@ -172,10 +178,6 @@ jupyterhub:
         exec(open('/usr/local/etc/jupyterhub/jupyterhub_config.d/2_swan_spark_config.py').read()) 
         c.SwanKubeSpawner.modify_pod_hook = spark_modify_pod_hook
     extraEnv:
-      OAUTH2_AUTHORIZE_URL: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/auth
-      OAUTH2_TOKEN_URL: https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/token
-      # placeholder for callback url
-      OAUTH_CALLBACK_URL: 
       # placeholder for hub auth state cryptographic key
       JUPYTERHUB_CRYPT_KEY:
     db:
