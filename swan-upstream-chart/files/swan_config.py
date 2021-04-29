@@ -1,9 +1,7 @@
-import os, subprocess, time, pwd, jwt
+import os, subprocess
 
 from kubernetes import client
 from kubernetes.client.rest import ApiException
-
-import swanspawner
 
 """
 Class handling KubeSpawner.modify_pod_hook(spawner,pod) call
@@ -319,88 +317,57 @@ def modify_pod_hook(spawner, pod):
 Configuration for JupyterHub
 """
 
-# Spawn single-user's servers in the Kubernetes cluster
-c.JupyterHub.spawner_class = swanspawner.SwanKubeSpawner
-
 # Get configuration parameters from environment variables
 swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
 
-SPAWN_ERROR_MESSAGE = """SWAN could not start a session for your user, please try again. If the problem persists, please check:
-<ul>
-    <li>Do you have a CERNBox account? If not, click <a href="https://cernbox.cern.ch" target="_blank">here</a>.</li>
-    <li>Is there a problem with the service? Find information <a href="https://cern.service-now.com/service-portal?id=service_status_board" target="_blank">here</a>.</li>
-    <li>If none of the options apply, please open a <a href="https://cern.service-now.com/service-portal?id=functional_element&name=swan" target="_blank">Support Ticket</a>.</li>
-</ul>"""
-
-# SWAN@CERN error message
-c.SpawnHandlersConfigs.spawn_error_message = SPAWN_ERROR_MESSAGE
-
-#SwanHelp
-c.SwanHelp.support = 'https://cern.service-now.com/service-portal?id=functional_element&name=swan'
-
-# disable some defaults of swanspawner that do now work for kube-spawner
-c.SpawnHandlersConfigs.metrics_on = False
-c.SpawnHandlersConfigs.local_home = True
-
-# Add SWAN look&feel
-c.JupyterHub.logo_file = '/usr/local/share/jupyterhub/static/swan/logos/logo_swan_cloudhisto.png'
-
-# Configure swan spawn form
-c.SwanSpawner.options_form_config = '/srv/jupyterhub/options_form_config.json'
-
-c.JupyterHub.cleanup_servers = False
-
 # Hub services
-c.JupyterHub.services = [
-    {
-        'name': 'notifications',
-        'command': 'swannotificationsservice --port 8989'.split(),
-        'url': 'http://127.0.0.1:8989'
-    }
-]
+# FIXME port is not exposed so it cannot be accessed. Maybe we should run this separately?
+# if get_config("custom.notificationsService", True):
+#     c.JupyterHub.services.append(
+#         {
+#             'name': 'notifications',
+#             'command': 'swannotificationsservice --port 8989'.split(),
+#             'url': 'http://hub:8989'
+#         }
+#     )
+
+swan_cull_period = get_config('custom.cull.every', 600)
 
 # Culling of users and ticket refresh
-swan_cull_idle = get_config('custom.cull.enabled', False)
-swan_cull_check_ticket = get_config('custom.cull.checkEosAuth.enabled', False)
-swan_cull_period = get_config('custom.cull.period', 600)
-swan_cull_timeout = get_config('custom.cull.timeout', 14400)
-if swan_cull_idle:
-    if swan_cull_check_ticket:
-        cull_command_local_home = "False"
-    else:
-        cull_command_local_home = "True"
+if get_config("custom.cull.enabled", False):
+    cull_cmd = ["swanculler"]
+    base_url = c.JupyterHub.get("base_url", "/")
+    cull_cmd.append("--url=http://localhost:8081" + url_path_join(base_url, "hub/api"))
 
-    cull_command = 'swanculler ' \
-                   '--cull_every=%d ' \
-                   '--timeout=%d ' \
-                   '--disable_hooks=%s ' \
-                   '--cull_users=True' % (swan_cull_period, swan_cull_timeout, cull_command_local_home)
-    print(cull_command)
+    cull_timeout = get_config("custom.cull.timeout")
+    if cull_timeout:
+        cull_cmd.append("--timeout=%s" % cull_timeout)
+
+    cull_every = get_config("custom.cull.every")
+    if cull_every:
+        cull_cmd.append("--cull-every=%s" % cull_every)
+
+    if get_config("ccustom.ull.users"):
+        cull_cmd.append("--cull-users=True")
+
+    if get_config("custom.cull.removeNamedServers"):
+        cull_cmd.append("--remove-named-servers")
+
+    cull_max_age = get_config("custom.cull.maxAge")
+    if cull_max_age:
+        cull_cmd.append("--max-age=%s" % cull_max_age)
+    
+    check_eos = get_config('custom.cull.checkEosAuth', False)
+    if check_eos:
+        cull_cmd.append("--disable-hooks=True")
+
     c.JupyterHub.services.append(
         {
-            'name': 'cull-idle',
-            'admin': True,
-            'command': cull_command.split(),
+            "name": "cull-idle",
+            "admin": True,
+            "command": cull_cmd,
         }
     )
-
-# Give notebook 45s to start a webserver and max 60s for whole spawn process
-c.SwanSpawner.http_timeout = 45
-c.SwanSpawner.start_timeout = 60
-c.SwanSpawner.consecutive_failure_limit = 0
-
-# FIXME:
-# remove when we move to jh.1.1 exception .jupyterhub_message, that is displayed in not_running.html (upstream)
-# currently we customize spawnhandler to redirect to form
-c.JupyterHub.tornado_settings = {
-    'slow_spawn_timeout': 15
-}
-
-# Enble namedservers
-c.JupyterHub.allow_named_servers = False
-
-# Required for swan systemuser.sh
-c.SwanKubeSpawner.cmd = None
 
 # add EOS to notebook pods
 c.SwanKubeSpawner.volume_mounts = [
@@ -410,9 +377,6 @@ c.SwanKubeSpawner.volume_mounts = [
         mount_propagation='HostToContainer'
     ),
 ]
-
-# set home directory to EOS
-c.SwanKubeSpawner.local_home = False
 
 c.SwanKubeSpawner.volumes = [
     client.V1Volume(

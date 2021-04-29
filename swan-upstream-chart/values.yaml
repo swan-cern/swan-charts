@@ -158,8 +158,32 @@ jupyterhub:
         client_id: # placeholder, check secrets
         client_secret: # placeholder, check secrets
         oauth_callback_url: # placeholder, check secrets
+      SwanSpawner:
+        options_form_config: /srv/jupyterhub/options_form_config.json
+        # Give notebook 45s to start a webserver and max 60s for whole spawn process
+        http_timeout: 45
+        start_timeout: 60
+        consecutive_failure_limit: 0
+      SwanKubeSpawner:
+        # Required for swan systemuser.sh
+        # FIXME clean with new image?
+        cmd: None
+        # set home directory to EOS
+        local_home: False
+      SpawnHandlersConfigs:
+        # disable some defaults of swanspawner that do now work for kube-spawner
+        # FIXME remove this from the spawner once we support only k8s
+        metrics_on: False
+        local_home: True
       JupyterHub:
         authenticator_class: keycloakauthenticator.KeyCloakAuthenticator
+        spawner_class: swanspawner.SwanKubeSpawner
+        cleanup_servers: False
+        tornado_settings:
+          # currently we customize spawnhandler to stay in form before redirecting the user, as upstream does
+          # FIXME remove once we remove the the metrics from the spawn
+          slow_spawn_timeout: 15
+        allow_named_servers: False
     extraConfig:
       00-authConf: |
         def pre_spawn_hook(authenticator, spawner, auth_state):
@@ -172,6 +196,16 @@ jupyterhub:
       # TODO delete this once we upgrade to newer upstream (which loads files from this path automatically)
       01-swanConf: |
         exec(open('/usr/local/etc/jupyterhub/jupyterhub_config.d/1_swan_config.py').read())
+      02-spawnError: |
+        SPAWN_ERROR_MESSAGE = """SWAN could not start a session for your user, please try again. If the problem persists, please check:
+        <ul>
+            <li>Do you have a CERNBox account? If not, click <a href="https://cernbox.cern.ch" target="_blank">here</a>.</li>
+            <li>Is there a problem with the service? Find information <a href="https://cern.service-now.com/service-portal?id=service_status_board" target="_blank">here</a>.</li>
+            <li>If none of the options apply, please open a <a href="https://cern.service-now.com/service-portal?id=functional_element&name=swan" target="_blank">Support Ticket</a>.</li>
+        </ul>"""
+
+        # SWAN@CERN error message
+        c.SpawnHandlersConfigs.spawn_error_message = SPAWN_ERROR_MESSAGE
       # TODO move this into separate chart
       # TODO delete this once we upgrade to newer upstream (which loads files from this path automatically)
       10-sparkConf: |
@@ -214,8 +248,7 @@ jupyterhub:
     cull:
       enabled: true
       period: 600
-      checkEosAuth:
-        enabled: true
+      checkEosAuth: true
     cvmfs:
       storageProvisioner: csi-cvmfsplugin
       repositories:
