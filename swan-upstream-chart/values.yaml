@@ -226,6 +226,7 @@ jupyterhub:
     networkPolicy:
       enabled: false
     # placeholder for hub cookieSecret
+    # when empty, it generates a new randomly
     cookieSecret:
   rbac:
     enabled: true
