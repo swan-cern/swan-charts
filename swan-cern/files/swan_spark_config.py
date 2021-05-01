@@ -383,7 +383,9 @@ def spark_modify_pod_hook(spawner, pod):
     :returns: dynamically customized pod specification for user session
     :rtype: client.V1Pod
     """
-    pod_hook_handler = SwanPodHookHandler(spawner, pod)
+    pod_hook_handler = SwanPodHookHandlerProd(spawner, pod)
     swanpod = pod_hook_handler.get_swan_user_pod()
     spark_pod_hook_handler = SwanSparkPodHookHandler(spawner, swanpod)
     return spark_pod_hook_handler.get_spark_swan_user_pod()
+
+c.SwanKubeSpawner.modify_pod_hook = spark_modify_pod_hook
