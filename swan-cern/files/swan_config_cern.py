@@ -7,9 +7,8 @@ from kubernetes.client.rest import ApiException
 Class handling KubeSpawner.modify_pod_hook(spawner,pod) call
 """
 
-# TODO Clean EOS Kerberos
 
-class SwanPodHookHandler:
+class SwanPodHookHandlerProd:
     def __init__(self, spawner, pod):
         """
         :type spawner: swanspawner.SwanKubeSpawner
@@ -305,7 +304,7 @@ class SwanPodHookHandler:
 # This is defined in the configuration to allow overring iindependently 
 # of which config file is loaded first
 # c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook
-def swan_pod_hook(spawner, pod):
+def swan_pod_hook_prod(spawner, pod):
     """
     :param spawner: Swan Kubernetes Spawner
     :type spawner: swanspawner.SwanKubeSpawner
@@ -315,104 +314,7 @@ def swan_pod_hook(spawner, pod):
     :returns: dynamically customized pod specification for user session
     :rtype: client.V1Pod
     """
-    pod_hook_handler = SwanPodHookHandler(spawner, pod)
+    pod_hook_handler = SwanPodHookHandlerProd(spawner, pod)
     return pod_hook_handler.get_swan_user_pod()
 
-"""
-Configuration for JupyterHub
-"""
-c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook
-
-# Get configuration parameters from environment variables
-swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
-
-# Hub services
-# FIXME port is not exposed so it cannot be accessed. Maybe we should run this separately?
-# if get_config("custom.notificationsService", True):
-#     c.JupyterHub.services.append(
-#         {
-#             'name': 'notifications',
-#             'command': 'swannotificationsservice --port 8989'.split(),
-#             'url': 'http://hub:8989'
-#         }
-#     )
-
-swan_cull_period = get_config('custom.cull.every', 600)
-
-# Culling of users and ticket refresh
-if get_config("custom.cull.enabled", False):
-    cull_cmd = ["swanculler"]
-    base_url = c.JupyterHub.get("base_url", "/")
-    cull_cmd.append("--url=http://localhost:8081" + url_path_join(base_url, "hub/api"))
-
-    cull_timeout = get_config("custom.cull.timeout")
-    if cull_timeout:
-        cull_cmd.append("--timeout=%s" % cull_timeout)
-
-    cull_every = get_config("custom.cull.every")
-    if cull_every:
-        cull_cmd.append("--cull-every=%s" % cull_every)
-
-    if get_config("custom.cull.users"):
-        cull_cmd.append("--cull-users=True")
-
-    if get_config("custom.cull.removeNamedServers"):
-        cull_cmd.append("--remove-named-servers")
-
-    cull_max_age = get_config("custom.cull.maxAge")
-    if cull_max_age:
-        cull_cmd.append("--max-age=%s" % cull_max_age)
-    
-    check_eos = get_config('custom.cull.checkEosAuth', False)
-    if not check_eos:
-        cull_cmd.append("--disable-hooks=True")
-    
-    hooks_dir = get_config('custom.cull.hooksDir', False)
-    if not hooks_dir:
-        cull_cmd.append(f"--hooks-dir={hooks_dir}")
-
-    c.JupyterHub.services.append(
-        {
-            "name": "cull-idle",
-            "admin": True,
-            "command": cull_cmd,
-        }
-    )
-
-# add EOS to notebook pods
-c.SwanKubeSpawner.volume_mounts = [
-    client.V1VolumeMount(
-        name='eos',
-        mount_path='/eos',
-        mount_propagation='HostToContainer'
-    ),
-]
-
-c.SwanKubeSpawner.volumes = [
-    client.V1Volume(
-        name='eos',
-        host_path=client.V1HostPathVolumeSource(
-            path='/var/eos'
-        )
-    ),
-]
-
-# add CVMFS to notebook pods
-cvmfs_repos = get_config('custom.cvmfs.repositories', [])
-for cvmfs_repo_path in cvmfs_repos:
-    cvmfs_repo_id = cvmfs_repo_path.replace('.', '-')
-    c.SwanKubeSpawner.volumes.append(
-        client.V1Volume(
-            name='cvmfs-'+cvmfs_repo_id,
-            persistent_volume_claim=client.V1PersistentVolumeClaimVolumeSource(
-                claim_name='cvmfs-'+cvmfs_repo_id+'-pvc'
-            )
-        )
-    )
-    c.SwanKubeSpawner.volume_mounts.append(
-        client.V1VolumeMount(
-            name='cvmfs-'+cvmfs_repo_id,
-            mount_path='/cvmfs/'+cvmfs_repo_path,
-            read_only=True
-        )
-    )
+c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook_prod
