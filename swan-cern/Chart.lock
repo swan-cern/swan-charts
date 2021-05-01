@@ -1,0 +1,6 @@
+dependencies:
+- name: swan
+  repository: file://../swan
+  version: 0.0.1
+digest: sha256:a37c8e41ebf25479d8fdeda5704bd49ef08e07e23a5abdba6d3060ad30f56367
+generated: "2021-05-01T12:00:23.886021+02:00"

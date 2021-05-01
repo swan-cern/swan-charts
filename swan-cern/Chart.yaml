@@ -1,0 +1,13 @@
+apiVersion: v2
+#
+name: swan-cern
+type: application
+version: 0.0.1
+appVersion: 0.0.3
+#
+description: The chart to deploy SWAN at CERN
+#
+dependencies:
+  - name: swan
+    version: 0.0.1
+    repository: file://../swan
