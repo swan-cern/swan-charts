@@ -10,16 +10,10 @@ Class handling KubeSpawner.modify_pod_hook(spawner,pod) call
 """
 
 
-class SwanSparkPodHookHandler:
-    def __init__(self, spawner, pod):
-        """
-        :type spawner: swanspawner.SwanKubeSpawner
-        :type pod: client.V1Pod
-        """
-        self.spawner = spawner
-        self.pod = pod
+class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
 
-    def get_spark_swan_user_pod(self):
+    def get_swan_user_pod(self):
+        super().get_swan_user_pod()
 
         # get hadoop token
         hadoop_secret_name = None
@@ -29,7 +23,7 @@ class SwanSparkPodHookHandler:
             self._init_spark(self.pod.metadata.labels)
 
         # init user containers (notebook and side-container)
-        self._init_user_containers(hadoop_secret_name)
+        self._init_spark_containers(hadoop_secret_name)
 
         return self.pod
 
@@ -119,7 +113,7 @@ class SwanSparkPodHookHandler:
 
         return hadoop_secret_name
 
-    def _init_user_containers(self, hadoop_secret_name):
+    def _init_spark_containers(self, hadoop_secret_name):
         """
         Define cern related secrets for spark and eos
         """
@@ -349,29 +343,6 @@ class SwanSparkPodHookHandler:
         except ApiException as e:
             raise Exception("Could not create required user ports: %s\n" % e)
 
-    def _get_pod_container(self, container_name):
-        """
-        :returns: required container from pod spec
-        :rtype: client.V1Container
-        """
-        for container in self.pod.spec.containers:
-            if container.name == container_name:
-                return container
-
-        return None
-
-    def _add_or_replace_by_name(self, list, element):
-        found = False
-        for list_index in range(0, len(list)):
-            if list[list_index].to_dict().get("name") == element.to_dict().get("name"):
-                list[list_index] = element
-                found = True
-                break
-
-        if not found:
-            list.append(element)
-
-        return list
 
 def spark_modify_pod_hook(spawner, pod):
     """
@@ -383,9 +354,10 @@ def spark_modify_pod_hook(spawner, pod):
     :returns: dynamically customized pod specification for user session
     :rtype: client.V1Pod
     """
-    pod_hook_handler = SwanPodHookHandlerProd(spawner, pod)
-    swanpod = pod_hook_handler.get_swan_user_pod()
-    spark_pod_hook_handler = SwanSparkPodHookHandler(spawner, swanpod)
-    return spark_pod_hook_handler.get_spark_swan_user_pod()
+    spark_pod_hook_handler = SwanSparkPodHookHandler(spawner, pod)
+    return spark_pod_hook_handler.get_swan_user_pod()
+
+# Get configuration parameters from environment variables
+# swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
 
 c.SwanKubeSpawner.modify_pod_hook = spark_modify_pod_hook
