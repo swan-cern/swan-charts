@@ -210,3 +210,6 @@ swan_cull_period = get_config('custom.cull.every', 600)
 swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
 
 c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook_prod
+
+# Required for swan systemuser.sh
+c.SwanKubeSpawner.cmd = None
