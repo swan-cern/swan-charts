@@ -8,70 +8,21 @@ Class handling KubeSpawner.modify_pod_hook(spawner,pod) call
 """
 
 
-class SwanPodHookHandlerProd:
-    def __init__(self, spawner, pod):
-        """
-        :type spawner: swanspawner.SwanKubeSpawner
-        :type pod: client.V1Pod
-        """
-        self.spawner = spawner
-        self.pod = pod
+class SwanPodHookHandlerProd(SwanPodHookHandler):
 
     def get_swan_user_pod(self):
+        super().get_swan_user_pod()
 
-        # pod labels
-        pod_labels = dict(
-            lcg_release = self.spawner.user_options[self.spawner.lcg_rel_field].split('/')[0],
-            swan_user = self.spawner.user.name
-        )
-
-        # update pod labels
-        self.pod.metadata.labels.update(
-            pod_labels
-        )
+        # ATTENTION Spark requires this side container, so we need to create it!!
+        # Check if we should add the EOS path in the firstplace
+        # if hasattr(self.spawner, 'local_home') and \
+        #     not self.spawner.local_home:
 
         # get eos token
         eos_secret_name = self._init_eos_secret()
 
-        if self._gpu_enabled():
-            # currently no cern customisation required
-            self.pod.spec.volumes.append(
-                client.V1Volume(
-                    host_path=client.V1HostPathVolumeSource(path="/opt/nvidia-driver"),
-                    name='nvidia-driver'
-                )
-            )
-
-            notebook_container = self._get_pod_container('notebook')
-
-            notebook_container.volume_mounts.append(
-                client.V1VolumeMount(
-                name='nvidia-driver',
-                mount_path='/opt/nvidia-driver'
-                )
-            )
-
-            notebook_container.env = self._add_or_replace_by_name(
-                notebook_container.env,
-                client.V1EnvVar(
-                    name='NVIDIA_LIB_PATH',
-                    value='/opt/nvidia-driver/lib64'
-                ),
-            )
-
-            notebook_container.env = self._add_or_replace_by_name(
-                notebook_container.env,
-                client.V1EnvVar(
-                    name='NVIDIA_PATH',
-                    value='/opt/nvidia-driver/bin'
-                ),
-            )
-
-        # init pod affinity
-        self.pod.spec.affinity = self._init_pod_affinity(pod_labels)
-
         # init user containers (notebook and side-container)
-        self._init_user_containers(eos_secret_name)
+        self._init_eos_containers(eos_secret_name)
 
         return self.pod
 
@@ -116,7 +67,7 @@ class SwanPodHookHandlerProd:
 
         return eos_secret_name
 
-    def _init_user_containers(self, eos_secret_name):
+    def _init_eos_containers(self, eos_secret_name):
         """
         Define cern related secrets for spark and eos
         """
@@ -195,7 +146,7 @@ class SwanPodHookHandlerProd:
             client.V1Volume(
                 name='side-container-scripts',
                 config_map=client.V1ConfigMapVolumeSource(
-                    name='swan-scripts',
+                    name='swan-scripts-cern',
                     items=[
                         client.V1KeyToPath(
                             key='side_container_tokens_perm.sh',
@@ -236,70 +187,6 @@ class SwanPodHookHandlerProd:
         # assigning pod spec containers
         self.pod.spec.containers = pod_spec_containers
 
-    def _gpu_enabled(self):
-        """
-        Helper function to determine if gpu is allowed for given spawn
-        raise exception if user has not access to the gpu
-        return True if gpu is selected and user has access to gpu
-        return False if gpu is not selected
-        """
-
-        user_roles = self.spawner.user_roles
-        lcg_rel = self.spawner.user_options[self.spawner.lcg_rel_field]
-
-        if "cu" in lcg_rel and "swan-gpu" not in user_roles:
-            raise ValueError("Access to GPUs is not granted; please contact swan-admins@cern.ch")
-        elif "cu" in lcg_rel:
-            return True
-        return False
-
-    def _init_pod_affinity(self, pod_labels):
-        """
-        schedule pods to nodes that satisfy the specified label/affinity expressions 
-        """
-        try:
-            del pod_labels["swan_user"]
-        except KeyError:
-            pass
-        aff = client.V1Affinity()
-        pod_affinity = client.V1PodAffinity(
-            preferred_during_scheduling_ignored_during_execution=[client.V1WeightedPodAffinityTerm(
-                pod_affinity_term=client.V1PodAffinityTerm(
-                    label_selector=client.V1LabelSelector(
-                        match_labels=pod_labels
-                    ),
-                    topology_key="kubernetes.io/hostname"
-                ),
-                weight=100
-            )]
-        )
-        aff.pod_affinity = pod_affinity
-        return aff
-
-    def _get_pod_container(self, container_name):
-        """
-        :returns: required container from pod spec
-        :rtype: client.V1Container
-        """
-        for container in self.pod.spec.containers:
-            if container.name == container_name:
-                return container
-
-        return None
-
-    def _add_or_replace_by_name(self, list, element):
-        found = False
-        for list_index in range(0, len(list)):
-            if list[list_index].to_dict().get("name") == element.to_dict().get("name"):
-                list[list_index] = element
-                found = True
-                break
-
-        if not found:
-            list.append(element)
-
-        return list
-
 # https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html
 # This is defined in the configuration to allow overring iindependently 
 # of which config file is loaded first
@@ -316,5 +203,10 @@ def swan_pod_hook_prod(spawner, pod):
     """
     pod_hook_handler = SwanPodHookHandlerProd(spawner, pod)
     return pod_hook_handler.get_swan_user_pod()
+
+
+swan_cull_period = get_config('custom.cull.every', 600)
+# Get configuration parameters from environment variables
+swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
 
 c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook_prod
