@@ -243,3 +243,6 @@ for cvmfs_repo_path in cvmfs_repos:
             read_only=True
         )
     )
+
+# Required for swan systemuser.sh
+c.SwanKubeSpawner.cmd = None
