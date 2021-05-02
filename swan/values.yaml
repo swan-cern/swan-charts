@@ -105,9 +105,6 @@ jupyterhub:
         start_timeout: 60
         consecutive_failure_limit: 0
       SwanKubeSpawner:
-        # Required for swan systemuser.sh
-        # FIXME clean with new image?
-        cmd: None
         # set home directory to EOS
         local_home: False
       SpawnHandlersConfigs:
