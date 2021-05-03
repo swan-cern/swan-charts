@@ -1,4 +1,0 @@
-apiVersion: v1
-description: Wrapper for eosxd chart that customizes configuration to SWAN@CERN
-name: swan-eosxd-config-chart
-version: 0.2.1-swan1
