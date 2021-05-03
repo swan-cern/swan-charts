@@ -1,4 +1,0 @@
-dependencies:
-  - name: eosxd
-    version: 0.2.1
-    repository: http://registry.cern.ch/chartrepo/cern
