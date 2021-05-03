@@ -227,7 +227,7 @@ c.SwanKubeSpawner.volumes = [
 # add CVMFS to notebook pods
 cvmfs_repos = get_config('custom.cvmfs.repositories', [])
 for cvmfs_repo_path in cvmfs_repos:
-    cvmfs_repo_id = cvmfs_repo_path.replace('.', '-')
+    cvmfs_repo_id = cvmfs_repo_path['mount'].replace('.', '-')
     c.SwanKubeSpawner.volumes.append(
         client.V1Volume(
             name='cvmfs-'+cvmfs_repo_id,
@@ -239,7 +239,7 @@ for cvmfs_repo_path in cvmfs_repos:
     c.SwanKubeSpawner.volume_mounts.append(
         client.V1VolumeMount(
             name='cvmfs-'+cvmfs_repo_id,
-            mount_path='/cvmfs/'+cvmfs_repo_path,
+            mount_path='/cvmfs/'+cvmfs_repo_path['mount'],
             read_only=True
         )
     )

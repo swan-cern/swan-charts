@@ -1,4 +1,5 @@
-{{- range .Values.repositories }}
+{{ if .Values.cvmfsClient.csiDriver }}
+{{- range .Values.cvmfs.repositories }}
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -14,7 +15,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: cvmfs-{{.mount | replace "." "-"}}-pvc
-  namespace: {{ $.Values.namespace }}
+  namespace: {{ $.Release.Namespace }}
 spec:
   accessModes:
   - ReadOnlyMany
@@ -23,4 +24,5 @@ spec:
       storage: 1Gi
   storageClassName: csi-cvmfs-{{(split "." .mount)._0 }}
 ---
+{{- end }}
 {{- end }}
