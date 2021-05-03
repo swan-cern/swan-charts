@@ -38,7 +38,6 @@ export KUBECONFIG=/srv/swan-k8s/private/swan.$SWAN_ENV.kubeconfig
 
 # values and secrets based on environment
 SWAN_PROD_RELEASE_NAME=swan
-SWAN_PROD_VALUES_PATH=$ROOT_DIR/swan-upstream-chart/swan.values.yaml
 SWAN_SECRET_VALUES_PATH=/srv/swan-k8s/private/swan.$SWAN_ENV.secrets.yaml
 
 # secret files
@@ -49,18 +48,6 @@ HADOOP_AUTH_KEYTAB_ENCODED=$(base64 -w 0 $HADOOP_AUTH_KEYTAB_PATH)
 SPARKK8S_AUTH_TOKEN_PATH=/srv/swan-k8s/private/sparkk8s.kubeconfig
 SPARKK8S_AUTH_TOKEN_ENCODED=$(base64 -w 0 $SPARKK8S_AUTH_TOKEN_PATH)
 
-echo ""
-echo "Updating eosxd"
-echo ""
-
-helm upgrade --install --namespace kube-system --disable-openapi-validation  \
-eosxd $ROOT_DIR/swan-eosxd-config-chart
-
-if [[ $? -ne 0 ]]
-then
-    echo "failed"
-    exit 1
-fi
 
 echo ""
 echo "Updating fluentd"
@@ -75,18 +62,17 @@ then
     exit 1
 fi
 
+
 echo ""
-echo "Updating cvmfs"
+echo "Build chart dependencies"
 echo ""
 
-helm upgrade --install --namespace kube-system  \
-cvmfs $ROOT_DIR/swan-cvmfs-config-chart
+helm repo add cern http://registry.cern.ch/chartrepo/cern
+helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
+# TODO remove this once we push this to Harbor
+( cd $ROOT_DIR/swan && helm dependency build )
+( cd $ROOT_DIR/swan-cern && helm dependency build )
 
-if [[ $? -ne 0 ]]
-then
-    echo "failed"
-    exit 1
-fi
 
 echo ""
 echo "Updating swan env ${SWAN_ENV}, upgrade db ${UPGRADE_DB}"
@@ -94,14 +80,13 @@ echo ""
 
 # Annotation is required in order to restart jupyterhub server on swan_config.py or jupyterhub_form.html changes
 helm upgrade --install --namespace swan  \
---values $SWAN_PROD_VALUES_PATH \
 --values $SWAN_SECRET_VALUES_PATH \
 --set jupyterhub.hub.annotations.version="release-$(date +%s)" \
 --set jupyterhub.hub.db.upgrade=$UPGRADE_DB \
 --set swan.secrets.hadoop.cred=$HADOOP_AUTH_KEYTAB_ENCODED \
 --set swan.secrets.eos.cred=$EOS_AUTH_KEYTAB_ENCODED \
 --set swan.secrets.sparkk8s.cred=$SPARKK8S_AUTH_TOKEN_ENCODED \
-$SWAN_PROD_RELEASE_NAME $ROOT_DIR/swan-upstream-chart
+$SWAN_PROD_RELEASE_NAME $ROOT_DIR/swan-
 
 if [[ $? -ne 0 ]]
 then
