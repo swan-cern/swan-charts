@@ -1,4 +1,9 @@
 swan:
+  cvmfs:
+    repositories: &cvmfsRepos
+      - mount: sft.cern.ch
+      - mount: sft-nightlies.cern.ch
+      - mount: cvmfs-config.cern.ch
   jupyterhub:
     singleuser:
       image:
@@ -78,6 +83,4 @@ swan:
         enabled: false
     custom:
       cvmfs:
-        repositories:
-          - sft.cern.ch
-          - sft-nightlies.cern.ch
+        repositories: *cvmfsRepos
