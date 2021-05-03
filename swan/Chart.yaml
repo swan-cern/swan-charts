@@ -26,8 +26,4 @@ dependencies:
 #     version: 0.0.1
 #     repository: https://registry.cern.ch/chartrepo/tbd
 #     condition: cvmfsClient.daemonSet
-#   - name: swan-cvmfs
-#     version: 0.1.0
-#     repository: file://../swan-cvmfs-config-chart
-#     condition: cvmfsClient.csiDriver
 
