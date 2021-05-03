@@ -13,17 +13,17 @@ dependencies:
     version: 0.11.1
     repository: https://jupyterhub.github.io/helm-chart/
 #
-#   - name: eosxd
-#     version: 0.0.1
-#     repository: https://registry.cern.ch/chartrepo/eos
-#     condition: eosClient.daemonSet
-#   - name: eosxd
-#     version: 0.2.8
-#     repository: http://registry.cern.ch/chartrepo/cern
-#     condition: eosClient.csiDriver
+  # - name: eosxd
+  #   version: 0.0.2
+  #   repository: https://registry.cern.ch/chartrepo/eos
+  #   condition: eosClient.daemonSet
+  - name: eosxd
+    version: 0.2.8
+    repository: http://registry.cern.ch/chartrepo/cern
+    condition: eosClient.csiDriver
 #
-#   - name: cvmfs
-#     version: 0.0.1
-#     repository: https://registry.cern.ch/chartrepo/tbd
-#     condition: cvmfsClient.daemonSet
+  # - name: cvmfs
+  #   version: 0.0.1
+  #   repository: https://registry.cern.ch/chartrepo/tbd
+  #   condition: cvmfsClient.daemonSet
 

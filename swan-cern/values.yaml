@@ -185,7 +185,7 @@ swan:
 
   eosClient:
     daemonSet: false
-    csiDriver: true
+    csiDriver: false # The driver comes automatically with the cluster
   cvmfsClient:
     daemonSet: false
     csiDriver: true
