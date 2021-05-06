@@ -83,9 +83,9 @@ helm upgrade --install --namespace swan  \
 --values $SWAN_SECRET_VALUES_PATH \
 --set jupyterhub.hub.annotations.version="release-$(date +%s)" \
 --set jupyterhub.hub.db.upgrade=$UPGRADE_DB \
---set swan.secrets.hadoop.cred=$HADOOP_AUTH_KEYTAB_ENCODED \
---set swan.secrets.eos.cred=$EOS_AUTH_KEYTAB_ENCODED \
---set swan.secrets.sparkk8s.cred=$SPARKK8S_AUTH_TOKEN_ENCODED \
+--set swanCern.secrets.hadoop.cred=$HADOOP_AUTH_KEYTAB_ENCODED \
+--set swanCern.secrets.eos.cred=$EOS_AUTH_KEYTAB_ENCODED \
+--set swanCern.secrets.sparkk8s.cred=$SPARKK8S_AUTH_TOKEN_ENCODED \
 $SWAN_PROD_RELEASE_NAME $ROOT_DIR/swan-
 
 if [[ $? -ne 0 ]]
