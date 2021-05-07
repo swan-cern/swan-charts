@@ -86,7 +86,7 @@ helm upgrade --install --namespace swan  \
 --set swanCern.secrets.hadoop.cred=$HADOOP_AUTH_KEYTAB_ENCODED \
 --set swanCern.secrets.eos.cred=$EOS_AUTH_KEYTAB_ENCODED \
 --set swanCern.secrets.sparkk8s.cred=$SPARKK8S_AUTH_TOKEN_ENCODED \
-$SWAN_PROD_RELEASE_NAME $ROOT_DIR/swan-
+$SWAN_PROD_RELEASE_NAME $ROOT_DIR/swan-cern
 
 if [[ $? -ne 0 ]]
 then
