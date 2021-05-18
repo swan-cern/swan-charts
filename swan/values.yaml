@@ -11,7 +11,7 @@ jupyterhub:
       type: none
     image:
       name: "gitlab-registry.cern.ch/swan/docker-images/systemuser"
-      tag: "v5.6.1"
+      tag: "v5.9.0"
       pullPolicy: "Always"
     cloudMetadata:
       enabled: true
