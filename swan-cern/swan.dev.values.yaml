@@ -8,7 +8,7 @@ swan:
     singleuser:
       image:
         name: "gitlab-registry.cern.ch/swan/docker-images/systemuser"
-        tag: "v5.6.1"
+        tag: "v5.9.0"
         pullPolicy: Always
       # JH can randomly generate one, but then proxy also needs to do it
       secretToken: ca4ac8ac414707020a7db74341eaf25de01f6d0bd73f4ceb9d2a197f1e3b9f32
