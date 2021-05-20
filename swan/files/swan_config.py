@@ -224,6 +224,24 @@ c.SwanKubeSpawner.volumes = [
     ),
 ]
 
+## add /dev/shm  (for pyTorch and others)
+c.SwanKubeSpawner.volumes.append(
+    client.V1Volume(
+        name='devshm',
+       empty_dir=client.V1EmptyDirVolumeSource(
+            medium='Memory'
+        )
+    )
+)
+
+c.SwanKubeSpawner.volume_mounts.append(
+    client.V1VolumeMount(
+        name='devshm',
+        mount_path='/dev/shm',
+    )
+)
+
+
 # add CVMFS to notebook pods
 cvmfs_repos = get_config('custom.cvmfs.repositories', [])
 for cvmfs_repo_path in cvmfs_repos:
