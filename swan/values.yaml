@@ -71,12 +71,6 @@ jupyterhub:
       - name: swan-jh
         mountPath: /usr/local/etc/jupyterhub/jupyterhub_config.d/1_swan_config.py
         subPath: swan_config.py
-      - name: cvmfs-sft-cern-ch
-        mountPath: /cvmfs/sft.cern.ch
-    extraVolumes:
-      - name: cvmfs-sft-cern-ch
-        persistentVolumeClaim:
-          claimName: cvmfs-sft-cern-ch-pvc
       - name: swan-jh
         configMap:
           name: swan-scripts
