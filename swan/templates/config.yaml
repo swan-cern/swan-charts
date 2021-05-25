@@ -215,6 +215,10 @@ data:
             }
         )
 
+    # init lists for volumes and volume_mounts
+    c.SwanKubeSpawner.volumes = []
+    c.SwanKubeSpawner.volume_mounts = []
+
     # add EOS to notebook pods
     c.SwanKubeSpawner.volume_mounts = [
         client.V1VolumeMount(
@@ -234,6 +238,8 @@ data:
     ]
 
     # add CVMFS to notebook pods
+    {{- if .Values.cvmfsClient.csiDriver }}
+    # ... using the CSI driver
     cvmfs_repos = get_config('custom.cvmfs.repositories', [])
     for cvmfs_repo_path in cvmfs_repos:
         cvmfs_repo_id = cvmfs_repo_path['mount'].replace('.', '-')
@@ -252,6 +258,24 @@ data:
                 read_only=True
             )
         )
+    {{- else }}
+    # ... bind-mounting hostPath
+    c.SwanKubeSpawner.volumes.append(
+        client.V1Volume(
+            name='cvmfs',
+            host_path=client.V1HostPathVolumeSource(
+                path='/cvmfs'
+            )
+        )
+    )
+    c.SwanKubeSpawner.volume_mounts.append(
+        client.V1VolumeMount(
+            name='cvmfs',
+            mount_path='/cvmfs',
+            mount_propagation='HostToContainer'
+        )
+    )
+    {{- end }}
 
     # add /dev/shm (for pyTorch and others)
     c.SwanKubeSpawner.volumes.append(
@@ -262,7 +286,6 @@ data:
             )
         )
     )
-
     c.SwanKubeSpawner.volume_mounts.append(
         client.V1VolumeMount(
             name='devshm',
