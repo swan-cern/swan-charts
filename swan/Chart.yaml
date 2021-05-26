@@ -23,7 +23,7 @@ dependencies:
     condition: eosClient.csiDriver
 
   - name: cvmfs
-    version: 0.0.2
+    version: 0.0.3
     repository: https://registry.cern.ch/chartrepo/sciencebox
     condition: cvmfsClient.daemonSet
   - name: cvmfs-csi
