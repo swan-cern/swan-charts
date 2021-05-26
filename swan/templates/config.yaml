@@ -220,22 +220,41 @@ data:
     c.SwanKubeSpawner.volume_mounts = []
 
     # add EOS to notebook pods
-    c.SwanKubeSpawner.volume_mounts = [
-        client.V1VolumeMount(
-            name='eos',
-            mount_path='/eos',
-            mount_propagation='HostToContainer'
-        ),
-    ]
-
-    c.SwanKubeSpawner.volumes = [
+    {{- if .Values.eosClient.csiDriver }}
+    # ... using the CSI driver
+    c.SwanKubeSpawner.volumes.append(
         client.V1Volume(
             name='eos',
             host_path=client.V1HostPathVolumeSource(
                 path='/var/eos'
             )
-        ),
-    ]
+        )
+    )
+    c.SwanKubeSpawner.volume_mounts.append(
+        client.V1VolumeMount(
+            name='eos',
+            mount_path='/eos',
+            mount_propagation='HostToContainer'
+        )
+    )
+    {{- else }}
+    # ... bind-mounting hostPath
+    c.SwanKubeSpawner.volumes.append(
+        client.V1Volume(
+            name='eos',
+            host_path=client.V1HostPathVolumeSource(
+                path='/eos'
+            )
+        )
+    )
+    c.SwanKubeSpawner.volume_mounts.append(
+        client.V1VolumeMount(
+            name='eos',
+            mount_path='/eos',
+            mount_propagation='HostToContainer'
+        )
+    )
+    {{- end }}
 
     # add CVMFS to notebook pods
     {{- if .Values.cvmfsClient.csiDriver }}
@@ -281,7 +300,7 @@ data:
     c.SwanKubeSpawner.volumes.append(
         client.V1Volume(
             name='devshm',
-           empty_dir=client.V1EmptyDirVolumeSource(
+            empty_dir=client.V1EmptyDirVolumeSource(
                 medium='Memory'
             )
         )
