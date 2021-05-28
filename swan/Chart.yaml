@@ -12,11 +12,11 @@ dependencies:
   - name: jupyterhub
     version: 0.11.1
     repository: https://jupyterhub.github.io/helm-chart/
-#
-  # - name: eosxd
-  #   version: 0.0.2
-  #   repository: https://registry.cern.ch/chartrepo/eos
-  #   condition: eosClient.daemonSet
+
+  - name: fusex
+    version: 0.0.2
+    repository: https://registry.cern.ch/chartrepo/eos
+    condition: eosClient.daemonSet
   - name: eosxd
     version: 0.2.8
     repository: http://registry.cern.ch/chartrepo/cern
