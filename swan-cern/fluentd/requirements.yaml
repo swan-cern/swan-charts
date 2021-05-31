@@ -1,5 +1,0 @@
-dependencies:
-  - name: fluentd
-    version: 0.1.4
-    appVersion: 2.4.0
-    repository: http://registry.cern.ch/chartrepo/cern

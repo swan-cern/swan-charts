@@ -4,24 +4,24 @@
     {
       "type": "label",
       "label": {
-        "value": "label-rr",
+        "value": "label1",
         "text": "Recommended releases (General Purpose)"
       }
     },
     {
       "type": "selection",
       "lcg": {
-        "value": "LCG_99",
-        "text": "99"
+        "value": "LCG_100",
+        "text": "100"
       },
       "platforms": [
         {
-          "value": "x86_64-centos7-gcc10-opt",
-          "text": "CentOS 7 (gcc10)"
-        },
-        {
           "value": "x86_64-centos7-gcc8-opt",
           "text": "CentOS 7 (gcc8)"
+        },
+        {
+          "value": "x86_64-centos7-gcc10-opt",
+          "text": "CentOS 7 (gcc10)"
         }
       ],
       "cores": [
@@ -42,6 +42,10 @@
         {
           "value": "10",
           "text": "10 GB"
+        },
+        {
+          "value": "16",
+          "text": "16 GB"
         }
       ],
       "clusters": [
@@ -93,6 +97,10 @@
         {
           "value": "10",
           "text": "10 GB"
+        },
+        {
+          "value": "16",
+          "text": "16 GB"
         }
       ],
       "clusters": [
@@ -118,7 +126,7 @@
       "type": "selection",
       "lcg": {
         "value": "LCG_97apython3",
-        "text": "97 Spark2"
+        "text": "97a Spark2"
       },
       "platforms": [
         {
@@ -144,6 +152,10 @@
         {
           "value": "10",
           "text": "10 GB"
+        },
+        {
+          "value": "16",
+          "text": "16 GB"
         }
       ],
       "clusters": [
@@ -156,10 +168,6 @@
           "text": "General Purpose (Analytix)"
         },
         {
-          "value": "k8s",
-          "text": "Cloud Containers (K8s)"
-        },
-        {
           "value": "hadoop-qa",
           "text": "QA"
         }
@@ -168,13 +176,13 @@
     {
       "type": "selection",
       "lcg": {
-        "value": "LCG_95apython3_nxcals",
-        "text": "NXCals Python3"
+        "value": "LCG_100_nxcals",
+        "text": "NXCals Spark 3"
       },
       "platforms": [
         {
-          "value": "x86_64-centos7-gcc7-opt",
-          "text": "CentOS 7 (gcc7)"
+          "value": "x86_64-centos7-gcc9-opt",
+          "text": "CentOS 7 (gcc9)"
         }
       ],
       "cores": [
@@ -187,6 +195,10 @@
         {
           "value": "10",
           "text": "10 GB"
+        },
+        {
+          "value": "16",
+          "text": "16 GB"
         }
       ],
       "clusters": [
@@ -203,152 +215,14 @@
     {
       "type": "label",
       "label": {
-        "value": "empty-drg",
+        "value": "empty1",
         "text": ""
       }
     },
     {
       "type": "label",
       "label": {
-        "value": "label-drg",
-        "text": "Development releases (GPU)"
-      }
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "LCG_99cuda",
-        "text": "99 Cuda 10.1 Python3"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc8-opt",
-          "text": "CentOS 7 (gcc8)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2CPU, 1GPU"
-        }
-      ],
-      "memory": [
-        {
-          "value": "16",
-          "text": "16 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
-        }
-      ]
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "LCG_98py3cu10",
-        "text": "98 Cuda 10 Python3"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc8-opt",
-          "text": "CentOS 7 (gcc8)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2CPU, 1GPU"
-        }
-      ],
-      "memory": [
-        {
-          "value": "16",
-          "text": "16 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
-        }
-      ]
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "LCG_97py3cu10",
-        "text": "97 Cuda 10 Python3"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc7-opt",
-          "text": "CentOS 7 (gcc7)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2CPU, 1GPU"
-        }
-      ],
-      "memory": [
-        {
-          "value": "16",
-          "text": "16 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
-        }
-      ]
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "dev4cuda/latest",
-        "text": "Bleeding Edge Cuda 10"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc8-opt",
-          "text": "CentOS 7 (gcc8)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2CPU, 1GPU"
-        }
-      ],
-      "memory": [
-        {
-          "value": "16",
-          "text": "16 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
-        }
-      ]
-    },
-    {
-      "type": "label",
-      "label": {
-        "value": "empty-dr",
-        "text": ""
-      }
-    },
-    {
-      "type": "label",
-      "label": {
-        "value": "label-dr",
+        "value": "label2",
         "text": "Development releases (might be unstable)"
       }
     },
@@ -356,7 +230,7 @@
       "type": "selection",
       "lcg": {
         "value": "dev3/latest",
-        "text": "Bleeding Edge Python3"
+        "text": "Bleeding Edge"
       },
       "platforms": [
         {
@@ -441,43 +315,39 @@
     {
       "type": "selection",
       "lcg": {
-        "value": "dev3python3spark3/Tue",
-        "text": "Bleeding Edge Python3 Spark3"
+        "value": "devnxcals/latest",
+        "text": "NXCals Spark3 (dev snapshot)"
       },
       "platforms": [
         {
-          "value": "x86_64-centos7-gcc8-opt",
-          "text": "CentOS 7 (gcc8)"
+          "value": "x86_64-centos7-gcc9-opt",
+          "text": "CentOS 7 (gcc9)"
         }
       ],
       "cores": [
         {
-          "value": "2",
-          "text": "2"
+          "value": "4",
+          "text": "4"
         }
       ],
       "memory": [
         {
-          "value": "8",
-          "text": "8 GB"
+          "value": "10",
+          "text": "10 GB"
+        },
+        {
+          "value": "16",
+          "text": "16 GB"
         }
       ],
       "clusters": [
         {
+          "value": "hadoop-nxcals",
+          "text": "BE NXCALS (NXCals)"
+        },
+        {
           "value": "none",
           "text": "None"
-        },
-        {
-          "value": "analytix",
-          "text": "General Purpose (Analytix)"
-        },
-        {
-          "value": "k8s",
-          "text": "Cloud Containers (K8s)"
-        },
-        {
-          "value": "hadoop-qa",
-          "text": "QA"
         }
       ]
     },
@@ -498,17 +368,17 @@
     {
       "type": "selection",
       "lcg": {
-        "value": "LCG_97a",
-        "text": "97a"
+        "value": "LCG_99",
+        "text": "99"
       },
       "platforms": [
         {
-          "value": "x86_64-centos7-gcc9-opt",
-          "text": "CentOS 7 (gcc9)"
-        },
-        {
           "value": "x86_64-centos7-gcc8-opt",
           "text": "CentOS 7 (gcc8)"
+        },
+        {
+          "value": "x86_64-centos7-gcc10-opt",
+          "text": "CentOS 7 (gcc10)"
         }
       ],
       "cores": [
@@ -529,6 +399,10 @@
         {
           "value": "10",
           "text": "10 GB"
+        },
+        {
+          "value": "16",
+          "text": "16 GB"
         }
       ],
       "clusters": [
@@ -553,14 +427,49 @@
     {
       "type": "selection",
       "lcg": {
-        "value": "LCG_97apython3",
-        "text": "97a Python3"
+        "value": "LCG_95nxcalspython3_nxcals",
+        "text": "NXCals Spark 2"
       },
       "platforms": [
         {
-          "value": "x86_64-centos7-gcc9-opt",
-          "text": "CentOS 7 (gcc9)"
+          "value": "x86_64-centos7-gcc7-opt",
+          "text": "CentOS 7 (gcc7)"
+        }
+      ],
+      "cores": [
+        {
+          "value": "4",
+          "text": "4"
+        }
+      ],
+      "memory": [
+        {
+          "value": "10",
+          "text": "10 GB"
         },
+        {
+          "value": "16",
+          "text": "16 GB"
+        }
+      ],
+      "clusters": [
+        {
+          "value": "hadoop-nxcals",
+          "text": "BE NXCALS (NXCals)"
+        },
+        {
+          "value": "none",
+          "text": "None"
+        }
+      ]
+    },
+    {
+      "type": "selection",
+      "lcg": {
+        "value": "LCG_97apython3",
+        "text": "97a"
+      },
+      "platforms": [
         {
           "value": "x86_64-centos7-gcc8-opt",
           "text": "CentOS 7 (gcc8)"
@@ -584,6 +493,65 @@
         {
           "value": "10",
           "text": "10 GB"
+        },
+        {
+          "value": "16",
+          "text": "16 GB"
+        }
+      ],
+      "clusters": [
+        {
+          "value": "none",
+          "text": "None"
+        },
+        {
+          "value": "analytix",
+          "text": "General Purpose (Analytix)"
+        },
+        {
+          "value": "k8s",
+          "text": "Cloud Containers (K8s)"
+        },
+        {
+          "value": "hadoop-qa",
+          "text": "QA"
+        }
+      ]
+    },
+    {
+      "type": "selection",
+      "lcg": {
+        "value": "LCG_97a",
+        "text": "97a Python2"
+      },
+      "platforms": [
+        {
+          "value": "x86_64-centos7-gcc8-opt",
+          "text": "CentOS 7 (gcc8)"
+        }
+      ],
+      "cores": [
+        {
+          "value": "2",
+          "text": "2"
+        },
+        {
+          "value": "4",
+          "text": "4"
+        }
+      ],
+      "memory": [
+        {
+          "value": "8",
+          "text": "8 GB"
+        },
+        {
+          "value": "10",
+          "text": "10 GB"
+        },
+        {
+          "value": "16",
+          "text": "16 GB"
         }
       ],
       "clusters": [
@@ -635,6 +603,10 @@
         {
           "value": "10",
           "text": "10 GB"
+        },
+        {
+          "value": "16",
+          "text": "16 GB"
         }
       ],
       "clusters": [
@@ -686,6 +658,10 @@
         {
           "value": "10",
           "text": "10 GB"
+        },
+        {
+          "value": "16",
+          "text": "16 GB"
         }
       ],
       "clusters": [
