@@ -53,16 +53,6 @@ echo ""
 echo "Updating fluentd"
 echo ""
 
-helm upgrade --install --namespace kube-system  \
-fluentd $ROOT_DIR/swan-fluentd-config-chart
-
-if [[ $? -ne 0 ]]
-then
-    echo "failed"
-    exit 1
-fi
-
-
 echo ""
 echo "Build chart dependencies"
 echo ""

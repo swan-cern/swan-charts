@@ -11,6 +11,3 @@ dependencies:
   - name: swan
     version: 0.0.1
     repository: file://../swan
-  - name: swan-fluentd
-    version: 0.0.1
-    repository: file://fluentd
