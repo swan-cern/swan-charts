@@ -2,3 +2,8 @@ apiVersion: v1
 description: Wrapper for fluentd chart that customizes configuration to SWAN@CERN
 name: swan-fluentd
 version: 0.0.1
+
+dependencies:
+  - name: fluentd
+    repository: registry.cern.ch/cern/fluentd
+    version: 0.1.4
