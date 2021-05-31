@@ -1,6 +1,0 @@
-dependencies:
-- name: fluentd
-  repository: http://registry.cern.ch/chartrepo/cern
-  version: 0.1.4
-digest: sha256:6e6cf29f8c5fc5439159b400c8422672dc1b2cdaba4e14c0de2614ed18740cd1
-generated: "2020-08-31T13:14:30.676044647+02:00"

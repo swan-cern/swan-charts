@@ -1,0 +1,33 @@
+image:
+  name: gitlab-registry.cern.ch/cloud/atomic-system-containers/fluentd-elasticsearch
+  tag: v2.4.0
+plugins:
+  - fluent-plugin-rewrite-tag-filter
+  - fluent-plugin-out-http
+  - fluent-plugin-grok-parser
+output:
+  producer:
+  endpoint: http://monit-logs.cern.ch:10012/
+  includeInternal: false
+parsingConfig: |
+    # add basic parsing to all logs
+    with kubernetes tag (e.g. kubernetes.var.log.container*)
+    <filter kubernetes.**>
+      @type record_transformer
+      enable_ruby
+      <record>
+        producer "#{ENV['OUTPUT_PRODUCER']}"
+        type "generic"
+        timestamp ${(time.to_f * 1000).to_i}
+        raw ${record["log"].strip}
+      </record>
+      remove_keys ["log"]
+    </filter>
+
+    # send to http endpoint
+    <match kubernetes.**>
+      @type http
+      endpoint_url    "#{ENV['OUTPUT_ENDPOINT']}"
+      serializer      json
+      http_method     post
+    </match>
