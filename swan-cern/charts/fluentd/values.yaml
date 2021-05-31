@@ -1,0 +1,12 @@
+fluentd:
+  plugins:
+    - fluent-plugin-rewrite-tag-filter
+    - fluent-plugin-out-http
+    - fluent-plugin-grok-parser
+    - fluent-plugin-concat
+  output:
+    producer: swan
+    endpoint: http://monit-logs.cern.ch:10012/
+    includeInternal: false
+  parsingConfig: |
+    {{ (.Files "../../files/fluentd_config").AsConfig | indent 2 }}
