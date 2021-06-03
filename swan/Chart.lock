@@ -1,0 +1,9 @@
+dependencies:
+- name: jupyterhub
+  repository: https://jupyterhub.github.io/helm-chart/
+  version: 0.11.1
+- name: eosxd
+  repository: http://registry.cern.ch/chartrepo/cern
+  version: 0.2.8
+digest: sha256:b9b80f0dba769765a9b22bc9afdcc30169b7f403d2e4f3ccddb6b9e4c80add70
+generated: "2021-05-04T12:55:58.496155+02:00"
