@@ -2,8 +2,17 @@ dependencies:
 - name: jupyterhub
   repository: https://jupyterhub.github.io/helm-chart/
   version: 0.11.1
+- name: fusex
+  repository: https://registry.cern.ch/chartrepo/eos
+  version: 0.0.2
 - name: eosxd
   repository: http://registry.cern.ch/chartrepo/cern
   version: 0.2.8
-digest: sha256:b9b80f0dba769765a9b22bc9afdcc30169b7f403d2e4f3ccddb6b9e4c80add70
-generated: "2021-05-04T12:55:58.496155+02:00"
+- name: cvmfs
+  repository: https://registry.cern.ch/chartrepo/sciencebox
+  version: 0.0.3
+- name: cvmfs-csi
+  repository: http://registry.cern.ch/chartrepo/cern
+  version: 0.1.0
+digest: sha256:fb5d0b312fbf159d72d1fe042e96c2d2bde4f84dbf55a251fdd4514ac0d46a06
+generated: "2021-06-04T15:02:50.556654807+02:00"
