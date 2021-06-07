@@ -206,25 +206,12 @@ if get_config("custom.cull.enabled", False):
         }
     )
 
-# add EOS to notebook pods
-c.SwanKubeSpawner.volume_mounts = [
-    client.V1VolumeMount(
-        name='eos',
-        mount_path='/eos',
-        mount_propagation='HostToContainer'
-    ),
-]
 
-c.SwanKubeSpawner.volumes = [
-    client.V1Volume(
-        name='eos',
-        host_path=client.V1HostPathVolumeSource(
-            path='/var/eos'
-        )
-    ),
-]
+# Init lists for volumes and volume_mounts
+c.SwanKubeSpawner.volumes = []
+c.SwanKubeSpawner.volume_mounts = []
 
-## add /dev/shm  (for pyTorch and others)
+# add /dev/shm (for pyTorch and others)
 c.SwanKubeSpawner.volumes.append(
     client.V1Volume(
         name='devshm',
@@ -233,7 +220,6 @@ c.SwanKubeSpawner.volumes.append(
         )
     )
 )
-
 c.SwanKubeSpawner.volume_mounts.append(
     client.V1VolumeMount(
         name='devshm',
@@ -241,26 +227,88 @@ c.SwanKubeSpawner.volume_mounts.append(
     )
 )
 
-
-# add CVMFS to notebook pods
-cvmfs_repos = get_config('custom.cvmfs.repositories', [])
-for cvmfs_repo_path in cvmfs_repos:
-    cvmfs_repo_id = cvmfs_repo_path['mount'].replace('.', '-')
+# Manage EOS access
+if get_config("singleuser.eos.deployDaemonSet", False):
+    # Access via bind-mount from the host
+    c.SwanKubeSpawner.volume_mounts.append(
+        client.V1VolumeMount(
+            name='eos',
+            mount_path='/eos',
+            mount_propagation='HostToContainer'
+        ),
+    )
     c.SwanKubeSpawner.volumes.append(
         client.V1Volume(
-            name='cvmfs-'+cvmfs_repo_id,
-            persistent_volume_claim=client.V1PersistentVolumeClaimVolumeSource(
-                claim_name='cvmfs-'+cvmfs_repo_id+'-pvc'
+            name='eos',
+            host_path=client.V1HostPathVolumeSource(
+                path='/eos'
+            )
+        ),
+    )
+elif (get_config("singleuser.eos.deployCsiDriver", False) or \
+        get_config("singleuser.eos.useCsiDriver", False)):
+    # Access via CSI driver (still a bind-mount in practical terms)
+    c.SwanKubeSpawner.volume_mounts.append(
+        client.V1VolumeMount(
+            name='eos',
+            mount_path='/eos',
+            mount_propagation='HostToContainer'
+        ),
+    )
+    c.SwanKubeSpawner.volumes.append(
+        client.V1Volume(
+            name='eos',
+            host_path=client.V1HostPathVolumeSource(
+                path='/var/eos'
+            )
+        ),
+    )
+else:
+    # No access to EOS provided
+    pass
+
+# Manage CVMFS access
+if get_config("singleuser.cvmfs.deployDaemonSet", False):
+    # Access via bind-mount from the host
+    c.SwanKubeSpawner.volumes.append(
+        client.V1Volume(
+            name='cvmfs',
+            host_path=client.V1HostPathVolumeSource(
+                path='/cvmfs'
             )
         )
     )
     c.SwanKubeSpawner.volume_mounts.append(
         client.V1VolumeMount(
-            name='cvmfs-'+cvmfs_repo_id,
-            mount_path='/cvmfs/'+cvmfs_repo_path['mount'],
-            read_only=True
+            name='cvmfs',
+            mount_path='/cvmfs',
+            mount_propagation='HostToContainer'
         )
     )
+elif (get_config("singleuser.cvmfs.deployCsiDriver", False) or \
+        get_config("singleuser.cvmfs.useCsiDriver", False)):
+    # Access via CSI driver (persistent volume claims)
+    cvmfs_repos = get_config('singleuser.cvmfs.repositories', [])
+    for cvmfs_repo_path in cvmfs_repos:
+        cvmfs_repo_id = cvmfs_repo_path['mount'].replace('.', '-')
+        c.SwanKubeSpawner.volumes.append(
+            client.V1Volume(
+                name='cvmfs-'+cvmfs_repo_id,
+                persistent_volume_claim=client.V1PersistentVolumeClaimVolumeSource(
+                    claim_name='cvmfs-'+cvmfs_repo_id+'-pvc'
+                )
+            )
+        )
+        c.SwanKubeSpawner.volume_mounts.append(
+            client.V1VolumeMount(
+                name='cvmfs-'+cvmfs_repo_id,
+                mount_path='/cvmfs/'+cvmfs_repo_path['mount'],
+                read_only=True
+            )
+        )
+else:
+    # No access to CVMFS provided -- Nothing will work.
+    pass
 
 # Required for swan systemuser.sh
 c.SwanKubeSpawner.cmd = None

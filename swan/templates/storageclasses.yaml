@@ -1,4 +1,4 @@
-{{ if .Values.cvmfsClient.csiDriver }}
+{{ if or .Values.cvmfs.deployCsiDriver .Values.cvmfs.useCsiDriver }}
 {{- range .Values.cvmfs.repositories }}
 apiVersion: storage.k8s.io/v1
 kind: StorageClass

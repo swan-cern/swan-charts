@@ -1,8 +1,56 @@
+#
+# CVMFS access
+# - deployDaemonSet deploys CVMFS pods exposing `/cvmfs` path on the host.
+#     Access to CVMFS is provided by bind-mounting `/cvmfs` from the host.
+# - deployCsiDriver deploys a cluster-wide storage driver for CVMFS.
+#     Access to CVMFS is provided by persistent volume claims.
+# - useCsiDriver has to be used in case the hosting infrastructure provides
+#       a CSI driver to access CVMFS (i.e., it is not needed to deploy additional pods).
+#     Access to CVMFS is provided by persistent volume claims (identical to deployCsiDriver).
+# - repositories defines which CVMFS repos have to be mounted into singleusers' pods.
+#       The value passed depends on the method used, DaemonSet VS CSI driver.
+#
+# Defaults best support a stand-alone small deployment:
+# - Deploy a DaemonSet pod with the CVMFS client running inside
+# - Chunks from upstream are fetched connecting to the CERN Stratum 1 server
+#
+# Warning:
+# - It is discouraged to enable more than one at once.
+# - By setting all to false, access to EOS will not be possible
+#     and singleuser's session will not be able to start.
+#
 cvmfs:
+  deployDaemonSet: &cvmfsDeployDS true
+  deployCsiDriver: &cvmfsDeployCSI false
+  useCsiDriver: &cvmfsUseCSI false
   repositories: &cvmfsRepos
-    - mount: sft.cern.ch
-    - mount: sft-nightlies.cern.ch
-    - mount: cvmfs-config.cern.ch
+    - cvmfs-config.cern.ch
+    - sft.cern.ch
+    - sft-nightlies.cern.ch
+
+#
+# EOS access
+# - deployDaemonSet deploys EOS fusex pods exposing `/eos` path on the host.
+#     Access to EOS is provided by bind-mounting `/eos` from the host.
+# - deployCsiDriver deploys a cluster-wide storage driver for EOS.
+#     Access to EOS is provided by persistent volume claims.
+# - useCsiDriver has to be used in case the hosting infrastructure provides
+#       a CSI driver to access EOS (i.e., it is not needed to deploy additional pods).
+#     Access to EOS is provided by persistent volume claims (identical to deployCsiDriver).
+#
+# Warning:
+# - It is discouraged to enable more than one at once.
+# - By setting all to false, access to EOS will not be possible.
+#     You will need to set `juyterhub.hub.config.SwanKubeSpawner.local_home: true`
+#
+eos:
+  deployDaemonSet: &eosDeployDS true
+  deployCsiDriver: &eosDeployCSI false
+  useCsiDriver: &eosUseCSI false
+
+#
+# JupyerHub
+#
 jupyterhub:
   singleuser:
     uid: 0
@@ -17,6 +65,15 @@ jupyterhub:
       enabled: true
     networkPolicy:
       enabled: false
+    cvmfs:
+      deployDaemonSet: *cvmfsDeployDS
+      deployCsiDriver: *cvmfsDeployCSI
+      useCsiDriver: *cvmfsUseCSI
+      repositories: *cvmfsRepos
+    eos:
+      deployDaemonSet: *eosDeployDS
+      deployCsiDriver: *eosDeployCSI
+      useCsiDriver: *eosUseCSI
   ingress:
     enabled: true
     annotations:
@@ -71,6 +128,7 @@ jupyterhub:
       - name: swan-jh
         mountPath: /usr/local/etc/jupyterhub/jupyterhub_config.d/1_swan_config.py
         subPath: swan_config.py
+    extraVolumes:
       - name: swan-jh
         configMap:
           name: swan-scripts
@@ -164,9 +222,6 @@ jupyterhub:
       users: true
       checkEosAuth: false
     cvmfs:
-      # FIXME
-      storageProvisioner: csi-cvmfsplugin
-      repositories: *cvmfsRepos
       prefetcher:
         enabled: false
         image:
@@ -179,34 +234,3 @@ swan:
       cert:
       key:
 
-#
-# Decide which client to use for accessing EOS
-# - daemonSet deploys eosxd pods exposing `/eos` path on the host.
-#     Other pods can access `/eos` bind-mounting from the host.
-# - CSI driver configures a cluster-wide storage driver for EOS.
-#     Access to EOS is provided by persistnt volume claims.
-#
-# By setting both to false, no eosxd client pods will be deployed
-#   and access to EOS will not be possible.
-#
-# Warning: It is discouraged to enable both at the same time.
-#
-eosClient:
-  daemonSet: true
-  csiDriver: false
-
-#
-# Decide which client to use for accessing CVMFS
-# - daemonSet deploys cvmfs pods exposing `/cvmfs` path on the host.
-#     Other pods can access `/cvmfs` bind-mounting from the host.
-# - CSI driver configures a cluster-wide storage driver for CVMFS.
-#     Access to CVMFS is provided by persistnt volume claims.
-#
-# By setting both to false, no cvmfs client pods will be deployed
-#   and access to CVMFS will not be possible.
-#
-# Warning: It is discouraged to enable both at the same time.
-#
-cvmfsClient:
-  daemonSet: true
-  csiDriver: false

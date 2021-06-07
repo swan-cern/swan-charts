@@ -16,17 +16,17 @@ dependencies:
   - name: fusex
     version: 0.0.2
     repository: https://registry.cern.ch/chartrepo/eos
-    condition: eosClient.daemonSet
+    condition: eos.deployDaemonSet
   - name: eosxd
     version: 0.2.8
     repository: http://registry.cern.ch/chartrepo/cern
-    condition: eosClient.csiDriver
+    condition: eos.deployCsiDriver
 
   - name: cvmfs
     version: 0.0.3
     repository: https://registry.cern.ch/chartrepo/sciencebox
-    condition: cvmfsClient.daemonSet
+    condition: cvmfs.deployDaemonSet
   - name: cvmfs-csi
     version: 0.1.0
     repository: http://registry.cern.ch/chartrepo/cern
-    condition: cvmfsClient.csiDriver
+    condition: cvmfs.deployCsiDriver
