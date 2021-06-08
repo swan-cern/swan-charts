@@ -1,4 +1,4 @@
-import os, subprocess
+import logging, os, subprocess
 
 from kubernetes import client
 from kubernetes.client.rest import ApiException
@@ -230,6 +230,7 @@ c.SwanKubeSpawner.volume_mounts.append(
 # Manage EOS access
 if get_config("singleuser.eos.deployDaemonSet", False):
     # Access via bind-mount from the host
+    logging.info("EOS access via DaemonSet")
     c.SwanKubeSpawner.volume_mounts.append(
         client.V1VolumeMount(
             name='eos',
@@ -248,6 +249,7 @@ if get_config("singleuser.eos.deployDaemonSet", False):
 elif (get_config("singleuser.eos.deployCsiDriver", False) or \
         get_config("singleuser.eos.useCsiDriver", False)):
     # Access via CSI driver (still a bind-mount in practical terms)
+    logging.info("EOS access via CSI driver")
     c.SwanKubeSpawner.volume_mounts.append(
         client.V1VolumeMount(
             name='eos',
@@ -265,11 +267,13 @@ elif (get_config("singleuser.eos.deployCsiDriver", False) or \
     )
 else:
     # No access to EOS provided
+    logging.warn("EOS access not provided. Make sure you use a scratch space as home directory (local_home: true)")
     pass
 
 # Manage CVMFS access
 if get_config("singleuser.cvmfs.deployDaemonSet", False):
     # Access via bind-mount from the host
+    logging.info("CVMFS access via DaemonSet")
     c.SwanKubeSpawner.volumes.append(
         client.V1Volume(
             name='cvmfs',
@@ -288,6 +292,7 @@ if get_config("singleuser.cvmfs.deployDaemonSet", False):
 elif (get_config("singleuser.cvmfs.deployCsiDriver", False) or \
         get_config("singleuser.cvmfs.useCsiDriver", False)):
     # Access via CSI driver (persistent volume claims)
+    logging.info("CVMFS access via CSI driver")
     cvmfs_repos = get_config('singleuser.cvmfs.repositories', [])
     for cvmfs_repo_path in cvmfs_repos:
         cvmfs_repo_id = cvmfs_repo_path['mount'].replace('.', '-')
@@ -308,6 +313,7 @@ elif (get_config("singleuser.cvmfs.deployCsiDriver", False) or \
         )
 else:
     # No access to CVMFS provided -- Nothing will work.
+    logging.warning("CVMFS access not provided -- singleuser session will fail. Please review your configuration.")
     pass
 
 # Required for swan systemuser.sh
