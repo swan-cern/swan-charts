@@ -27,6 +27,8 @@ cvmfs:
     - cvmfs-config.cern.ch
     - sft.cern.ch
     - sft-nightlies.cern.ch
+  mountOptions:
+    hostMountpoint: /var/cvmfs
 
 #
 # EOS access
@@ -47,6 +49,8 @@ eos:
   deployDaemonSet: &eosDeployDS true
   deployCsiDriver: &eosDeployCSI false
   useCsiDriver: &eosUseCSI false
+  fusex:
+    hostMountpoint: /var/eos
 
 #
 # JupyerHub

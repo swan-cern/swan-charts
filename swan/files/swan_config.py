@@ -242,7 +242,7 @@ if get_config("singleuser.eos.deployDaemonSet", False):
         client.V1Volume(
             name='eos',
             host_path=client.V1HostPathVolumeSource(
-                path='/eos'
+                path='/var/eos'
             )
         ),
     )
@@ -278,7 +278,7 @@ if get_config("singleuser.cvmfs.deployDaemonSet", False):
         client.V1Volume(
             name='cvmfs',
             host_path=client.V1HostPathVolumeSource(
-                path='/cvmfs'
+                path='/var/cvmfs'
             )
         )
     )
