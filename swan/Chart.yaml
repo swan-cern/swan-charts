@@ -14,7 +14,7 @@ dependencies:
     repository: https://jupyterhub.github.io/helm-chart/
 
   - name: fusex
-    version: 0.0.2
+    version: 0.0.4
     repository: https://registry.cern.ch/chartrepo/eos
     condition: eos.deployDaemonSet
   - name: eosxd
@@ -23,7 +23,7 @@ dependencies:
     condition: eos.deployCsiDriver
 
   - name: cvmfs
-    version: 0.0.3
+    version: 0.0.4
     repository: https://registry.cern.ch/chartrepo/sciencebox
     condition: cvmfs.deployDaemonSet
   - name: cvmfs-csi
