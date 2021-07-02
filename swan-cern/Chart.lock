@@ -1,9 +1,9 @@
 dependencies:
 - name: swan
   repository: file://../swan
-  version: 0.0.1
+  version: 0.0.3
 - name: fluentd
   repository: http://registry.cern.ch/chartrepo/cern
   version: 0.1.4
-digest: sha256:9f2ca59f421e26b2c173387359d10b2421207ddaa090640ea0274448cb29e527
-generated: "2021-05-31T16:27:26.71352892+02:00"
+digest: sha256:963966141e4aaa2243aef3b632b088f1cdd33e441c3bd4fa4fbc4ef3c741daf7
+generated: "2021-07-08T11:08:54.920705+02:00"
