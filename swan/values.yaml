@@ -49,6 +49,7 @@ eos:
   deployDaemonSet: &eosDeployDS true
   deployCsiDriver: &eosDeployCSI false
   useCsiDriver: &eosUseCSI false
+fusex:
   fusex:
     hostMountpoint: /var/eos
 
