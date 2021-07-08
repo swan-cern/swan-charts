@@ -50,15 +50,15 @@ SPARKK8S_AUTH_TOKEN_ENCODED=$(base64 -w 0 $SPARKK8S_AUTH_TOKEN_PATH)
 
 
 echo ""
-echo "Updating fluentd"
-echo ""
-
-echo ""
 echo "Build chart dependencies"
 echo ""
 
+helm repo add swan https://registry.cern.ch/chartrepo/swan
 helm repo add cern http://registry.cern.ch/chartrepo/cern
+helm repo add eos https://registry.cern.ch/chartrepo/eos
+helm repo add sciencebox https://registry.cern.ch/chartrepo/sciencebox
 helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
+
 # TODO remove this once we push this to Harbor
 ( cd $ROOT_DIR/swan && helm dependency build )
 ( cd $ROOT_DIR/swan-cern && helm dependency build )
