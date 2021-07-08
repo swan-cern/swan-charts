@@ -1,10 +1,18 @@
 swan:
+  cvmfs:
+    deployDaemonSet: &cvmfsDeployDS false
+    deployCsiDriver: &cvmfsDeployCSI true
+    useCsiDriver: &cvmfsUseCSI false
+  eos:
+    deployDaemonSet: &eosDeployDS false
+    deployCsiDriver: &eosDeployCSI true
+    useCsiDriver: &eosUseCSI false
   jupyterhub:
     singleuser:
       cvmfs:
-        deployDaemonSet: false
-        deployCsiDriver: false
-        useCsiDriver: true
+        deployDaemonSet: *cvmfsDeployDS
+        deployCsiDriver: *cvmfsDeployCSI
+        useCsiDriver: *cvmfsUseCSI
         repositories:
           - mount: cvmfs-config.cern.ch
           - mount: sft.cern.ch
@@ -50,9 +58,9 @@ swan:
           - mount: projects.cern.ch
           - mount: sw.hsf.org
       eos:
-        deployDaemonSet: false
-        deployCsiDriver: false
-        useCsiDriver: true
+        deployDaemonSet: *eosDeployDS
+        deployCsiDriver: *eosDeployCSI
+        useCsiDriver: *eosUseCSI
     hub:
       extraVolumeMounts:
         - name: swan-jh-cern
