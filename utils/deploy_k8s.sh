@@ -23,21 +23,10 @@ if [ -n "$(git status --porcelain)" ]; then
     exit 1
 fi
 
-if [ "${SWAN_ENV}" == 'qa' ] && [ $(git rev-parse --abbrev-ref HEAD) != 'qa' ]; then
-    echo "ERROR: ${SWAN_ENV} can be deployed from qa branch"
-    exit 1
-fi  
-
-if [ "${SWAN_ENV}" == 'prod' ] && [ $(git rev-parse --abbrev-ref HEAD) != 'master' ]; then
-    echo "ERROR: ${SWAN_ENV} can be deployed from master branch"
-    exit 1
-fi
-
 # kubernetes access based on environment
 export KUBECONFIG=/srv/swan-k8s/private/swan.$SWAN_ENV.kubeconfig
 
 # values and secrets based on environment
-SWAN_PROD_RELEASE_NAME=swan
 SWAN_SECRET_VALUES_PATH=/srv/swan-k8s/private/swan.$SWAN_ENV.secrets.yaml
 
 # secret files
@@ -59,10 +48,7 @@ helm repo add eos https://registry.cern.ch/chartrepo/eos
 helm repo add sciencebox https://registry.cern.ch/chartrepo/sciencebox
 helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
 
-# TODO remove this once we push this to Harbor
-( cd $ROOT_DIR/swan && helm dependency build )
-( cd $ROOT_DIR/swan-cern && helm dependency build )
-
+helm repo update
 
 echo ""
 echo "Updating swan env ${SWAN_ENV}, upgrade db ${UPGRADE_DB}"
@@ -76,7 +62,7 @@ helm upgrade --install --namespace swan  \
 --set swanCern.secrets.hadoop.cred=$HADOOP_AUTH_KEYTAB_ENCODED \
 --set swanCern.secrets.eos.cred=$EOS_AUTH_KEYTAB_ENCODED \
 --set swanCern.secrets.sparkk8s.cred=$SPARKK8S_AUTH_TOKEN_ENCODED \
-$SWAN_PROD_RELEASE_NAME $ROOT_DIR/swan-cern
+swan swan/swan-cern
 
 if [[ $? -ne 0 ]]
 then
