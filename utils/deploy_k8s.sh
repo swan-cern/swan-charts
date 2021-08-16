@@ -25,18 +25,25 @@ if [ "$CLEAN_REPO" = true -a -n "$(git status --porcelain)" ]; then
     exit 1
 fi
 
-# kubernetes access based on environment
-export KUBECONFIG=/srv/swan-k8s/private/swan.$SWAN_ENV.kubeconfig
+# kubernetes access 
+KUBECONFIG=$(mktemp -p .)
+tbag show --hg swan --file $KUBECONFIG swan_${SWAN_ENV}_k8s_kubeconfig
 
-# values and secrets based on environment
-SWAN_SECRET_VALUES_PATH=/srv/swan-k8s/private/swan.$SWAN_ENV.secrets.yaml
+# values and secrets
+SWAN_SECRET_VALUES_PATH=$(mktemp -p .)
+tbag show --hg swan --file $SWAN_SECRET_VALUES_PATH swan_${SWAN_ENV}_k8s_secrets_yaml
 
 # secret files
-EOS_AUTH_KEYTAB_PATH=/srv/swan-k8s/private/constrdt.keytab
+EOS_AUTH_KEYTAB_PATH=$(mktemp -p .)
+tbag show --hg swan --file $EOS_AUTH_KEYTAB_PATH constrdt
 EOS_AUTH_KEYTAB_ENCODED=$(base64 -w 0 $EOS_AUTH_KEYTAB_PATH)
-HADOOP_AUTH_KEYTAB_PATH=/srv/swan-k8s/private/hswan.keytab
+
+HADOOP_AUTH_KEYTAB_PATH=$(mktemp -p .)
+tbag show --hg swan --file $HADOOP_AUTH_KEYTAB_PATH hswan
 HADOOP_AUTH_KEYTAB_ENCODED=$(base64 -w 0 $HADOOP_AUTH_KEYTAB_PATH)
-SPARKK8S_AUTH_TOKEN_PATH=/srv/swan-k8s/private/sparkk8s.kubeconfig
+
+SPARKK8S_AUTH_TOKEN_PATH=$(mktemp -p .)
+tbag show --hg swan --file $SPARKK8S_AUTH_TOKEN_PATH hswan
 SPARKK8S_AUTH_TOKEN_ENCODED=$(base64 -w 0 $SPARKK8S_AUTH_TOKEN_PATH)
 
 
@@ -66,8 +73,18 @@ helm upgrade --install --namespace swan  \
 --set swanCern.secrets.sparkk8s.cred=$SPARKK8S_AUTH_TOKEN_ENCODED \
 swan swan/swan-cern
 
-if [[ $? -ne 0 ]]
+HELMRETURN=$?
+
+rm $KUBECONFIG
+rm $SWAN_SECRET_VALUES_PATH
+rm $EOS_AUTH_KEYTAB_PATH
+rm $HADOOP_AUTH_KEYTAB_PATH
+rm $SPARKK8S_AUTH_TOKEN_PATH
+
+if [[ $HELMRETURN -ne 0 ]]
 then
     echo "failed"
     exit 1
 fi
+
+
