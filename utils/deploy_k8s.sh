@@ -1,14 +1,16 @@
 ROOT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.."; pwd;)
 
-echo "# USAGE: ${ROOT_DIR}/utils/deploy_k8s.sh --env <qa/prod> (--upgrade-db)"
+echo "# USAGE: ${ROOT_DIR}/utils/deploy_k8s.sh --env <qa/prod> (--upgrade-db) (--no-clean-repo)"
 echo ""
 
 SWAN_ENV=""
 UPGRADE_DB="false"
+CLEAN_REPO=true
 
 while [[ "$#" -gt 0 ]]; do case $1 in
   --env) SWAN_ENV="$2"; shift;;
   --upgrade-db) UPGRADE_DB="true";;
+  --no-clean-repo) CLEAN_REPO=false;;
   *) echo "Unknown parameter passed: $1"; exit 1;;
 esac; shift; done
 
@@ -18,7 +20,7 @@ if ! [[ -n "${SWAN_ENV}" && " ${AVAILABLE_SWAN_ENV[@]} " =~ " ${SWAN_ENV} " ]]; 
     exit 1
 fi
 
-if [ -n "$(git status --porcelain)" ]; then
+if [ "$CLEAN_REPO" = true -a -n "$(git status --porcelain)" ]; then
     echo "ERROR: Cannot proceed as repository has not commited changes"
     exit 1
 fi
