@@ -21,14 +21,17 @@ do
         *) echo "invalid option $REPLY";;
     esac
     alias kubectl="kubectl --kubeconfig <(echo $KUBECONFIG_DATA | base64 --decode)"
-    # detects if using bash or zsh
-    source <(kubectl completion $(basename $(readlink /proc/$$/exe)))
-    complete -F __start_kubectl k
 
     if [ "${ZSH_VERSION-}" ]; then
-    export PS1="%F{red}[\$opt]%f [%n@%m ]%$ "
+        source <(kubectl completion zsh)
+        export PS1="%F{red}[\$opt]%f [%n@%m ]%$ "
     else
-    export PS1="\e[0;31m\$opt\e[m [\u@\h \W]\$ "
+        source <(kubectl completion bash)
+        export PS1="\e[0;31m\$opt\e[m [\u@\h \W]\$ "
     fi
+
+    echo 'alias k=kubectl' >>~/.bashrc
+    complete -F __start_kubectl k
+
     break
 done
