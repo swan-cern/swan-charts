@@ -5,7 +5,7 @@ swan:
     useCsiDriver: &cvmfsUseCSI true
   eos:
     deployDaemonSet: &eosDeployDS false
-    deployCsiDriver: &eosDeployCSI false
+    deployCsiDriver: &eosDeployCSI true
     useCsiDriver: &eosUseCSI true
   jupyterhub:
     singleuser:
