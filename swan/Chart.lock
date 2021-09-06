@@ -4,7 +4,7 @@ dependencies:
   version: 0.11.1
 - name: fusex
   repository: https://registry.cern.ch/chartrepo/eos
-  version: 0.0.5
+  version: 0.1.0
 - name: eosxd
   repository: http://registry.cern.ch/chartrepo/cern
   version: 0.2.8
@@ -14,5 +14,5 @@ dependencies:
 - name: cvmfs-csi
   repository: http://registry.cern.ch/chartrepo/cern
   version: 0.1.0
-digest: sha256:a7515560d7fc2f54e0453ebbb2143de6802c60ef42b7283d69d9aa57d14cad36
-generated: "2021-07-20T19:46:54.370994+02:00"
+digest: sha256:f98e8806ecbeb22c2ffbed551dd6ff6c886308d993a9db86bbedbc0bdbbfc7ad
+generated: "2021-09-06T15:49:06.770062348+02:00"
