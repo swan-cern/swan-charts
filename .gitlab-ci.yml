@@ -68,7 +68,20 @@ deploy:
     - |
         set -x
         CHART=$(echo $CI_COMMIT_TAG | awk -F '@' '{print $1}')
-        helm dependency update ${CHART}
-        helm push ${CHART}/ ${HELM_CHART_REPO}
+        TAG_VERSION=$(echo $CI_COMMIT_TAG | awk -F '@' '{print $2}')
+
+        test -f ${CHART}/Chart.yaml
+        if [ $? -ne 0 ]; then
+          echo "ERROR: Chart.yaml does not exist for chart ${CHART}"
+          exit 1
+        fi
+        YAML_VERSION=$(cat ${CHART}/Chart.yaml | grep ^version | awk '{print $2}')
+        if [[ "$TAG_VERSION" == "$YAML_VERSION" ]]; then
+          helm dependency update ${CHART}
+          helm push ${CHART}/ ${HELM_CHART_REPO}
+        else
+          echo "ERROR: Chart version ($YAML_VERSION) differs from tag version ($TAG_VERSION)"
+          exit 1
+        fi
   only:
     - tags
