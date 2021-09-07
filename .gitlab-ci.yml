@@ -68,9 +68,7 @@ deploy:
     - |
         set -x
         CHART=$(echo $CI_COMMIT_TAG | awk -F '@' '{print $1}')
-        for chart in $(ls -d */Chart.yaml | xargs dirname); do
-            helm dependency update ${chart}
-            helm push ${chart}/ ${HELM_CHART_REPO}
-        done
+        helm dependency update ${CHART}
+        helm push ${CHART}/ ${HELM_CHART_REPO}
   only:
     - tags
