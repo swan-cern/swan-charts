@@ -28,27 +28,32 @@ fi
 # kubernetes access 
 KUBECONFIG=$(mktemp -p .)
 tbag show --hg swan --file $KUBECONFIG swan_${SWAN_ENV}_k8s_kubeconfig
+trap "rm -f $KUBECONFIG" EXIT
 
 # values and secrets
 SWAN_SECRET_VALUES_PATH=$(mktemp -p .)
 tbag show --hg swan --file $SWAN_SECRET_VALUES_PATH swan_${SWAN_ENV}_k8s_secrets_yaml
+trap "rm -f $SWAN_SECRET_VALUES_PATH" EXIT
 
 # secret files
 EOS_AUTH_KEYTAB_PATH=$(mktemp -p .)
 tbag show --hg swan --file $EOS_AUTH_KEYTAB_PATH constrdt
 EOS_AUTH_KEYTAB_ENCODED=$(base64 -w 0 $EOS_AUTH_KEYTAB_PATH)
-rm $EOS_AUTH_KEYTAB_PATH
+trap "rm -f $EOS_AUTH_KEYTAB_PATH" EXIT
+rm -f $EOS_AUTH_KEYTAB_PATH
+
 
 HADOOP_AUTH_KEYTAB_PATH=$(mktemp -p .)
 tbag show --hg swan --file $HADOOP_AUTH_KEYTAB_PATH hswan
 HADOOP_AUTH_KEYTAB_ENCODED=$(base64 -w 0 $HADOOP_AUTH_KEYTAB_PATH)
-rm $HADOOP_AUTH_KEYTAB_PATH
+trap "rm -f $HADOOP_AUTH_KEYTAB_PATH" EXIT
+rm -f $HADOOP_AUTH_KEYTAB_PATH
 
 SPARKK8S_AUTH_TOKEN_PATH=$(mktemp -p .)
 tbag show --hg swan --file $SPARKK8S_AUTH_TOKEN_PATH hswan
 SPARKK8S_AUTH_TOKEN_ENCODED=$(base64 -w 0 $SPARKK8S_AUTH_TOKEN_PATH)
-rm $SPARKK8S_AUTH_TOKEN_PATH
-
+trap "rm -f $SPARKK8S_AUTH_TOKEN_PATH" EXIT
+rm -rf $SPARKK8S_AUTH_TOKEN_PATH
 
 echo ""
 echo "Build chart dependencies"
@@ -78,8 +83,8 @@ swan swan/swan-cern
 
 HELMRETURN=$?
 
-rm $KUBECONFIG
-rm $SWAN_SECRET_VALUES_PATH
+rm -f $SWAN_SECRET_VALUES_PATH
+rm -f $KUBECONFIG
 
 if [[ $HELMRETURN -ne 0 ]]
 then
