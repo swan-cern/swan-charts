@@ -24,6 +24,16 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
         # init user containers (notebook and side-container)
         self._init_eos_containers(eos_secret_name)
 
+        if self._gpu_enabled():
+            # spc_t type is added as recommended by CM
+            spc_t_selinux = client.V1SELinuxOptions(
+                type = "spc_t"
+            )
+            security_context = client.V1PodSecurityContext(
+                se_linux_options = spc_t_selinux
+            )
+            self.pod.spec.security_context = security_context
+
         return self.pod
 
     def _init_eos_secret(self):
