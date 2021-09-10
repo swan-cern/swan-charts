@@ -1,4 +1,4 @@
-:%s/\s\+$//eswan:
+swan:
   cvmfs:
     deployDaemonSet: &cvmfsDeployDS false
     deployCsiDriver: &cvmfsDeployCSI false
