@@ -67,18 +67,11 @@ jupyterhub:
       tag: "v5.9.0"
       pullPolicy: "Always"
     cloudMetadata:
-      enabled: true
+      # until we configure networkPolicy
+      blockWithIptables: true
+      ip: 169.254.169.254
     networkPolicy:
       enabled: false
-    cvmfs:
-      deployDaemonSet: *cvmfsDeployDS
-      deployCsiDriver: *cvmfsDeployCSI
-      useCsiDriver: *cvmfsUseCSI
-      repositories: *cvmfsRepos
-    eos:
-      deployDaemonSet: *eosDeployDS
-      deployCsiDriver: *eosDeployCSI
-      useCsiDriver: *eosUseCSI
   ingress:
     enabled: true
     annotations:
@@ -96,7 +89,7 @@ jupyterhub:
     chp:
       image:
         name: "jupyterhub/configurable-http-proxy"
-        tag: "4.2.0"
+        tag: "4.5.0"
         pullPolicy: "IfNotPresent"
       resources:
         requests:
@@ -232,6 +225,14 @@ jupyterhub:
         image:
           name: "gitlab-registry.cern.ch/swan/docker-images/cvmfs-prefetcher"
           tag: "v1.1"
+      deployDaemonSet: *cvmfsDeployDS
+      deployCsiDriver: *cvmfsDeployCSI
+      useCsiDriver: *cvmfsUseCSI
+      repositories: *cvmfsRepos
+    eos:
+      deployDaemonSet: *eosDeployDS
+      deployCsiDriver: *eosDeployCSI
+      useCsiDriver: *eosUseCSI
 # placeholders for swan credentials
 swan:
   secrets:

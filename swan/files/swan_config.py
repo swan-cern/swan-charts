@@ -228,7 +228,7 @@ c.SwanKubeSpawner.volume_mounts.append(
 )
 
 # Manage EOS access
-if get_config("singleuser.eos.deployDaemonSet", False):
+if get_config("custom.eos.deployDaemonSet", False):
     # Access via bind-mount from the host
     logging.info("EOS access via DaemonSet")
     c.SwanKubeSpawner.volume_mounts.append(
@@ -246,8 +246,8 @@ if get_config("singleuser.eos.deployDaemonSet", False):
             )
         ),
     )
-elif (get_config("singleuser.eos.deployCsiDriver", False) or \
-        get_config("singleuser.eos.useCsiDriver", False)):
+elif (get_config("custom.eos.deployCsiDriver", False) or \
+        get_config("custom.eos.useCsiDriver", False)):
     # Access via CSI driver (still a bind-mount in practical terms)
     logging.info("EOS access via CSI driver")
     c.SwanKubeSpawner.volume_mounts.append(
@@ -271,7 +271,7 @@ else:
     pass
 
 # Manage CVMFS access
-if get_config("singleuser.cvmfs.deployDaemonSet", False):
+if get_config("custom.cvmfs.deployDaemonSet", False):
     # Access via bind-mount from the host
     logging.info("CVMFS access via DaemonSet")
     c.SwanKubeSpawner.volumes.append(
@@ -289,11 +289,11 @@ if get_config("singleuser.cvmfs.deployDaemonSet", False):
             mount_propagation='HostToContainer'
         )
     )
-elif (get_config("singleuser.cvmfs.deployCsiDriver", False) or \
-        get_config("singleuser.cvmfs.useCsiDriver", False)):
+elif (get_config("custom.cvmfs.deployCsiDriver", False) or \
+        get_config("custom.cvmfs.useCsiDriver", False)):
     # Access via CSI driver (persistent volume claims)
     logging.info("CVMFS access via CSI driver")
-    cvmfs_repos = get_config('singleuser.cvmfs.repositories', [])
+    cvmfs_repos = get_config('custom.cvmfs.repositories', [])
     for cvmfs_repo_path in cvmfs_repos:
         cvmfs_repo_id = cvmfs_repo_path['mount'].replace('.', '-')
         c.SwanKubeSpawner.volumes.append(
