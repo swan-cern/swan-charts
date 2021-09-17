@@ -8,59 +8,6 @@ swan:
     deployCsiDriver: &eosDeployCSI true
     useCsiDriver: &eosUseCSI true
   jupyterhub:
-    singleuser:
-      cvmfs:
-        deployDaemonSet: *cvmfsDeployDS
-        deployCsiDriver: *cvmfsDeployCSI
-        useCsiDriver: *cvmfsUseCSI
-        repositories:
-          - mount: cvmfs-config.cern.ch
-          - mount: sft.cern.ch
-            proxy: 'http://ca-proxy-sft.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: sft-nightlies.cern.ch
-            proxy: 'http://ca-proxy-sft.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: alice.cern.ch
-            proxy: 'http://ca-proxy-alice.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: alice-ocdb.cern.ch
-            proxy: 'http://ca-proxy-alice.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: alice-nightlies.cern.ch
-            proxy: 'http://ca-proxy-alice.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: alpha.cern.ch
-          - mount: ams.cern.ch
-          - mount: atlas.cern.ch
-            proxy: 'http://ca-proxy-atlas.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: atlas-condb.cern.ch
-            proxy: 'http://ca-proxy-atlas.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: atlas-nightlies.cern.ch
-            proxy: 'http://ca-proxy-atlas.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: clicbp.cern.ch
-          - mount: cms.cern.ch
-            proxy: 'http://cmsmeyproxy.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: cms-ib.cern.ch
-            proxy: 'http://cmsmeyproxy.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: cms-bril.cern.ch
-            proxy: 'http://cmsmeyproxy.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: compass.cern.ch
-            proxy: 'http://ca-proxy-compass.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: compass-condb.cern.ch
-            proxy: 'http://ca-proxy-compass.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: fcc.cern.ch
-          - mount: ganga.cern.ch
-          - mount: geant4.cern.ch
-          - mount: lhcb.cern.ch
-            proxy: 'http://ca-proxy-lhcb.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: lhcb-condb.cern.ch
-            proxy: 'http://ca-proxy-lhcb.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: lhcbdev.cern.ch
-            proxy: 'http://ca-proxy-lhcb.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: na61.cern.ch
-          - mount: na62.cern.ch
-          - mount: projects.cern.ch
-          - mount: sw.hsf.org
-      eos:
-        deployDaemonSet: *eosDeployDS
-        deployCsiDriver: *eosDeployCSI
-        useCsiDriver: *eosUseCSI
     hub:
       extraVolumeMounts:
         - name: swan-jh-cern
@@ -194,12 +141,6 @@ swan:
 
           # SWAN@CERN error message
           c.SpawnHandlersConfigs.spawn_error_message = SPAWN_ERROR_MESSAGE
-        # TODO delete this once we upgrade to newer upstream (which loads files from this path automatically)
-        03-prodConf: |
-          exec(open('/usr/local/etc/jupyterhub/jupyterhub_config.d/2_swan_config_cern.py').read())
-        # TODO delete this once we upgrade to newer upstream (which loads files from this path automatically)
-        10-sparkConf: |
-          exec(open('/usr/local/etc/jupyterhub/jupyterhub_config.d/3_swan_spark_config.py').read())
       db:
         type: postgres
         # placeholder for postgres connection url
@@ -212,6 +153,58 @@ swan:
         timeout: 21600
         checkEosAuth: true
         hooksDir: /srv/jupyterhub/culler
+      cvmfs:
+        deployDaemonSet: *cvmfsDeployDS
+        deployCsiDriver: *cvmfsDeployCSI
+        useCsiDriver: *cvmfsUseCSI
+        repositories:
+          - mount: cvmfs-config.cern.ch
+          - mount: sft.cern.ch
+            proxy: 'http://ca-proxy-sft.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+          - mount: sft-nightlies.cern.ch
+            proxy: 'http://ca-proxy-sft.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+          - mount: alice.cern.ch
+            proxy: 'http://ca-proxy-alice.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+          - mount: alice-ocdb.cern.ch
+            proxy: 'http://ca-proxy-alice.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+          - mount: alice-nightlies.cern.ch
+            proxy: 'http://ca-proxy-alice.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+          - mount: alpha.cern.ch
+          - mount: ams.cern.ch
+          - mount: atlas.cern.ch
+            proxy: 'http://ca-proxy-atlas.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+          - mount: atlas-condb.cern.ch
+            proxy: 'http://ca-proxy-atlas.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+          - mount: atlas-nightlies.cern.ch
+            proxy: 'http://ca-proxy-atlas.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+          - mount: clicbp.cern.ch
+          - mount: cms.cern.ch
+            proxy: 'http://cmsmeyproxy.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+          - mount: cms-ib.cern.ch
+            proxy: 'http://cmsmeyproxy.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+          - mount: cms-bril.cern.ch
+            proxy: 'http://cmsmeyproxy.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+          - mount: compass.cern.ch
+            proxy: 'http://ca-proxy-compass.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+          - mount: compass-condb.cern.ch
+            proxy: 'http://ca-proxy-compass.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+          - mount: fcc.cern.ch
+          - mount: ganga.cern.ch
+          - mount: geant4.cern.ch
+          - mount: lhcb.cern.ch
+            proxy: 'http://ca-proxy-lhcb.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+          - mount: lhcb-condb.cern.ch
+            proxy: 'http://ca-proxy-lhcb.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+          - mount: lhcbdev.cern.ch
+            proxy: 'http://ca-proxy-lhcb.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+          - mount: na61.cern.ch
+          - mount: na62.cern.ch
+          - mount: projects.cern.ch
+          - mount: sw.hsf.org
+      eos:
+        deployDaemonSet: *eosDeployDS
+        deployCsiDriver: *eosDeployCSI
+        useCsiDriver: *eosUseCSI
 
 swanCern:
   secrets:
