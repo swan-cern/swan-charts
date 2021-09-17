@@ -181,9 +181,6 @@ jupyterhub:
         def pre_spawn_hook(authenticator, spawner, auth_state):
           raise Exception("Please configure pre_spawn_hook")
         c.KeyCloakAuthenticator.pre_spawn_hook = pre_spawn_hook
-    extraEnv:
-      # placeholder for hub auth state cryptographic key
-      JUPYTERHUB_CRYPT_KEY:
     networkPolicy:
       enabled: false
     # placeholder for hub cookieSecret
