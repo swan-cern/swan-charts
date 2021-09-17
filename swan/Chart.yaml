@@ -3,7 +3,7 @@ apiVersion: v2
 name: swan
 type: application
 version: 0.1.0
-appVersion: 0.0.3 # Using swanhub version
+appVersion: 0.1.1 # Using swanhub version
 #
 description: A fully-fledge SWAN instance with jupyterhub, EOS, and CVMFS
 icon: https://swan.docs.cern.ch/images/logos/logo_swan_letters.png
