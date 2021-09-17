@@ -5,22 +5,6 @@ swan:
         name: "gitlab-registry.cern.ch/swan/docker-images/systemuser"
         tag: "v5.9.0"
         pullPolicy: Always
-      # JH can randomly generate one, but then proxy also needs to do it
-      secretToken: ca4ac8ac414707020a7db74341eaf25de01f6d0bd73f4ceb9d2a197f1e3b9f32
-      cvmfs:
-        deployDaemonSet: false
-        deployCsiDriver: false
-        useCsiDriver: true
-        repositories:
-          - mount: cvmfs-config.cern.ch
-          - mount: sft.cern.ch
-            proxy: 'http://ca-proxy-sft.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: sft-nightlies.cern.ch
-            proxy: 'http://ca-proxy-sft.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-      eos:
-        deployDaemonSet: false
-        deployCsiDriver: false
-        useCsiDriver: true
     hub:
       image:
         name: "gitlab-registry.cern.ch/swan/docker-images/jupyterhub"
@@ -87,6 +71,21 @@ swan:
               path: sparkk8s.cred
       db:
         type: sqlite-memory
+    custom:
+      cvmfs:
+        deployDaemonSet: false
+        deployCsiDriver: false
+        useCsiDriver: true
+        repositories:
+          - mount: cvmfs-config.cern.ch
+          - mount: sft.cern.ch
+            proxy: 'http://ca-proxy-sft.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+          - mount: sft-nightlies.cern.ch
+            proxy: 'http://ca-proxy-sft.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+      eos:
+        deployDaemonSet: false
+        deployCsiDriver: true
+        useCsiDriver: true
     prePuller:
       hook:
         enabled: false
