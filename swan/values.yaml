@@ -181,9 +181,6 @@ jupyterhub:
         def pre_spawn_hook(authenticator, spawner, auth_state):
           raise Exception("Please configure pre_spawn_hook")
         c.KeyCloakAuthenticator.pre_spawn_hook = pre_spawn_hook
-      # TODO delete this once we upgrade to newer upstream (which loads files from this path automatically)
-      01-swanConf: |
-        exec(open('/usr/local/etc/jupyterhub/jupyterhub_config.d/1_swan_config.py').read())
     extraEnv:
       # placeholder for hub auth state cryptographic key
       JUPYTERHUB_CRYPT_KEY:
