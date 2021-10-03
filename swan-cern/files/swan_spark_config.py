@@ -273,9 +273,9 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
         try:
             spark_ports_env = []
 
-            # Define some 6 random NodePorts on the cluster for spark using V1Service
+            # Define some 18 random NodePorts on the cluster for spark using V1Service
             service_template_ports = []
-            spark_ports_per_pod = 6
+            spark_ports_per_pod = 18
             for port_id in range(1, spark_ports_per_pod + 1):
                 service_template_ports.append(
                     client.V1ServicePort(
