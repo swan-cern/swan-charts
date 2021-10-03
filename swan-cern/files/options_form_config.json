@@ -11,8 +11,8 @@
     {
       "type": "selection",
       "lcg": {
-        "value": "LCG_100",
-        "text": "100"
+        "value": "LCG_101swan",
+        "text": "101"
       },
       "platforms": [
         {
@@ -503,6 +503,26 @@
         "text": "Other releases"
       }
     },
+    {
+        "type": "selection",
+        "lcg": { 
+                "value": "LCG_100",
+                "text": "100" },
+        "platforms": [
+         { 
+           "value": "x86_64-centos7-gcc8-opt",
+           "text": "CentOS 7 (gcc8)" 
+         },
+           { "value": "x86_64-centos7-gcc10-opt", "text": "CentOS 7 (gcc10)" }],
+        "cores": [
+                 { "value": "2", "text": "2" }, 
+                 { "value": "4", "text": "4" }],
+        "memory": [ { "value": "8", "text": "8 GB" }, { "value": "10", "text": "10 GB" }, { "value": "16", "text": "16 GB" } ],
+        "clusters": [ { "value": "none", "text": "None" },
+                      { "value": "analytix", "text": "General Purpose (Analytix)" },
+                      { "value": "k8s", "text": "Cloud Containers (K8s)" },
+                      { "value": "hadoop-qa", "text": "QA" } ]
+      },
     {
       "type": "selection",
       "lcg": {
