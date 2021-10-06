@@ -1,1079 +1,1118 @@
 {
-  "header": "Specify the parameters that will be used to contextualise the container which is created for you. See <a target='_blank' href='https://swan.web.cern.ch'>SWAN service website</a> for more details and contact to administrators.",
-  "options": [
-    {
-      "type": "label",
-      "label": {
-        "value": "label1",
-        "text": "Recommended releases (General Purpose)"
-      }
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "LCG_101swan",
-        "text": "101"
-      },
-      "platforms": [
+    "header": "Specify the parameters that will be used to contextualise the container which is created for you. See <a target='_blank' href='https://swan.web.cern.ch'>SWAN service website</a> for more details and contact to administrators.",
+    "options": [
         {
-          "value": "x86_64-centos7-gcc8-opt",
-          "text": "CentOS 7 (gcc8)"
+            "type": "label",
+            "label": {
+                "value": "label1",
+                "text": "Recommended releases (General Purpose)"
+            }
         },
         {
-          "value": "x86_64-centos7-gcc10-opt",
-          "text": "CentOS 7 (gcc10)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2"
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_101swan",
+                "text": "101"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc8-opt",
+                    "text": "CentOS 7 (gcc8)"
+                },
+                {
+                    "value": "x86_64-centos7-gcc10-opt",
+                    "text": "CentOS 7 (gcc10)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2"
+                },
+                {
+                    "value": "4",
+                    "text": "4"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "8",
+                    "text": "8 GB"
+                },
+                {
+                    "value": "10",
+                    "text": "10 GB"
+                },
+                {
+                    "value": "16",
+                    "text": "16 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                },
+                {
+                    "value": "analytix",
+                    "text": "General Purpose (Analytix)"
+                },
+                {
+                    "value": "k8s",
+                    "text": "Cloud Containers (K8s)"
+                },
+                {
+                    "value": "hadoop-qa",
+                    "text": "QA"
+                }
+            ]
         },
         {
-          "value": "4",
-          "text": "4"
-        }
-      ],
-      "memory": [
-        {
-          "value": "8",
-          "text": "8 GB"
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_99python2",
+                "text": "99 Python2"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc8-opt",
+                    "text": "CentOS 7 (gcc8)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2"
+                },
+                {
+                    "value": "4",
+                    "text": "4"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "8",
+                    "text": "8 GB"
+                },
+                {
+                    "value": "10",
+                    "text": "10 GB"
+                },
+                {
+                    "value": "16",
+                    "text": "16 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                },
+                {
+                    "value": "analytix",
+                    "text": "General Purpose (Analytix)"
+                },
+                {
+                    "value": "k8s",
+                    "text": "Cloud Containers (K8s)"
+                },
+                {
+                    "value": "hadoop-qa",
+                    "text": "QA"
+                }
+            ]
         },
         {
-          "value": "10",
-          "text": "10 GB"
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_97apython3",
+                "text": "97a Spark2"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc8-opt",
+                    "text": "CentOS 7 (gcc8)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2"
+                },
+                {
+                    "value": "4",
+                    "text": "4"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "8",
+                    "text": "8 GB"
+                },
+                {
+                    "value": "10",
+                    "text": "10 GB"
+                },
+                {
+                    "value": "16",
+                    "text": "16 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                },
+                {
+                    "value": "analytix",
+                    "text": "General Purpose (Analytix)"
+                },
+                {
+                    "value": "hadoop-qa",
+                    "text": "QA"
+                }
+            ]
         },
         {
-          "value": "16",
-          "text": "16 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_100_nxcals",
+                "text": "NXCals Spark 3"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc9-opt",
+                    "text": "CentOS 7 (gcc9)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "4",
+                    "text": "4"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "10",
+                    "text": "10 GB"
+                },
+                {
+                    "value": "16",
+                    "text": "16 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "hadoop-nxcals",
+                    "text": "BE NXCALS (NXCals)"
+                },
+                {
+                    "value": "none",
+                    "text": "None"
+                }
+            ]
         },
         {
-          "value": "analytix",
-          "text": "General Purpose (Analytix)"
+            "type": "label",
+            "label": {
+                "value": "emptygpu",
+                "text": ""
+            }
         },
         {
-          "value": "k8s",
-          "text": "Cloud Containers (K8s)"
+            "type": "label",
+            "label": {
+                "value": "label-drg",
+                "text": "Development releases (GPU)"
+            }
         },
         {
-          "value": "hadoop-qa",
-          "text": "QA"
-        }
-      ]
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "LCG_99python2",
-        "text": "99 Python2"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc8-opt",
-          "text": "CentOS 7 (gcc8)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2"
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_100cuda",
+                "text": "100 Cuda 10.1 Python3"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc8-opt",
+                    "text": "CentOS 7 (gcc8)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2CPU, 1GPU"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "16",
+                    "text": "16 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                }
+            ]
         },
         {
-          "value": "4",
-          "text": "4"
-        }
-      ],
-      "memory": [
-        {
-          "value": "8",
-          "text": "8 GB"
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_99cuda",
+                "text": "99 Cuda 10.1 Python3"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc8-opt",
+                    "text": "CentOS 7 (gcc8)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2CPU, 1GPU"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "16",
+                    "text": "16 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                }
+            ]
         },
         {
-          "value": "10",
-          "text": "10 GB"
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_98py3cu10",
+                "text": "98 Cuda 10 Python3"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc8-opt",
+                    "text": "CentOS 7 (gcc8)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2CPU, 1GPU"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "16",
+                    "text": "16 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                }
+            ]
         },
         {
-          "value": "16",
-          "text": "16 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
+            "type": "label",
+            "label": {
+                "value": "empty1",
+                "text": ""
+            }
         },
         {
-          "value": "analytix",
-          "text": "General Purpose (Analytix)"
+            "type": "label",
+            "label": {
+                "value": "label2",
+                "text": "Development releases (might be unstable)"
+            }
         },
         {
-          "value": "k8s",
-          "text": "Cloud Containers (K8s)"
+            "type": "selection",
+            "lcg": {
+                "value": "dev3/latest",
+                "text": "Bleeding Edge"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc8-opt",
+                    "text": "CentOS 7 (gcc8)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "8",
+                    "text": "8 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                },
+                {
+                    "value": "analytix",
+                    "text": "General Purpose (Analytix)"
+                },
+                {
+                    "value": "k8s",
+                    "text": "Cloud Containers (K8s)"
+                },
+                {
+                    "value": "hadoop-qa",
+                    "text": "QA"
+                }
+            ]
         },
         {
-          "value": "hadoop-qa",
-          "text": "QA"
-        }
-      ]
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "LCG_97apython3",
-        "text": "97a Spark2"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc8-opt",
-          "text": "CentOS 7 (gcc8)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2"
+            "type": "selection",
+            "lcg": {
+                "value": "dev3python2/latest",
+                "text": "Bleeding Edge Python2"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc8-opt",
+                    "text": "CentOS 7 (gcc8)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "8",
+                    "text": "8 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                },
+                {
+                    "value": "analytix",
+                    "text": "General Purpose (Analytix)"
+                },
+                {
+                    "value": "k8s",
+                    "text": "Cloud Containers (K8s)"
+                },
+                {
+                    "value": "hadoop-qa",
+                    "text": "QA"
+                }
+            ]
         },
         {
-          "value": "4",
-          "text": "4"
-        }
-      ],
-      "memory": [
-        {
-          "value": "8",
-          "text": "8 GB"
+            "type": "selection",
+            "lcg": {
+                "value": "devnxcals/latest",
+                "text": "NXCals Spark3 (dev snapshot)"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc9-opt",
+                    "text": "CentOS 7 (gcc9)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "4",
+                    "text": "4"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "10",
+                    "text": "10 GB"
+                },
+                {
+                    "value": "16",
+                    "text": "16 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "hadoop-nxcals",
+                    "text": "BE NXCALS (NXCals)"
+                },
+                {
+                    "value": "none",
+                    "text": "None"
+                }
+            ]
         },
         {
-          "value": "10",
-          "text": "10 GB"
+            "type": "selection",
+            "lcg": {
+                "value": "dev4cuda/latest",
+                "text": "Bleeding Edge Cuda 10"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc8-opt",
+                    "text": "CentOS 7 (gcc8)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2CPU, 1GPU"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "16",
+                    "text": "16 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                }
+            ]
         },
         {
-          "value": "16",
-          "text": "16 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
+            "type": "label",
+            "label": {
+                "value": "empty2",
+                "text": ""
+            }
         },
         {
-          "value": "analytix",
-          "text": "General Purpose (Analytix)"
+            "type": "label",
+            "label": {
+                "value": "label3",
+                "text": "Other releases"
+            }
         },
         {
-          "value": "hadoop-qa",
-          "text": "QA"
-        }
-      ]
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "LCG_100_nxcals",
-        "text": "NXCals Spark 3"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc9-opt",
-          "text": "CentOS 7 (gcc9)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "4",
-          "text": "4"
-        }
-      ],
-      "memory": [
-        {
-          "value": "10",
-          "text": "10 GB"
-        },
-        {
-          "value": "16",
-          "text": "16 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "hadoop-nxcals",
-          "text": "BE NXCALS (NXCals)"
-        },
-        {
-          "value": "none",
-          "text": "None"
-        }
-      ]
-    },
-    {
-      "type": "label",
-      "label": {
-        "value": "emptygpu",
-        "text": ""
-      }
-    },
-    {
-      "type": "label",
-      "label": {
-        "value": "label-drg",
-        "text": "Development releases (GPU)"
-      }
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "LCG_100cuda",
-        "text": "100 Cuda 10.1 Python3"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc8-opt",
-          "text": "CentOS 7 (gcc8)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2CPU, 1GPU"
-        }
-      ],
-      "memory": [
-        {
-          "value": "16",
-          "text": "16 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
-        }
-      ]
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "LCG_99cuda",
-        "text": "99 Cuda 10.1 Python3"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc8-opt",
-          "text": "CentOS 7 (gcc8)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2CPU, 1GPU"
-        }
-      ],
-      "memory": [
-        {
-          "value": "16",
-          "text": "16 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
-        }
-      ]
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "LCG_98py3cu10",
-        "text": "98 Cuda 10 Python3"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc8-opt",
-          "text": "CentOS 7 (gcc8)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2CPU, 1GPU"
-        }
-      ],
-      "memory": [
-        {
-          "value": "16",
-          "text": "16 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
-        }
-      ]
-    },
-    {
-      "type": "label",
-      "label": {
-        "value": "empty1",
-        "text": ""
-      }
-    },
-    {
-      "type": "label",
-      "label": {
-        "value": "label2",
-        "text": "Development releases (might be unstable)"
-      }
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "dev3/latest",
-        "text": "Bleeding Edge"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc8-opt",
-          "text": "CentOS 7 (gcc8)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2"
-        }
-      ],
-      "memory": [
-        {
-          "value": "8",
-          "text": "8 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
-        },
-        {
-          "value": "analytix",
-          "text": "General Purpose (Analytix)"
-        },
-        {
-          "value": "k8s",
-          "text": "Cloud Containers (K8s)"
-        },
-        {
-          "value": "hadoop-qa",
-          "text": "QA"
-        }
-      ]
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "dev3python2/latest",
-        "text": "Bleeding Edge Python2"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc8-opt",
-          "text": "CentOS 7 (gcc8)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2"
-        }
-      ],
-      "memory": [
-        {
-          "value": "8",
-          "text": "8 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
-        },
-        {
-          "value": "analytix",
-          "text": "General Purpose (Analytix)"
-        },
-        {
-          "value": "k8s",
-          "text": "Cloud Containers (K8s)"
-        },
-        {
-          "value": "hadoop-qa",
-          "text": "QA"
-        }
-      ]
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "devnxcals/latest",
-        "text": "NXCals Spark3 (dev snapshot)"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc9-opt",
-          "text": "CentOS 7 (gcc9)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "4",
-          "text": "4"
-        }
-      ],
-      "memory": [
-        {
-          "value": "10",
-          "text": "10 GB"
-        },
-        {
-          "value": "16",
-          "text": "16 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "hadoop-nxcals",
-          "text": "BE NXCALS (NXCals)"
-        },
-        {
-          "value": "none",
-          "text": "None"
-        }
-      ]
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "dev4cuda/latest",
-        "text": "Bleeding Edge Cuda 10"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc8-opt",
-          "text": "CentOS 7 (gcc8)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2CPU, 1GPU"
-        }
-      ],
-      "memory": [
-        {
-          "value": "16",
-          "text": "16 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
-        }
-      ]
-    },
-    {
-      "type": "label",
-      "label": {
-        "value": "empty2",
-        "text": ""
-      }
-    },
-    {
-      "type": "label",
-      "label": {
-        "value": "label3",
-        "text": "Other releases"
-      }
-    },
-    {
-        "type": "selection",
-        "lcg": { 
+            "type": "selection",
+            "lcg": {
                 "value": "LCG_100",
-                "text": "100" },
-        "platforms": [
-         { 
-           "value": "x86_64-centos7-gcc8-opt",
-           "text": "CentOS 7 (gcc8)" 
-         },
-           { "value": "x86_64-centos7-gcc10-opt", "text": "CentOS 7 (gcc10)" }],
-        "cores": [
-                 { "value": "2", "text": "2" }, 
-                 { "value": "4", "text": "4" }],
-        "memory": [ { "value": "8", "text": "8 GB" }, { "value": "10", "text": "10 GB" }, { "value": "16", "text": "16 GB" } ],
-        "clusters": [ { "value": "none", "text": "None" },
-                      { "value": "analytix", "text": "General Purpose (Analytix)" },
-                      { "value": "k8s", "text": "Cloud Containers (K8s)" },
-                      { "value": "hadoop-qa", "text": "QA" } ]
-      },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "LCG_99",
-        "text": "99"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc8-opt",
-          "text": "CentOS 7 (gcc8)"
+                "text": "100"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc8-opt",
+                    "text": "CentOS 7 (gcc8)"
+                },
+                {
+                    "value": "x86_64-centos7-gcc10-opt",
+                    "text": "CentOS 7 (gcc10)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2"
+                },
+                {
+                    "value": "4",
+                    "text": "4"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "8",
+                    "text": "8 GB"
+                },
+                {
+                    "value": "10",
+                    "text": "10 GB"
+                },
+                {
+                    "value": "16",
+                    "text": "16 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                },
+                {
+                    "value": "analytix",
+                    "text": "General Purpose (Analytix)"
+                },
+                {
+                    "value": "k8s",
+                    "text": "Cloud Containers (K8s)"
+                },
+                {
+                    "value": "hadoop-qa",
+                    "text": "QA"
+                }
+            ]
         },
         {
-          "value": "x86_64-centos7-gcc10-opt",
-          "text": "CentOS 7 (gcc10)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2"
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_99",
+                "text": "99"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc8-opt",
+                    "text": "CentOS 7 (gcc8)"
+                },
+                {
+                    "value": "x86_64-centos7-gcc10-opt",
+                    "text": "CentOS 7 (gcc10)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2"
+                },
+                {
+                    "value": "4",
+                    "text": "4"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "8",
+                    "text": "8 GB"
+                },
+                {
+                    "value": "10",
+                    "text": "10 GB"
+                },
+                {
+                    "value": "16",
+                    "text": "16 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                },
+                {
+                    "value": "analytix",
+                    "text": "General Purpose (Analytix)"
+                },
+                {
+                    "value": "k8s",
+                    "text": "Cloud Containers (K8s)"
+                },
+                {
+                    "value": "hadoop-qa",
+                    "text": "QA"
+                }
+            ]
         },
         {
-          "value": "4",
-          "text": "4"
-        }
-      ],
-      "memory": [
-        {
-          "value": "8",
-          "text": "8 GB"
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_95nxcalspython3_nxcals",
+                "text": "NXCals Spark 2"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc7-opt",
+                    "text": "CentOS 7 (gcc7)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "4",
+                    "text": "4"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "10",
+                    "text": "10 GB"
+                },
+                {
+                    "value": "16",
+                    "text": "16 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "hadoop-nxcals",
+                    "text": "BE NXCALS (NXCals)"
+                },
+                {
+                    "value": "none",
+                    "text": "None"
+                }
+            ]
         },
         {
-          "value": "10",
-          "text": "10 GB"
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_97apython3",
+                "text": "97a"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc8-opt",
+                    "text": "CentOS 7 (gcc8)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2"
+                },
+                {
+                    "value": "4",
+                    "text": "4"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "8",
+                    "text": "8 GB"
+                },
+                {
+                    "value": "10",
+                    "text": "10 GB"
+                },
+                {
+                    "value": "16",
+                    "text": "16 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                },
+                {
+                    "value": "analytix",
+                    "text": "General Purpose (Analytix)"
+                },
+                {
+                    "value": "k8s",
+                    "text": "Cloud Containers (K8s)"
+                },
+                {
+                    "value": "hadoop-qa",
+                    "text": "QA"
+                }
+            ]
         },
         {
-          "value": "16",
-          "text": "16 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_97a",
+                "text": "97a Python2"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc8-opt",
+                    "text": "CentOS 7 (gcc8)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2"
+                },
+                {
+                    "value": "4",
+                    "text": "4"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "8",
+                    "text": "8 GB"
+                },
+                {
+                    "value": "10",
+                    "text": "10 GB"
+                },
+                {
+                    "value": "16",
+                    "text": "16 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                },
+                {
+                    "value": "analytix",
+                    "text": "General Purpose (Analytix)"
+                },
+                {
+                    "value": "k8s",
+                    "text": "Cloud Containers (K8s)"
+                },
+                {
+                    "value": "hadoop-qa",
+                    "text": "QA"
+                }
+            ]
         },
         {
-          "value": "analytix",
-          "text": "General Purpose (Analytix)"
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_96",
+                "text": "96"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc8-opt",
+                    "text": "CentOS 7 (gcc8)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2"
+                },
+                {
+                    "value": "4",
+                    "text": "4"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "8",
+                    "text": "8 GB"
+                },
+                {
+                    "value": "10",
+                    "text": "10 GB"
+                },
+                {
+                    "value": "16",
+                    "text": "16 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                },
+                {
+                    "value": "analytix",
+                    "text": "General Purpose (Analytix)"
+                },
+                {
+                    "value": "k8s",
+                    "text": "Cloud Containers (K8s)"
+                },
+                {
+                    "value": "hadoop-qa",
+                    "text": "QA"
+                }
+            ]
         },
         {
-          "value": "k8s",
-          "text": "Cloud Containers (K8s)"
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_96python3",
+                "text": "96 Python3"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc8-opt",
+                    "text": "CentOS 7 (gcc8)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2"
+                },
+                {
+                    "value": "4",
+                    "text": "4"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "8",
+                    "text": "8 GB"
+                },
+                {
+                    "value": "10",
+                    "text": "10 GB"
+                },
+                {
+                    "value": "16",
+                    "text": "16 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                },
+                {
+                    "value": "analytix",
+                    "text": "General Purpose (Analytix)"
+                },
+                {
+                    "value": "k8s",
+                    "text": "Cloud Containers (K8s)"
+                },
+                {
+                    "value": "hadoop-qa",
+                    "text": "QA"
+                }
+            ]
         },
         {
-          "value": "hadoop-qa",
-          "text": "QA"
-        }
-      ]
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "LCG_95nxcalspython3_nxcals",
-        "text": "NXCals Spark 2"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc7-opt",
-          "text": "CentOS 7 (gcc7)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "4",
-          "text": "4"
-        }
-      ],
-      "memory": [
-        {
-          "value": "10",
-          "text": "10 GB"
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_95a",
+                "text": "95a"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc7-opt",
+                    "text": "CentOS 7 (gcc7)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "8",
+                    "text": "8 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                },
+                {
+                    "value": "analytix",
+                    "text": "General Purpose (Analytix)"
+                },
+                {
+                    "value": "hadoop-qa",
+                    "text": "QA"
+                }
+            ]
         },
         {
-          "value": "16",
-          "text": "16 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "hadoop-nxcals",
-          "text": "BE NXCALS (NXCals)"
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_95apython3",
+                "text": "95a Python3"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc7-opt",
+                    "text": "CentOS 7 (gcc7)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "8",
+                    "text": "8 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                },
+                {
+                    "value": "analytix",
+                    "text": "General Purpose (Analytix)"
+                },
+                {
+                    "value": "hadoop-qa",
+                    "text": "QA"
+                }
+            ]
         },
         {
-          "value": "none",
-          "text": "None"
-        }
-      ]
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "LCG_97apython3",
-        "text": "97a"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc8-opt",
-          "text": "CentOS 7 (gcc8)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2"
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_94",
+                "text": "94"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc7-opt",
+                    "text": "CentOS 7 (gcc7)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "8",
+                    "text": "8 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                },
+                {
+                    "value": "analytix",
+                    "text": "General Purpose (Analytix)"
+                },
+                {
+                    "value": "hadoop-qa",
+                    "text": "QA"
+                }
+            ]
         },
         {
-          "value": "4",
-          "text": "4"
-        }
-      ],
-      "memory": [
-        {
-          "value": "8",
-          "text": "8 GB"
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_94python3",
+                "text": "94 Python3"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc7-opt",
+                    "text": "CentOS 7 (gcc7)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "8",
+                    "text": "8 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                },
+                {
+                    "value": "analytix",
+                    "text": "General Purpose (Analytix)"
+                },
+                {
+                    "value": "hadoop-qa",
+                    "text": "QA"
+                }
+            ]
         },
         {
-          "value": "10",
-          "text": "10 GB"
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_93",
+                "text": "93"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc7-opt",
+                    "text": "CentOS 7 (gcc7)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "8",
+                    "text": "8 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                },
+                {
+                    "value": "analytix",
+                    "text": "General Purpose (Analytix)"
+                },
+                {
+                    "value": "hadoop-qa",
+                    "text": "QA"
+                }
+            ]
         },
         {
-          "value": "16",
-          "text": "16 GB"
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_93python3",
+                "text": "93 Python3"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc7-opt",
+                    "text": "CentOS 7 (gcc7)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "8",
+                    "text": "8 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                },
+                {
+                    "value": "analytix",
+                    "text": "General Purpose (Analytix)"
+                },
+                {
+                    "value": "hadoop-qa",
+                    "text": "QA"
+                }
+            ]
         }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
-        },
-        {
-          "value": "analytix",
-          "text": "General Purpose (Analytix)"
-        },
-        {
-          "value": "k8s",
-          "text": "Cloud Containers (K8s)"
-        },
-        {
-          "value": "hadoop-qa",
-          "text": "QA"
-        }
-      ]
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "LCG_97a",
-        "text": "97a Python2"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc8-opt",
-          "text": "CentOS 7 (gcc8)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2"
-        },
-        {
-          "value": "4",
-          "text": "4"
-        }
-      ],
-      "memory": [
-        {
-          "value": "8",
-          "text": "8 GB"
-        },
-        {
-          "value": "10",
-          "text": "10 GB"
-        },
-        {
-          "value": "16",
-          "text": "16 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
-        },
-        {
-          "value": "analytix",
-          "text": "General Purpose (Analytix)"
-        },
-        {
-          "value": "k8s",
-          "text": "Cloud Containers (K8s)"
-        },
-        {
-          "value": "hadoop-qa",
-          "text": "QA"
-        }
-      ]
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "LCG_96",
-        "text": "96"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc8-opt",
-          "text": "CentOS 7 (gcc8)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2"
-        },
-        {
-          "value": "4",
-          "text": "4"
-        }
-      ],
-      "memory": [
-        {
-          "value": "8",
-          "text": "8 GB"
-        },
-        {
-          "value": "10",
-          "text": "10 GB"
-        },
-        {
-          "value": "16",
-          "text": "16 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
-        },
-        {
-          "value": "analytix",
-          "text": "General Purpose (Analytix)"
-        },
-        {
-          "value": "k8s",
-          "text": "Cloud Containers (K8s)"
-        },
-        {
-          "value": "hadoop-qa",
-          "text": "QA"
-        }
-      ]
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "LCG_96python3",
-        "text": "96 Python3"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc8-opt",
-          "text": "CentOS 7 (gcc8)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2"
-        },
-        {
-          "value": "4",
-          "text": "4"
-        }
-      ],
-      "memory": [
-        {
-          "value": "8",
-          "text": "8 GB"
-        },
-        {
-          "value": "10",
-          "text": "10 GB"
-        },
-        {
-          "value": "16",
-          "text": "16 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
-        },
-        {
-          "value": "analytix",
-          "text": "General Purpose (Analytix)"
-        },
-        {
-          "value": "k8s",
-          "text": "Cloud Containers (K8s)"
-        },
-        {
-          "value": "hadoop-qa",
-          "text": "QA"
-        }
-      ]
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "LCG_95a",
-        "text": "95a"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc7-opt",
-          "text": "CentOS 7 (gcc7)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2"
-        }
-      ],
-      "memory": [
-        {
-          "value": "8",
-          "text": "8 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
-        },
-        {
-          "value": "analytix",
-          "text": "General Purpose (Analytix)"
-        },
-        {
-          "value": "hadoop-qa",
-          "text": "QA"
-        }
-      ]
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "LCG_95apython3",
-        "text": "95a Python3"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc7-opt",
-          "text": "CentOS 7 (gcc7)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2"
-        }
-      ],
-      "memory": [
-        {
-          "value": "8",
-          "text": "8 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
-        },
-        {
-          "value": "analytix",
-          "text": "General Purpose (Analytix)"
-        },
-        {
-          "value": "hadoop-qa",
-          "text": "QA"
-        }
-      ]
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "LCG_94",
-        "text": "94"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc7-opt",
-          "text": "CentOS 7 (gcc7)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2"
-        }
-      ],
-      "memory": [
-        {
-          "value": "8",
-          "text": "8 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
-        },
-        {
-          "value": "analytix",
-          "text": "General Purpose (Analytix)"
-        },
-        {
-          "value": "hadoop-qa",
-          "text": "QA"
-        }
-      ]
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "LCG_94python3",
-        "text": "94 Python3"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc7-opt",
-          "text": "CentOS 7 (gcc7)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2"
-        }
-      ],
-      "memory": [
-        {
-          "value": "8",
-          "text": "8 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
-        },
-        {
-          "value": "analytix",
-          "text": "General Purpose (Analytix)"
-        },
-        {
-          "value": "hadoop-qa",
-          "text": "QA"
-        }
-      ]
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "LCG_93",
-        "text": "93"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc7-opt",
-          "text": "CentOS 7 (gcc7)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2"
-        }
-      ],
-      "memory": [
-        {
-          "value": "8",
-          "text": "8 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
-        },
-        {
-          "value": "analytix",
-          "text": "General Purpose (Analytix)"
-        },
-        {
-          "value": "hadoop-qa",
-          "text": "QA"
-        }
-      ]
-    },
-    {
-      "type": "selection",
-      "lcg": {
-        "value": "LCG_93python3",
-        "text": "93 Python3"
-      },
-      "platforms": [
-        {
-          "value": "x86_64-centos7-gcc7-opt",
-          "text": "CentOS 7 (gcc7)"
-        }
-      ],
-      "cores": [
-        {
-          "value": "2",
-          "text": "2"
-        }
-      ],
-      "memory": [
-        {
-          "value": "8",
-          "text": "8 GB"
-        }
-      ],
-      "clusters": [
-        {
-          "value": "none",
-          "text": "None"
-        },
-        {
-          "value": "analytix",
-          "text": "General Purpose (Analytix)"
-        },
-        {
-          "value": "hadoop-qa",
-          "text": "QA"
-        }
-      ]
-    }
-  ]
+    ]
 }
