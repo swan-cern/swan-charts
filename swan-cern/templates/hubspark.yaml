@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: hubspark
+    hub.jupyter.org/network-access-proxy-api: "true"
+    hub.jupyter.org/network-access-proxy-http: "true"
+    hub.jupyter.org/network-access-singleuser: "true"
+  name: hubspark
+  namespace: swan
+spec:
+  containers:
+  - args:
+    - jupyterhub
+    - --config
+    - /usr/local/etc/jupyterhub/jupyterhub_config.py
+    - --debug
+    env:
+    - name: JUPYTERHUB_SERVICE_PREFIX
+      value: /services/hubspark
+    - name: JUPYTERHUB_SERVICE_URL
+      value: http://hubspark:1111
+    - name: KRB5CCNAME
+      value: /krb5cc
+    - name: JUPYTERHUB_API_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: jupyterhub_api_token
+          name: hubspark
+    image: gitlab-registry.cern.ch/rcastell/publicregistry/hubspark:latest
+    imagePullPolicy: Always
+    name: hubspark
+    ports:
+    - containerPort: 1111
+      name: http
+      protocol: TCP
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      runAsGroup: 0
+      runAsUser: 0
+    volumeMounts:
+    - mountPath: /cvmfs
+      name: cvmfs
+    - mountPath: /krb5cc
+      name: krbtoken
+  dnsPolicy: ClusterFirst
+  volumes:
+  - name: krbtoken
+    secret:
+      defaultMode: 420
+      secretName: krbtoken
+  - name: hubspark
+    secret:
+      defaultMode: 420
+      secretName: hubspark
+  - hostPath:
+      path: /var/cvmfs
+      type: Directory
+    name: cvmfs
+---
+apiVersion: v1
+data:
+  krbtoken: {{.Values.swanCern.secrets.eos.cred}}
+kind: Secret
+metadata:
+  name: krbtoken
+  namespace: swan
+---
+apiVersion: v1
+data:
+  jupyterhub_api_token: c3VwZXItc2VjcmV0Cg==
+kind: Secret
+metadata:
+  labels:
+    app: jupyterhub
+    component: hub
+  name: hubspark
+  namespace: swan
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hubspark
+spec:
+  selector:
+    app: hubspark
+  ports:
+    - protocol: TCP
+      port: 1111
+      targetPort: 1111

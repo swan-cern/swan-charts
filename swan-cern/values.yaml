@@ -142,6 +142,13 @@ swan:
 
           # SWAN@CERN error message
           c.SpawnHandlersConfigs.spawn_error_message = SPAWN_ERROR_MESSAGE
+        03-sparkhub: |
+          services = {
+              'name': 'hubspark',
+              'url': 'http://127.0.0.1:1234',
+              'api_token': 'super-secret',
+          }
+          c.JupyterHub.services.append(services)
       db:
         type: postgres
         # placeholder for postgres connection url
