@@ -2,14 +2,14 @@ apiVersion: v2
 #
 name: swan-cern
 type: application
-version: 0.1.2
+version: 0.1.3
 appVersion: 0.0.3
 #
 description: The chart to deploy SWAN at CERN
 #
 dependencies:
   - name: swan
-    version: 0.1.2
+    version: 0.1.3
     repository: https://registry.cern.ch/chartrepo/swan
   - name: fluentd
     repository: http://registry.cern.ch/chartrepo/cern
