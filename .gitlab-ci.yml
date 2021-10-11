@@ -78,7 +78,7 @@ deploy:
         YAML_VERSION=$(cat ${CHART}/Chart.yaml | grep ^version | awk '{print $2}')
         if [[ "$TAG_VERSION" == "$YAML_VERSION" ]]; then
           helm dependency update ${CHART}
-          helm push ${CHART}/ ${HELM_CHART_REPO}
+          helm cm-push ${CHART}/ ${HELM_CHART_REPO}
         else
           echo "ERROR: Chart version ($YAML_VERSION) differs from tag version ($TAG_VERSION)"
           exit 1
