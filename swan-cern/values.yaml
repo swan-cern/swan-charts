@@ -145,7 +145,7 @@ swan:
         03-sparkhub: |
           services = {
               'name': 'hubspark',
-              'url': 'http://127.0.0.1:1234',
+              'url': 'http://hubspark:1111',
               'api_token': 'super-secret',
           }
           c.JupyterHub.services.append(services)

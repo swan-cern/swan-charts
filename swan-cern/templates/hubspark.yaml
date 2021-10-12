@@ -16,6 +16,8 @@ spec:
     - /usr/local/etc/jupyterhub/jupyterhub_config.py
     - --debug
     env:
+    - name: JUPYTERHUB_API_URL
+      value: http://hub:8081/hub/api
     - name: JUPYTERHUB_SERVICE_PREFIX
       value: /services/hubspark
     - name: JUPYTERHUB_SERVICE_URL
@@ -23,10 +25,11 @@ spec:
     - name: KRB5CCNAME
       value: /krb5cc
     - name: JUPYTERHUB_API_TOKEN
-      valueFrom:
-        secretKeyRef:
-          key: jupyterhub_api_token
-          name: hubspark
+      value: super-secret
+      #      valueFrom:
+      #        secretKeyRef:
+      #          key: jupyterhub_api_token
+      #          name: hubspark
     image: gitlab-registry.cern.ch/rcastell/publicregistry/hubspark:latest
     imagePullPolicy: Always
     name: hubspark
