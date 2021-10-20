@@ -44,9 +44,6 @@ swan:
           mountPath: /srv/jupyterhub/private/eos_token.sh
           subPath: eos_token.sh
         - name: swan-tokens-scripts
-          mountPath: /srv/jupyterhub/private/hadoop_token.sh
-          subPath: hadoop_token.sh
-        - name: swan-tokens-scripts
           mountPath: /srv/jupyterhub/private/webhdfs_token.sh
           subPath: webhdfs_token.sh
         - name: swan-tokens-scripts
@@ -90,8 +87,6 @@ swan:
           configMap:
             name: swan-scripts-env-prod
             items:
-            - key: hadoop_token.sh
-              path: hadoop_token.sh
             - key: webhdfs_token.sh
               path: webhdfs_token.sh
             - key: eos_token.sh
@@ -223,6 +218,15 @@ swanCern:
     sparkk8s:
       cred:
 
+hubspark:
+  extraVolumes:
+    - name: swan-tokens-scripts
+      configMap:
+        name: swan-scripts-env-prod
+        items:
+          - key: hadoop_token.sh
+            path: hadoop_token.sh
+        defaultMode: 356
 fluentd:
   plugins:
     - fluent-plugin-rewrite-tag-filter
