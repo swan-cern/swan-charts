@@ -1,11 +1,12 @@
 #!/bin/bash
-# Located at [/hubspark/hadoop-token.sh]
+# Located at [/hadoop-token-generator/hadoop-token.sh]
 
 TOKEN_FILE_PATH=${1}
 USER=${2}
 CLUSTER=${3}
 
-if [[ ! -f "/hubspark/hadoop.cred" ]]; then
+if [[ ! -f "/hadoop-token-generator/hadoop.cred" ]]; then
+    echo "keytab file not found" >&2
     exit 1;
 fi
 
@@ -19,8 +20,8 @@ export OVERRIDE_HADOOP_MAPRED_HOME="${LCG_VIEW}"
 source "${LCG_VIEW}/setup.sh"
 source /cvmfs/sft.cern.ch/lcg/etc/hadoop-confext/hadoop-swan-setconf.sh "${CLUSTER}"
 
-kinit -V -kt /hubspark/hadoop.cred hswan@CERN.CH -c "${KRB5CCNAME}"
+kinit -V -kt /hadoop-token-generator/hadoop.cred hswan@CERN.CH -c "${KRB5CCNAME}"
 
-/usr/hdp/hadoop-fetchdt-0.2.0/hadoop-fetchdt -required hdfs,yarn -optional hive -proxyuser "${USER}" -tokenfile "${TOKEN_FILE_PATH}"
+/usr/hdp/hadoop-fetchdt-0.2.0/hadoop-fetchdt -required hdfs,yarn -proxyuser "${USER}" -tokenfile "${TOKEN_FILE_PATH}"
 
 kdestroy -c "${KRB5CCNAME}"

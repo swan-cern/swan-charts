@@ -130,8 +130,15 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
             notebook_container.env = self._add_or_replace_by_name(
                 notebook_container.env,
                 client.V1EnvVar(
-                    name='SWAN_SPARKCONNECTOR_FETCH_DELEGATION_TOKENS',
+                    name='SWAN_FETCH_HADOOP_TOKENS',
                     value='true'
+                ),
+            )
+            notebook_container.env = self._add_or_replace_by_name(
+                notebook_container.env,
+                client.V1EnvVar(
+                    name='SWAN_HADOOP_TOKEN_GENERATOR_URL',
+                    value='http://hadoop-token-generator:80'
                 ),
             )
             notebook_container.env = self._add_or_replace_by_name(

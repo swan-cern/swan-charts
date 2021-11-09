@@ -126,7 +126,7 @@ swan:
     prePuller:
       hook:
         enabled: false
-hubspark:
+hadoopTokenGenerator:
   extraVolumes:
     - name: swan-tokens-scripts
       configMap:
@@ -134,4 +134,4 @@ hubspark:
         items:
           - key: hadoop_token.sh
             path: hadoop_token.sh
-        defaultMode: 356
+        defaultMode: 500

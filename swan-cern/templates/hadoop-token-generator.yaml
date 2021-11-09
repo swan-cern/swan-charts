@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hadoop-token-generator
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: hadoop-token-generator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hadoop-token-generator
+  template:
+    metadata:
+      labels:
+        app: hadoop-token-generator
+        hub.jupyter.org/network-access-hub: "true"
+    spec:
+      containers:
+      - name: hadoop-token-generator
+        env:
+        - name: HADOOP_TOKEN_GENERATOR_PORT
+          value: "80"
+        - name: HADOOP_TOKEN_SCRIPT_PATH
+          value: /hadoop-token-generator/hadoop_token.sh
+        - name: JUPYTERHUB_API_URL
+          value: http://hub:8081/hub/api
+        - name: JUPYTERHUB_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: hub
+              key: hub.services.hadoop-token-generator.apiToken
+
+        image: gitlab-registry.cern.ch/krraghav/test-container-registry:hadoop-token-generator
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 1000m
+            memory: 1024Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+        volumeMounts:
+        - mountPath: /cvmfs
+          name: cvmfs
+        - name: swan-secrets
+          mountPath: /hadoop-token-generator/hadoop.cred
+          subPath: hadoop.cred
+        - name: swan-tokens-scripts
+          mountPath: /hadoop-token-generator/hadoop_token.sh
+          subPath: hadoop_token.sh
+
+      volumes:
+      - name: cvmfs
+        hostPath:
+          path: /var/cvmfs
+          type: Directory
+      - name: swan-secrets
+        secret:
+          defaultMode: 400
+          secretName: swan-cern
+          items:
+            - key: hadoop.cred
+              path: hadoop.cred
+      {{- with .Values.hadoopTokenGenerator.extraVolumes }}
+        {{- . | toYaml | nindent 6 }}
+      {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hadoop-token-generator
+spec:
+  selector:
+    app: hadoop-token-generator
+  ports:
+    - protocol: TCP
+      port: 80

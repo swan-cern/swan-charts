@@ -4,7 +4,8 @@ TOKEN_FILE_PATH=${1}
 USER=${2}
 CLUSTER=${3}
 
-if [[ ! -f "/hubspark/hadoop.cred" ]]; then
+if [[ ! -f "/hadoop-token-generator/hadoop.cred" ]]; then
+    echo "keytab file not found" >&2
     exit 1;
 fi
 
@@ -19,8 +20,8 @@ source "${LCG_VIEW}/setup.sh"
 source /cvmfs/sft.cern.ch/lcg/etc/hadoop-confext/hadoop-swan-setconf.sh "${CLUSTER}"
 
 # For development get a kerberos token as self. (hadoop.cred is the keytab of a normal user)
-kinit -V -kt /hubspark/hadoop.cred "${USER}@CERN.CH" -c "${KRB5CCNAME}"
+kinit -V -kt /hadoop-token-generator/hadoop.cred "${USER}@CERN.CH" -c "${KRB5CCNAME}"
 
 # For development, we omit -proxyuser and fetch the token as a normal user
-/usr/hdp/hadoop-fetchdt-0.2.0/hadoop-fetchdt -required hdfs,yarn -optional hive -tokenfile "${TOKEN_FILE_PATH}"
+/usr/hdp/hadoop-fetchdt-0.2.0/hadoop-fetchdt -required hdfs,yarn -tokenfile "${TOKEN_FILE_PATH}"
 kdestroy -c "${KRB5CCNAME}"
