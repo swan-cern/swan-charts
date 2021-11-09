@@ -31,7 +31,7 @@ spec:
               name: hub
               key: hub.services.hadoop-token-generator.apiToken
 
-        image: gitlab-registry.cern.ch/krraghav/test-container-registry:hadoop-token-generator
+        image: gitlab-registry.cern.ch/swan/private/hadoop-token-generator:v1.0.0 
         imagePullPolicy: Always
         ports:
         - containerPort: 80
