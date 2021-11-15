@@ -37,7 +37,6 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
         username = self.spawner.user.name
         hadoop_secret_name ='hadoop-tokens-%s' % username
 
-        hadoop_token_base64 = ''
         webhdfs_token_base64 = ''
         k8suser_config_base64 = ''
 
@@ -51,14 +50,7 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
             except Exception as e:
                 # if no access, all good for now
                 raise ValueError("Could not setup user on k8s")
-            try:
-                # Retrieve HDFS, YARN token for user
-                hadoop_token_base64 = subprocess.check_output(
-                    ['sudo', '/srv/jupyterhub/private/hadoop_token.sh', hdfs_cluster, username], timeout=60
-                ).decode('ascii')
-            except Exception as e:
-                # if no access, all good for now
-                raise ValueError("Could not get spark tokens")
+
             try:
                 # Retrieve hdfs token for user
                 webhdfs_token_base64 = subprocess.check_output(
@@ -68,14 +60,6 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
                 # if no access, all good for now
                 raise ValueError("Could not get webhdfs tokens")
         else:
-            try:
-                # Retrieve HDFS, YARN token for user
-                hadoop_token_base64 = subprocess.check_output(
-                    ['sudo', '/srv/jupyterhub/private/hadoop_token.sh', cluster, username], timeout=60
-                ).decode('ascii')
-            except Exception as e:
-                # if no access, all good for now
-                raise ValueError("Could not get spark tokens")
             try:
                 # Retrieve hdfs token for user
                 webhdfs_token_base64 = subprocess.check_output(
@@ -95,7 +79,6 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
             secret_data.metadata = secret_meta
             secret_data.data = {}
             secret_data.data['k8s-user.config'] = k8suser_config_base64
-            secret_data.data['hadoop.toks'] = hadoop_token_base64
             secret_data.data['webhdfs.toks'] = webhdfs_token_base64
 
             try:
@@ -143,12 +126,19 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
                 )
             )
 
-            # define hadoop auth environment for the notebook container
+            # instruct sparkconnector to fetch delegation tokens from service
             notebook_container.env = self._add_or_replace_by_name(
                 notebook_container.env,
                 client.V1EnvVar(
-                    name='HADOOP_TOKEN_FILE_LOCATION',
-                    value='/srv/notebook/tokens/hadoop.toks'
+                    name='SWAN_FETCH_HADOOP_TOKENS',
+                    value='true'
+                ),
+            )
+            notebook_container.env = self._add_or_replace_by_name(
+                notebook_container.env,
+                client.V1EnvVar(
+                    name='SWAN_HADOOP_TOKEN_GENERATOR_URL',
+                    value='http://hadoop-token-generator:80'
                 ),
             )
             notebook_container.env = self._add_or_replace_by_name(

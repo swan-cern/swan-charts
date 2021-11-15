@@ -47,8 +47,6 @@ swan:
           configMap:
             name: swan-scripts-env-dev
             items:
-            - key: hadoop_token.sh
-              path: hadoop_token.sh
             - key: webhdfs_token.sh
               path: webhdfs_token.sh
             - key: eos_token.sh
@@ -128,3 +126,12 @@ swan:
     prePuller:
       hook:
         enabled: false
+hadoopTokenGenerator:
+  extraVolumes:
+    - name: swan-tokens-scripts
+      configMap:
+        name: swan-scripts-env-dev
+        items:
+          - key: hadoop_token.sh
+            path: hadoop_token.sh
+        defaultMode: 500
