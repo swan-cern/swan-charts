@@ -73,6 +73,7 @@ echo ""
 
 # Annotation is required in order to restart jupyterhub server on swan_config.py or jupyterhub_form.html changes
 helm upgrade --install --namespace swan  \
+--kubeconfig $KUBECONFIG \
 --values $SWAN_SECRET_VALUES_PATH \
 --set jupyterhub.hub.annotations.version="release-$(date +%s)" \
 --set jupyterhub.hub.db.upgrade=$UPGRADE_DB \
