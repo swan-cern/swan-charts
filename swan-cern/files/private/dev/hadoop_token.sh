@@ -9,4 +9,4 @@ if [[ ! -f "/hadoop-token-generator/hadoop.cred" ]]; then
 fi
 
 # in dev, one can provide already generated token instead of the proxy user keytab
-cat /srv/jupyterhub/private/hadoop.cred > "${TOKEN_FILE_PATH}"
+cat /hadoop-token-generator/hadoop.cred > "${TOKEN_FILE_PATH}"

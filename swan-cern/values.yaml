@@ -204,7 +204,8 @@ swan:
         deployDaemonSet: *eosDeployDS
         deployCsiDriver: *eosDeployCSI
         useCsiDriver: *eosUseCSI
-
+      spark:
+        configurationPath: /cvmfs/sft.cern.ch/lcg/etc/hadoop-confext
 swanCern:
   secrets:
     eos:
