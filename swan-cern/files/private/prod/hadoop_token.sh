@@ -18,7 +18,8 @@ LCG_VIEW=/cvmfs/sft.cern.ch/lcg/views/LCG_94/x86_64-slc6-gcc62-opt
 export OVERRIDE_HADOOP_MAPRED_HOME="${LCG_VIEW}"
 
 source "${LCG_VIEW}/setup.sh"
-source /cvmfs/sft.cern.ch/lcg/etc/hadoop-confext/hadoop-swan-setconf.sh "${CLUSTER}"
+# HADOOP_CONF_HOME set from chart template
+source "${HADOOP_CONF_HOME}/hadoop-swan-setconf.sh" "${CLUSTER}"
 
 kinit -V -kt /hadoop-token-generator/hadoop.cred hswan@CERN.CH -c "${KRB5CCNAME}"
 
