@@ -245,11 +245,11 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
         )
 
         # add spark config env
-
+        conf_home = get_config('custom.spark.configurationPath')
         if cluster == 'k8s':
-            spark_conf_script = '/cvmfs/sft.cern.ch/lcg/etc/hadoop-confext/k8s-swan-setconf.sh'
+            spark_conf_script = f'{conf_home}/k8s-swan-setconf.sh'
         else:
-            spark_conf_script = '/cvmfs/sft.cern.ch/lcg/etc/hadoop-confext/hadoop-swan-setconf.sh'
+            spark_conf_script = f'{conf_home}/hadoop-swan-setconf.sh'
 
         notebook_container.env = self._add_or_replace_by_name(
             notebook_container.env,
