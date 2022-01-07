@@ -1,10 +1,5 @@
 swan:
   jupyterhub:
-    singleuser:
-      image:
-        name: "gitlab-registry.cern.ch/swan/docker-images/systemuser"
-        tag: "v5.9.0"
-        pullPolicy: Always
     hub:
       image:
         name: "gitlab-registry.cern.ch/swan/docker-images/jupyterhub"
