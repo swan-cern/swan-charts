@@ -75,6 +75,7 @@ jupyterhub:
   ingress:
     enabled: true
     annotations:
+      kubernetes.io/ingress.class: nginx
     #tls:
     #  - secretName: swan-tls-cert
     # placeholder for hostname
