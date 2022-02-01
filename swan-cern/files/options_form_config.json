@@ -279,49 +279,10 @@
                 {
                     "value": "8",
                     "text": "8 GB"
-                }
-            ],
-            "clusters": [
-                {
-                    "value": "none",
-                    "text": "None"
                 },
                 {
-                    "value": "analytix",
-                    "text": "General Purpose (Analytix)"
-                },
-                {
-                    "value": "k8s",
-                    "text": "Cloud Containers (K8s)"
-                },
-                {
-                    "value": "hadoop-qa",
-                    "text": "QA"
-                }
-            ]
-        },
-        {
-            "type": "selection",
-            "lcg": {
-                "value": "dev3python2/latest",
-                "text": "Bleeding Edge Python2"
-            },
-            "platforms": [
-                {
-                    "value": "x86_64-centos7-gcc8-opt",
-                    "text": "CentOS 7 (gcc8)"
-                }
-            ],
-            "cores": [
-                {
-                    "value": "2",
-                    "text": "2"
-                }
-            ],
-            "memory": [
-                {
-                    "value": "8",
-                    "text": "8 GB"
+                    "value": "16",
+                    "text": "16 GB"
                 }
             ],
             "clusters": [
@@ -386,7 +347,7 @@
             "type": "selection",
             "lcg": {
                 "value": "dev4cuda/latest",
-                "text": "Bleeding Edge Cuda 10 (GPU)"
+                "text": "Bleeding Edge Cuda 11 (GPU)"
             },
             "platforms": [
                 {
