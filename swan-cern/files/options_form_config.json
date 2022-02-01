@@ -212,117 +212,41 @@
                 }
             ]
         },
+    {
+        "type": "selection",
+        "lcg": {
+            "value": "LCG_101cuda",
+            "text": "101 Cuda 11.2 (GPU)"
+        },
+        "platforms": [
+            {
+                "value": "x86_64-centos7-gcc8-opt",
+                "text": "CentOS 7 (gcc8)"
+            }
+        ],
+        "cores": [
+            {
+                "value": "2",
+                "text": "2CPU, 1GPU"
+            }
+        ],
+        "memory": [
+            {
+                "value": "16",
+                "text": "16 GB"
+            }
+        ],
+        "clusters": [
+            {
+                "value": "none",
+                "text": "None"
+            }
+        ]
+    },
         {
             "type": "label",
             "label": {
                 "value": "emptygpu",
-                "text": ""
-            }
-        },
-        {
-            "type": "label",
-            "label": {
-                "value": "label-drg",
-                "text": "Development releases (GPU)"
-            }
-        },
-        {
-            "type": "selection",
-            "lcg": {
-                "value": "LCG_100cuda",
-                "text": "100 Cuda 10.1 Python3"
-            },
-            "platforms": [
-                {
-                    "value": "x86_64-centos7-gcc8-opt",
-                    "text": "CentOS 7 (gcc8)"
-                }
-            ],
-            "cores": [
-                {
-                    "value": "2",
-                    "text": "2CPU, 1GPU"
-                }
-            ],
-            "memory": [
-                {
-                    "value": "16",
-                    "text": "16 GB"
-                }
-            ],
-            "clusters": [
-                {
-                    "value": "none",
-                    "text": "None"
-                }
-            ]
-        },
-        {
-            "type": "selection",
-            "lcg": {
-                "value": "LCG_99cuda",
-                "text": "99 Cuda 10.1 Python3"
-            },
-            "platforms": [
-                {
-                    "value": "x86_64-centos7-gcc8-opt",
-                    "text": "CentOS 7 (gcc8)"
-                }
-            ],
-            "cores": [
-                {
-                    "value": "2",
-                    "text": "2CPU, 1GPU"
-                }
-            ],
-            "memory": [
-                {
-                    "value": "16",
-                    "text": "16 GB"
-                }
-            ],
-            "clusters": [
-                {
-                    "value": "none",
-                    "text": "None"
-                }
-            ]
-        },
-        {
-            "type": "selection",
-            "lcg": {
-                "value": "LCG_98py3cu10",
-                "text": "98 Cuda 10 Python3"
-            },
-            "platforms": [
-                {
-                    "value": "x86_64-centos7-gcc8-opt",
-                    "text": "CentOS 7 (gcc8)"
-                }
-            ],
-            "cores": [
-                {
-                    "value": "2",
-                    "text": "2CPU, 1GPU"
-                }
-            ],
-            "memory": [
-                {
-                    "value": "16",
-                    "text": "16 GB"
-                }
-            ],
-            "clusters": [
-                {
-                    "value": "none",
-                    "text": "None"
-                }
-            ]
-        },
-        {
-            "type": "label",
-            "label": {
-                "value": "empty1",
                 "text": ""
             }
         },
@@ -462,7 +386,7 @@
             "type": "selection",
             "lcg": {
                 "value": "dev4cuda/latest",
-                "text": "Bleeding Edge Cuda 10"
+                "text": "Bleeding Edge Cuda 10 (GPU)"
             },
             "platforms": [
                 {
@@ -620,6 +544,75 @@
                     "text": "QA"
                 }
             ]
+        },
+        {
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_99cuda",
+                "text": "99 Cuda 10.1 (GPU)"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc8-opt",
+                    "text": "CentOS 7 (gcc8)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2CPU, 1GPU"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "16",
+                    "text": "16 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                }
+            ]
+        },
+        {
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_98py3cu10",
+                "text": "98 Cuda 10 Python3"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc8-opt",
+                    "text": "CentOS 7 (gcc8)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2CPU, 1GPU"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "16",
+                    "text": "16 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                }
+            ]
+        },
+        {
+            "type": "label",
+            "label": {
+                "value": "empty1",
+                "text": ""
+            }
         },
         {
             "type": "selection",
