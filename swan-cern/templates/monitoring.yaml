@@ -1,0 +1,25 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: hub-metrics-servicemonitor
+  namespace: {{ .Release.Namespace }}
+  labels:
+    # This label only works for kubernetes version >= 1.22,
+    # prometheus operator uses this label selector to list servicemonitors
+    release: cern-magnum
+spec:
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      app: jupyterhub
+      component: hub
+      release: {{ .Release.Name }}
+  endpoints:
+  - port: hub
+    interval: 30s
+    path: /metrics
+    bearerTokenSecret:
+      name: hub
+      key: hub.services.prometheus-service-monitor.apiToken
