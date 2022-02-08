@@ -33,6 +33,14 @@ spec:
         - name: HADOOP_CONF_HOME
           value: {{ .Values.swan.jupyterhub.custom.spark.configurationPath }} 
 
+        livenessProbe:
+          exec:
+            command:
+            - ls
+            - {{ .Values.swan.jupyterhub.custom.spark.configurationPath }}
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
         image: gitlab-registry.cern.ch/swan/docker-images/hadoop-token-generator:v1.0.0 
         imagePullPolicy: Always
         ports:
