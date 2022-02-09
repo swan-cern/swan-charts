@@ -347,7 +347,7 @@
             "type": "selection",
             "lcg": {
                 "value": "dev4cuda/latest",
-                "text": "Bleeding Edge Cuda 10 (GPU)"
+                "text": "Bleeding Edge Cuda 11 (GPU)"
             },
             "platforms": [
                 {
