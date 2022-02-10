@@ -5,6 +5,11 @@ TOKEN_FILE_PATH=${1}
 USER=${2}
 CLUSTER=${3}
 
+# For spark on k8s, generate hdfs tokens for the analytix cluster
+if [ ${CLUSTER} = "k8s" ]; then
+    CLUSTER="analytix"
+fi
+
 if [[ ! -f "/hadoop-token-generator/hadoop.cred" ]]; then
     echo "keytab file not found" >&2
     exit 1;
