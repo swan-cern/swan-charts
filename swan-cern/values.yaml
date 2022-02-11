@@ -78,23 +78,11 @@ swan:
           mountPath: /usr/local/etc/jupyterhub/jupyterhub_config.d/3_swan_spark_config.py
           subPath: swan_spark_config.py
         - name: swan-secrets
-          mountPath: /srv/jupyterhub/private/eos.cred
-          subPath: eos.cred
-        - name: swan-secrets
           mountPath: /srv/jupyterhub/private/hadoop.cred
           subPath: hadoop.cred
         - name: swan-secrets
           mountPath: /srv/jupyterhub/private/sparkk8s.cred
           subPath: sparkk8s.cred
-        - name: swan-cull-scripts
-          mountPath: /srv/jupyterhub/culler/check_ticket.sh
-          subPath: cull_check_ticket.sh
-        - name: swan-cull-scripts
-          mountPath: /srv/jupyterhub/culler/delete_ticket.sh
-          subPath: cull_delete_ticket.sh
-        - name: swan-tokens-scripts
-          mountPath: /srv/jupyterhub/private/eos_token.sh
-          subPath: eos_token.sh
         - name: swan-tokens-scripts
           mountPath: /srv/jupyterhub/private/webhdfs_token.sh
           subPath: webhdfs_token.sh
@@ -126,23 +114,12 @@ swan:
               path: swan_config_cern.py
             - key: swan_spark_config.py
               path: swan_spark_config.py
-        - name: swan-cull-scripts
-          configMap:
-            name: swan-scripts-cern
-            items:
-            - key: cull_check_ticket.sh
-              path: cull_check_ticket.sh
-            - key: cull_delete_ticket.sh
-              path: cull_delete_ticket.sh
-            defaultMode: 356 # 0544 perm
         - name: swan-tokens-scripts
           configMap:
             name: swan-scripts-env-prod
             items:
             - key: webhdfs_token.sh
               path: webhdfs_token.sh
-            - key: eos_token.sh
-              path: eos_token.sh
             - key: sparkk8s_token.sh
               path: sparkk8s_token.sh
             defaultMode: 356 # 0544 perm
@@ -150,8 +127,6 @@ swan:
           secret:
             secretName: swan-cern
             items:
-            - key: eos.cred
-              path: eos.cred
             - key: hadoop.cred
               path: hadoop.cred
             - key: sparkk8s.cred
@@ -208,8 +183,6 @@ swan:
       cull:
         # 6 hours
         timeout: 21600
-        checkEosAuth: true
-        hooksDir: /srv/jupyterhub/culler
       cvmfs:
         deployDaemonSet: *cvmfsDeployDS
         deployCsiDriver: *cvmfsDeployCSI
@@ -266,8 +239,6 @@ swan:
         configurationPath: /cvmfs/sft.cern.ch/lcg/etc/hadoop-confext
 swanCern:
   secrets:
-    eos:
-      cred:
     hadoop:
       cred:
     sparkk8s:

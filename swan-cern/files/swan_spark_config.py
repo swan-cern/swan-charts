@@ -98,14 +98,10 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
 
     def _init_spark_containers(self, hadoop_secret_name):
         """
-        Define cern related secrets for spark and eos
+        Define cern related secrets for spark
         """
         notebook_container = self._get_pod_container('notebook')
-        side_container = self._get_pod_container('side-container')
-        username = self.spawner.user.name
 
-        pod_spec_containers = []
-        side_container_volume_mounts = []
 
         if hadoop_secret_name:
             # pod volume to mount generated hadoop tokens and
@@ -119,10 +115,10 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
                     )
                 )
             )
-            side_container.volume_mounts.append(
+            notebook_container.volume_mounts.append(
                 client.V1VolumeMount(
                     name=hadoop_secret_name,
-                    mount_path='/srv/side-container/hadoop'
+                    mount_path='/srv/notebook/hadoop'
                 )
             )
 
@@ -145,7 +141,7 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
                 notebook_container.env,
                 client.V1EnvVar(
                     name='KUBECONFIG',
-                    value='/srv/notebook/tokens/k8s-user.config'
+                    value='/srv/notebook/hadoop/k8s-user.config'
                 ),
             )
             notebook_container.env = self._add_or_replace_by_name(
