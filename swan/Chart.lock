@@ -10,9 +10,9 @@ dependencies:
   version: 0.3.1
 - name: cvmfs
   repository: https://registry.cern.ch/chartrepo/sciencebox
-  version: 0.0.4
+  version: 0.0.5
 - name: cvmfs-csi
   repository: http://registry.cern.ch/chartrepo/cern
   version: 0.1.0
-digest: sha256:b8c51c9df17635614483cc7a57c5b4936ff18cf2f3b830e6f8555cec7c1eff68
-generated: "2022-01-07T10:40:34.001728425+01:00"
+digest: sha256:c7dc7437e90f98b5b0a60b46fd09d682ea03c0e51f94e4f71aa25bb470463a89
+generated: "2022-02-17T18:42:17.463481918+01:00"

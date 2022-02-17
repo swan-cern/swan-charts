@@ -29,6 +29,13 @@ cvmfs:
     - sft-nightlies.cern.ch
   mountOptions:
     hostMountpoint: /var/cvmfs
+  # Prefetcher is provided only by the daemonSet
+  prefetcher:
+    enabled: true
+    jobs:
+      cron_opennotebook_python3_ipy:
+        command: "source /cvmfs/sft.cern.ch/lcg/views/LCG_101swan/x86_64-centos7-gcc8-opt/setup.sh && ( timeout 20s python -m ipykernel > /dev/null 2>&1 || true )"
+        minute: '*/15'
 
 #
 # EOS access
@@ -219,11 +226,6 @@ jupyterhub:
       users: true
       checkEosAuth: false
     cvmfs:
-      prefetcher:
-        enabled: false
-        image:
-          name: "gitlab-registry.cern.ch/swan/docker-images/cvmfs-prefetcher"
-          tag: "v1.1"
       deployDaemonSet: *cvmfsDeployDS
       deployCsiDriver: *cvmfsDeployCSI
       useCsiDriver: *cvmfsUseCSI
