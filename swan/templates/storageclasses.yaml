@@ -1,5 +1,5 @@
-{{ if or .Values.jupyterhub.custom.cvmfs.deployCsiDriver .Values.jupyterhub.custom.cvmfs.useCsiDriver }}
-{{- range .Values.jupyterhub.custom.cvmfs.repositories }}
+{{ if or .Values.binderhub.jupyterhub.custom.cvmfs.deployCsiDriver .Values.binderhub.jupyterhub.custom.cvmfs.useCsiDriver }}
+{{- range .Values.binderhub.jupyterhub.custom.cvmfs.repositories }}
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
