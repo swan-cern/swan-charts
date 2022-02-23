@@ -53,6 +53,13 @@ fusex:
   fusex:
     hostMountpoint: /var/eos
 
+# Ensure file versions are shown to allow notebook checkpoints
+# (the fusex chart already sets this as default)
+eosxd:
+  fuseconf:
+    options:
+      hide-versions: 0
+
 #
 # JupyerHub
 #
