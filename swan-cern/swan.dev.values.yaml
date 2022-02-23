@@ -1,126 +1,127 @@
 swan:
-  jupyterhub:
-    hub:
-      image:
-        name: "gitlab-registry.cern.ch/swan/docker-images/jupyterhub"
-        tag: "v1.13"
-      config:
-        KeyCloakAuthenticator:
-          allowed_roles:
-            - swan-admins
-            - swan-qa
-            - swan-devs
-      extraVolumes:
-        - name: swan-jh
-          configMap:
-            name: swan-scripts
-            items:
-            - key: jupyterhub_form.html
-              path: jupyterhub_form.html
-            - key: swan_config.py
-              path: swan_config.py
-        - name: swan-jh-cern
-          configMap:
-            name: swan-scripts-cern
-            items:
-            - key: options_form_config.json
-              path: options_form_config.json
-            - key: swan_config_cern.py
-              path: swan_config_cern.py
-            - key: swan_spark_config.py
-              path: swan_spark_config.py
-        - name: swan-cull-scripts
-          configMap:
-            name: swan-scripts-cern
-            items:
-            - key: cull_check_ticket.sh
-              path: cull_check_ticket.sh
-            - key: cull_delete_ticket.sh
-              path: cull_delete_ticket.sh
-            defaultMode: 356 # 0544 perm
-        - name: swan-tokens-scripts
-          configMap:
-            name: swan-scripts-env-dev
-            items:
-            - key: webhdfs_token.sh
-              path: webhdfs_token.sh
-            - key: eos_token.sh
-              path: eos_token.sh
-            - key: sparkk8s_token.sh
-              path: sparkk8s_token.sh
-            defaultMode: 356 # 0544 perm
-        - name: swan-secrets
-          secret:
-            secretName: swan-cern
-            items:
-            - key: eos.cred
-              path: eos.cred
-            - key: hadoop.cred
-              path: hadoop.cred
-            - key: sparkk8s.cred
-              path: sparkk8s.cred
-        - name: cvmfs
-          hostPath: 
-            path: /var/cvmfs
-            type: Directory
-      db:
-        type: sqlite-memory
-    custom:
-      cvmfs:
-        deployDaemonSet: true
-        deployCsiDriver: false
-        useCsiDriver: false
-        repositories:
-          - mount: cvmfs-config.cern.ch
-          - mount: sft.cern.ch
-            proxy: 'http://ca-proxy-sft.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: sft-nightlies.cern.ch
-            proxy: 'http://ca-proxy-sft.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: alice.cern.ch
-            proxy: 'http://ca-proxy-alice.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: alice-ocdb.cern.ch
-            proxy: 'http://ca-proxy-alice.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: alice-nightlies.cern.ch
-            proxy: 'http://ca-proxy-alice.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: alpha.cern.ch
-          - mount: ams.cern.ch
-          - mount: atlas.cern.ch
-            proxy: 'http://ca-proxy-atlas.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: atlas-condb.cern.ch
-            proxy: 'http://ca-proxy-atlas.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: atlas-nightlies.cern.ch
-            proxy: 'http://ca-proxy-atlas.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: clicbp.cern.ch
-          - mount: cms.cern.ch
-            proxy: 'http://cmsmeyproxy.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: cms-ib.cern.ch
-            proxy: 'http://cmsmeyproxy.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: cms-bril.cern.ch
-            proxy: 'http://cmsmeyproxy.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: compass.cern.ch
-            proxy: 'http://ca-proxy-compass.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: compass-condb.cern.ch
-            proxy: 'http://ca-proxy-compass.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: fcc.cern.ch
-          - mount: ganga.cern.ch
-          - mount: geant4.cern.ch
-          - mount: lhcb.cern.ch
-            proxy: 'http://ca-proxy-lhcb.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: lhcb-condb.cern.ch
-            proxy: 'http://ca-proxy-lhcb.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: lhcbdev.cern.ch
-            proxy: 'http://ca-proxy-lhcb.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: na61.cern.ch
-          - mount: na62.cern.ch
-          - mount: projects.cern.ch
-          - mount: sw.hsf.org
-      eos:
-        deployDaemonSet: false
-        deployCsiDriver: true
-        useCsiDriver: true
-    prePuller:
-      hook:
-        enabled: false
+  binderhub:
+    jupyterhub:
+      hub:
+        image:
+          name: "gitlab-registry.cern.ch/swan/docker-images/jupyterhub"
+          tag: "v1.13"
+        config:
+          KeyCloakAuthenticator:
+            allowed_roles:
+              - swan-admins
+              - swan-qa
+              - swan-devs
+        extraVolumes:
+          - name: swan-jh
+            configMap:
+              name: swan-scripts
+              items:
+              - key: jupyterhub_form.html
+                path: jupyterhub_form.html
+              - key: swan_config.py
+                path: swan_config.py
+          - name: swan-jh-cern
+            configMap:
+              name: swan-scripts-cern
+              items:
+              - key: options_form_config.json
+                path: options_form_config.json
+              - key: swan_config_cern.py
+                path: swan_config_cern.py
+              - key: swan_spark_config.py
+                path: swan_spark_config.py
+          - name: swan-cull-scripts
+            configMap:
+              name: swan-scripts-cern
+              items:
+              - key: cull_check_ticket.sh
+                path: cull_check_ticket.sh
+              - key: cull_delete_ticket.sh
+                path: cull_delete_ticket.sh
+              defaultMode: 356 # 0544 perm
+          - name: swan-tokens-scripts
+            configMap:
+              name: swan-scripts-env-dev
+              items:
+              - key: webhdfs_token.sh
+                path: webhdfs_token.sh
+              - key: eos_token.sh
+                path: eos_token.sh
+              - key: sparkk8s_token.sh
+                path: sparkk8s_token.sh
+              defaultMode: 356 # 0544 perm
+          - name: swan-secrets
+            secret:
+              secretName: swan-cern
+              items:
+              - key: eos.cred
+                path: eos.cred
+              - key: hadoop.cred
+                path: hadoop.cred
+              - key: sparkk8s.cred
+                path: sparkk8s.cred
+          - name: cvmfs
+            hostPath: 
+              path: /var/cvmfs
+              type: Directory
+        db:
+          type: sqlite-memory
+      custom:
+        cvmfs:
+          deployDaemonSet: true
+          deployCsiDriver: false
+          useCsiDriver: false
+          repositories:
+            - mount: cvmfs-config.cern.ch
+            - mount: sft.cern.ch
+              proxy: 'http://ca-proxy-sft.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+            - mount: sft-nightlies.cern.ch
+              proxy: 'http://ca-proxy-sft.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+            - mount: alice.cern.ch
+              proxy: 'http://ca-proxy-alice.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+            - mount: alice-ocdb.cern.ch
+              proxy: 'http://ca-proxy-alice.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+            - mount: alice-nightlies.cern.ch
+              proxy: 'http://ca-proxy-alice.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+            - mount: alpha.cern.ch
+            - mount: ams.cern.ch
+            - mount: atlas.cern.ch
+              proxy: 'http://ca-proxy-atlas.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+            - mount: atlas-condb.cern.ch
+              proxy: 'http://ca-proxy-atlas.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+            - mount: atlas-nightlies.cern.ch
+              proxy: 'http://ca-proxy-atlas.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+            - mount: clicbp.cern.ch
+            - mount: cms.cern.ch
+              proxy: 'http://cmsmeyproxy.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+            - mount: cms-ib.cern.ch
+              proxy: 'http://cmsmeyproxy.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+            - mount: cms-bril.cern.ch
+              proxy: 'http://cmsmeyproxy.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+            - mount: compass.cern.ch
+              proxy: 'http://ca-proxy-compass.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+            - mount: compass-condb.cern.ch
+              proxy: 'http://ca-proxy-compass.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+            - mount: fcc.cern.ch
+            - mount: ganga.cern.ch
+            - mount: geant4.cern.ch
+            - mount: lhcb.cern.ch
+              proxy: 'http://ca-proxy-lhcb.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+            - mount: lhcb-condb.cern.ch
+              proxy: 'http://ca-proxy-lhcb.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+            - mount: lhcbdev.cern.ch
+              proxy: 'http://ca-proxy-lhcb.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+            - mount: na61.cern.ch
+            - mount: na62.cern.ch
+            - mount: projects.cern.ch
+            - mount: sw.hsf.org
+        eos:
+          deployDaemonSet: false
+          deployCsiDriver: true
+          useCsiDriver: true
+      prePuller:
+        hook:
+          enabled: false
 hadoopTokenGenerator:
   extraVolumes:
     - name: swan-tokens-scripts
