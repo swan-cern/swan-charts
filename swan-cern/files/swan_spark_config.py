@@ -14,6 +14,11 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
 
     def get_swan_user_pod(self):
 
+
+        if 'binder_ref_url' in self.spawner.user_options.keys():
+            # we don't need any customization if running within binder
+            return self.pod
+
         super().get_swan_user_pod()
 
         # get hadoop token

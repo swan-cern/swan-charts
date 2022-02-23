@@ -18,6 +18,11 @@ class SwanPodHookHandler:
 
     def get_swan_user_pod(self):
 
+        if 'binder_ref_url' in self.spawner.user_options.keys():
+            # we don't need any customization if running within binder
+            return self.pod
+
+
         # pod labels
         pod_labels = dict(
             lcg_release = self.spawner.user_options[self.spawner.lcg_rel_field].split('/')[0],
