@@ -13,6 +13,7 @@ Class handling KubeSpawner.modify_pod_hook(spawner,pod) call
 class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
 
     def get_swan_user_pod(self):
+
         super().get_swan_user_pod()
 
         # get hadoop token
@@ -170,8 +171,6 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
         """
 
         user_roles = self.spawner.user_roles
-        print(self.spawner.user_options)
-        print(self.spawner.user_roles)
         cluster = self.spawner.user_options[self.spawner.spark_cluster_field]
 
         if cluster == "analytix" and "analytix" not in user_roles:
@@ -337,7 +336,7 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
 def spark_modify_pod_hook(spawner, pod):
     """
     :param spawner: Swan Kubernetes Spawner
-    :type spawner: swanspawner.SwanKubeSpawner
+    :type spawner: swanspawner.SwanSpawner
     :param pod: default pod definition set by jupyterhub
     :type pod: client.V1Pod
 
@@ -362,5 +361,5 @@ def spark_cleanup_services(spawner):
         swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
         spawner.api.delete_namespaced_service(spark_ports_service, swan_container_namespace)
 
-c.SwanKubeSpawner.modify_pod_hook = spark_modify_pod_hook
-c.SwanKubeSpawner.post_stop_hook = spark_cleanup_services
+c.SwanSpawner.modify_pod_hook = spark_modify_pod_hook
+c.SwanSpawner.post_stop_hook = spark_cleanup_services
