@@ -54,120 +54,121 @@ swan:
         home-i04: c f i p q u
       web: {}
       workspace: {}
-  jupyterhub:
+  binderhub:
+    jupyterhub:
     singleuser:
       memory:
         guarantee: 4G
       cpu:
         guarantee: 1
-    hub:
-      extraVolumeMounts:
-        - name: swan-jh-cern
-          mountPath: /srv/jupyterhub/options_form_config.json
-          subPath: options_form_config.json
-        - name: swan-jh
-          mountPath: /srv/jupyterhub/jupyterhub_form.html
-          subPath: jupyterhub_form.html
-        - name: swan-jh
-          mountPath: /usr/local/etc/jupyterhub/jupyterhub_config.d/1_swan_config.py
-          subPath: swan_config.py
-        - name: swan-jh-cern
-          mountPath: /usr/local/etc/jupyterhub/jupyterhub_config.d/2_swan_config_cern.py
-          subPath: swan_config_cern.py
-        - name: swan-jh-cern
-          mountPath: /usr/local/etc/jupyterhub/jupyterhub_config.d/3_swan_spark_config.py
-          subPath: swan_spark_config.py
-        - name: swan-secrets
-          mountPath: /srv/jupyterhub/private/eos.cred
-          subPath: eos.cred
-        - name: swan-secrets
-          mountPath: /srv/jupyterhub/private/hadoop.cred
-          subPath: hadoop.cred
-        - name: swan-secrets
-          mountPath: /srv/jupyterhub/private/sparkk8s.cred
-          subPath: sparkk8s.cred
-        - name: swan-cull-scripts
-          mountPath: /srv/jupyterhub/culler/check_ticket.sh
-          subPath: cull_check_ticket.sh
-        - name: swan-cull-scripts
-          mountPath: /srv/jupyterhub/culler/delete_ticket.sh
-          subPath: cull_delete_ticket.sh
-        - name: swan-tokens-scripts
-          mountPath: /srv/jupyterhub/private/eos_token.sh
-          subPath: eos_token.sh
-        - name: swan-tokens-scripts
-          mountPath: /srv/jupyterhub/private/webhdfs_token.sh
-          subPath: webhdfs_token.sh
-        - name: swan-tokens-scripts
-          mountPath: /srv/jupyterhub/private/sparkk8s_token.sh
-          subPath: sparkk8s_token.sh
-        - name: cvmfs
-          mountPath: /cvmfs
-      extraVolumes:
-        - name: cvmfs
-          hostPath:
-            path: /var/cvmfs
-            type: Directory
-        - name: swan-jh
-          configMap:
-            name: swan-scripts
-            items:
-            - key: jupyterhub_form.html
-              path: jupyterhub_form.html
-            - key: swan_config.py
-              path: swan_config.py
-        - name: swan-jh-cern
-          configMap:
-            name: swan-scripts-cern
-            items:
-            - key: options_form_config.json
-              path: options_form_config.json
-            - key: swan_config_cern.py
-              path: swan_config_cern.py
-            - key: swan_spark_config.py
-              path: swan_spark_config.py
-        - name: swan-cull-scripts
-          configMap:
-            name: swan-scripts-cern
-            items:
-            - key: cull_check_ticket.sh
-              path: cull_check_ticket.sh
-            - key: cull_delete_ticket.sh
-              path: cull_delete_ticket.sh
-            defaultMode: 356 # 0544 perm
-        - name: swan-tokens-scripts
-          configMap:
-            name: swan-scripts-env-prod
-            items:
-            - key: webhdfs_token.sh
-              path: webhdfs_token.sh
-            - key: eos_token.sh
-              path: eos_token.sh
-            - key: sparkk8s_token.sh
-              path: sparkk8s_token.sh
-            defaultMode: 356 # 0544 perm
-        - name: swan-secrets
-          secret:
-            secretName: swan-cern
-            items:
-            - key: eos.cred
-              path: eos.cred
-            - key: hadoop.cred
-              path: hadoop.cred
-            - key: sparkk8s.cred
-              path: sparkk8s.cred
-      config:
-        KeyCloakAuthenticator:
-          oidc_issuer: https://auth.cern.ch/auth/realms/cern
-          exchange_tokens:
-            - eos-service
-            - cernbox-service
-          logout_redirect_url: https://cern.ch/swan
-          auto_login: True
-          username_key: preferred_username
-          client_id: # placeholder, check secrets
-          client_secret: # placeholder, check secrets
-          oauth_callback_url: # placeholder, check secrets
+      hub:
+        extraVolumeMounts:
+          - name: swan-jh-cern
+            mountPath: /srv/jupyterhub/options_form_config.json
+            subPath: options_form_config.json
+          - name: swan-jh
+            mountPath: /srv/jupyterhub/jupyterhub_form.html
+            subPath: jupyterhub_form.html
+          - name: swan-jh
+            mountPath: /usr/local/etc/jupyterhub/jupyterhub_config.d/1_swan_config.py
+            subPath: swan_config.py
+          - name: swan-jh-cern
+            mountPath: /usr/local/etc/jupyterhub/jupyterhub_config.d/2_swan_config_cern.py
+            subPath: swan_config_cern.py
+          - name: swan-jh-cern
+            mountPath: /usr/local/etc/jupyterhub/jupyterhub_config.d/3_swan_spark_config.py
+            subPath: swan_spark_config.py
+          - name: swan-secrets
+            mountPath: /srv/jupyterhub/private/eos.cred
+            subPath: eos.cred
+          - name: swan-secrets
+            mountPath: /srv/jupyterhub/private/hadoop.cred
+            subPath: hadoop.cred
+          - name: swan-secrets
+            mountPath: /srv/jupyterhub/private/sparkk8s.cred
+            subPath: sparkk8s.cred
+          - name: swan-cull-scripts
+            mountPath: /srv/jupyterhub/culler/check_ticket.sh
+            subPath: cull_check_ticket.sh
+          - name: swan-cull-scripts
+            mountPath: /srv/jupyterhub/culler/delete_ticket.sh
+            subPath: cull_delete_ticket.sh
+          - name: swan-tokens-scripts
+            mountPath: /srv/jupyterhub/private/eos_token.sh
+            subPath: eos_token.sh
+          - name: swan-tokens-scripts
+            mountPath: /srv/jupyterhub/private/webhdfs_token.sh
+            subPath: webhdfs_token.sh
+          - name: swan-tokens-scripts
+            mountPath: /srv/jupyterhub/private/sparkk8s_token.sh
+            subPath: sparkk8s_token.sh
+          - name: cvmfs
+            mountPath: /cvmfs
+        extraVolumes:
+          - name: cvmfs
+            hostPath:
+              path: /var/cvmfs
+              type: Directory
+          - name: swan-jh
+            configMap:
+              name: swan-scripts
+              items:
+              - key: jupyterhub_form.html
+                path: jupyterhub_form.html
+              - key: swan_config.py
+                path: swan_config.py
+          - name: swan-jh-cern
+            configMap:
+              name: swan-scripts-cern
+              items:
+              - key: options_form_config.json
+                path: options_form_config.json
+              - key: swan_config_cern.py
+                path: swan_config_cern.py
+              - key: swan_spark_config.py
+                path: swan_spark_config.py
+          - name: swan-cull-scripts
+            configMap:
+              name: swan-scripts-cern
+              items:
+              - key: cull_check_ticket.sh
+                path: cull_check_ticket.sh
+              - key: cull_delete_ticket.sh
+                path: cull_delete_ticket.sh
+              defaultMode: 356 # 0544 perm
+          - name: swan-tokens-scripts
+            configMap:
+              name: swan-scripts-env-prod
+              items:
+              - key: webhdfs_token.sh
+                path: webhdfs_token.sh
+              - key: eos_token.sh
+                path: eos_token.sh
+              - key: sparkk8s_token.sh
+                path: sparkk8s_token.sh
+              defaultMode: 356 # 0544 perm
+          - name: swan-secrets
+            secret:
+              secretName: swan-cern
+              items:
+              - key: eos.cred
+                path: eos.cred
+              - key: hadoop.cred
+                path: hadoop.cred
+              - key: sparkk8s.cred
+                path: sparkk8s.cred
+        config:
+          KeyCloakAuthenticator:
+            oidc_issuer: https://auth.cern.ch/auth/realms/cern
+            exchange_tokens:
+              - eos-service
+              - cernbox-service
+            logout_redirect_url: https://cern.ch/swan
+            auto_login: True
+            username_key: preferred_username
+            client_id: # placeholder, check secrets
+            client_secret: # placeholder, check secrets
+            oauth_callback_url: # placeholder, check secrets
 
           # skip refreshing tokens if already refreshed in last 15 minutes
           # this assumes tokens provided by keycloak are valid for 20 minutes
@@ -176,24 +177,28 @@ swan:
           environment: 
             # Enable HTCondor service configuration for CERN the in user image
             CERN_HTCONDOR: "true"
-        JupyterHub:
-          allow_named_servers: False
-      extraConfig:
-        00-authConf: |
-          def pre_spawn_hook(authenticator, spawner, auth_state):
-            spawner.environment['ACCESS_TOKEN'] = auth_state['exchanged_tokens']['eos-service']
-            spawner.environment['OAUTH_INSPECTION_ENDPOINT'] = authenticator.userdata_url.replace('https://', '')
-            spawner.user_uid = str(str(auth_state['oauth_user']['cern_uid'])) # k8s only supports values as strings!
-            decoded_token = authenticator._decode_token(auth_state['access_token'])
-            spawner.user_roles = authenticator.claim_roles_key(authenticator, decoded_token)
-          c.KeyCloakAuthenticator.pre_spawn_hook = pre_spawn_hook
-        02-spawnError: |
-          SPAWN_ERROR_MESSAGE = """SWAN could not start a session for your user, please try again. If the problem persists, please check:
-          <ul>
-              <li>Do you have a CERNBox account? If not, click <a href="https://cernbox.cern.ch" target="_blank">here</a>.</li>
-              <li>Is there a problem with the service? Find information <a href="https://cern.service-now.com/service-portal?id=service_status_board" target="_blank">here</a>.</li>
-              <li>If none of the options apply, please open a <a href="https://cern.service-now.com/service-portal?id=functional_element&name=swan" target="_blank">Support Ticket</a>.</li>
-          </ul>"""
+          JupyterHub:
+            allow_named_servers: False
+        extraConfig:
+          00-authConf: |
+            def pre_spawn_hook(authenticator, spawner, auth_state):
+              try:
+                spawner.environment['ACCESS_TOKEN'] = auth_state['exchanged_tokens']['eos-service']
+                spawner.environment['OAUTH_INSPECTION_ENDPOINT'] = authenticator.userdata_url.replace('https://', '')
+                spawner.user_uid = str(str(auth_state['oauth_user']['cern_uid'])) # k8s only supports values as strings!
+                decoded_token = authenticator._decode_token(auth_state['access_token'])
+                spawner.user_roles = authenticator.claim_roles_key(authenticator, decoded_token)
+              except:
+                pass
+            c.KeyCloakAuthenticator.pre_spawn_hook = pre_spawn_hook
+          01-hook-swancern: |
+          02-spawnError: |
+            SPAWN_ERROR_MESSAGE = """SWAN could not start a session for your user, please try again. If the problem persists, please check:
+            <ul>
+                <li>Do you have a CERNBox account? If not, click <a href="https://cernbox.cern.ch" target="_blank">here</a>.</li>
+                <li>Is there a problem with the service? Find information <a href="https://cern.service-now.com/service-portal?id=service_status_board" target="_blank">here</a>.</li>
+                <li>If none of the options apply, please open a <a href="https://cern.service-now.com/service-portal?id=functional_element&name=swan" target="_blank">Support Ticket</a>.</li>
+            </ul>"""
 
           # SWAN@CERN error message
           c.SpawnHandlersConfigs.spawn_error_message = SPAWN_ERROR_MESSAGE
