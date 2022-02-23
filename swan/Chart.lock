@@ -1,7 +1,7 @@
 dependencies:
-- name: jupyterhub
+- name: binderhub
   repository: https://jupyterhub.github.io/helm-chart/
-  version: 1.2.0
+  version: 0.2.0-n870.h3d61c7a
 - name: fusex
   repository: https://registry.cern.ch/chartrepo/eos
   version: 0.1.0
@@ -14,5 +14,5 @@ dependencies:
 - name: cvmfs-csi
   repository: http://registry.cern.ch/chartrepo/cern
   version: 0.1.0
-digest: sha256:b8c51c9df17635614483cc7a57c5b4936ff18cf2f3b830e6f8555cec7c1eff68
-generated: "2022-01-07T10:40:34.001728425+01:00"
+digest: sha256:c1e7999ab64e5eb9883f8be0139fa87c5d537fe1b21d5390a97389dec9009b71
+generated: "2022-02-22T16:23:55.902578832+01:00"
