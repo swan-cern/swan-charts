@@ -233,11 +233,6 @@ jupyterhub:
       users: true
       checkEosAuth: false
     cvmfs:
-      prefetcher:
-        enabled: false
-        image:
-          name: "gitlab-registry.cern.ch/swan/docker-images/cvmfs-prefetcher"
-          tag: "v1.1"
       deployDaemonSet: *cvmfsDeployDS
       deployCsiDriver: *cvmfsDeployCSI
       useCsiDriver: *cvmfsUseCSI
