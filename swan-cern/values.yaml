@@ -116,6 +116,11 @@ swan:
           client_id: # placeholder, check secrets
           client_secret: # placeholder, check secrets
           oauth_callback_url: # placeholder, check secrets
+          
+          # skip refreshing tokens if already refreshed in last 15 minutes 
+          # this assumes tokens provided by keycloak are valid for 20 minutes
+          auth_refresh_age: 900 
+          
         JupyterHub:
           allow_named_servers: False
       extraConfig:
