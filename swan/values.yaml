@@ -51,6 +51,12 @@ cvmfs:
       cron_opennotebook_python3nx_spark:
         command: "source /cvmfs/sft.cern.ch/lcg/views/LCG_100_nxcals/x86_64-centos7-gcc9-opt/setup.sh && ( timeout 20s python -c 'import pyspark' > /dev/null 2>&1 || true )"
         minute: '*/15'
+      cron_opennotebook_cuda_tensorflow:
+        command: "(lsmod | grep nvidia) && source /cvmfs/sft.cern.ch/lcg/views/LCG_101cuda/x86_64-centos7-gcc8-opt/setup.sh && ( timeout 60s python -c 'import tensorflow' > /dev/null 2>&1 || true )"
+        minute: '5,20,35,50'
+      cron_opennoteook_cuda_torch:
+        command: "(lsmod | grep nvidia) && source /cvmfs/sft.cern.ch/lcg/views/LCG_101cuda/x86_64-centos7-gcc8-opt/setup.sh && ( timeout 60s python -c 'import torch' > /dev/null 2>&1 || true )"
+        minute: '10,25,40,55'
 
 #
 # EOS access
