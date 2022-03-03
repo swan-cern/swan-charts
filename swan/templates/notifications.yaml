@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notifications
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: notifications
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notifications
+  template:
+    metadata:
+      labels:
+        app: notifications
+        hub.jupyter.org/network-access-hub: "true"
+    spec:
+      serviceAccountName: notifications-sa
+      containers:
+      - name: notifications
+        env:
+        - name: JUPYTERHUB_SERVICE_PREFIX
+          value: "/services/notifications/"
+        - name: JUPYTERHUB_CLIENT_ID
+          value: service-notifications
+        - name: JUPYTERHUB_API_URL
+          value: http://hub:8081/hub/api
+        - name: JUPYTERHUB_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: hub
+              key: hub.services.notifications.apiToken
+
+        livenessProbe:
+          exec:
+            command:
+            - ls
+            - /root
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+        image: gitlab-registry.cern.ch/swan/docker-images/jupyterhub/notifications:v0.1.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8888
+          name: http
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 1000m
+            memory: 1024Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+        volumeMounts:
+          - name: notifications
+            mountPath: "/srv/jupyterhub"
+      volumes:
+        - name: notifications
+          configMap:
+            name: notifications
+            items:
+              - key: "notifications.json"
+                path: "notifications.json"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notifications
+  namespace: {{ .Release.Namespace }}
+data:
+{{ (.Files.Glob "files/notifications.json").AsConfig | indent 2 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notifications
+spec:
+  selector:
+    app: notifications
+  ports:
+    - protocol: TCP
+      port: 8888

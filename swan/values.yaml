@@ -193,6 +193,10 @@ jupyterhub:
         def pre_spawn_hook(authenticator, spawner, auth_state):
           raise Exception("Please configure pre_spawn_hook")
         c.KeyCloakAuthenticator.pre_spawn_hook = pre_spawn_hook
+    services:
+      notifications:
+        url: http://notifications:8888/
+        oauth_no_confirm: true
     networkPolicy:
       enabled: false
     # placeholder for hub cookieSecret
