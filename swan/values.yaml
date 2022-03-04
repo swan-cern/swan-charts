@@ -33,30 +33,9 @@ cvmfs:
   prefetcher:
     enabled: true
     jobs:
-      cron_opennotebook_python2_ipy:
-        command: "source /cvmfs/sft.cern.ch/lcg/views/LCG_99python2/x86_64-centos7-gcc8-opt/setup.sh && ( timeout 20s python -m ipykernel > /dev/null 2>&1 || true )"
-        minute: '*/15'
-      cron_opennotebook_python2_root:
-        command: "source /cvmfs/sft.cern.ch/lcg/views/LCG_99python2/x86_64-centos7-gcc8-opt/setup.sh && ( timeout 20s python -m JupyROOT.kernel.rootkernel > /dev/null 2>&1 || true )"
-        minute: '*/15'
       cron_opennotebook_python3_ipy:
         command: "source /cvmfs/sft.cern.ch/lcg/views/LCG_101swan/x86_64-centos7-gcc8-opt/setup.sh && ( timeout 20s python -m ipykernel > /dev/null 2>&1 || true )"
         minute: '*/15'
-      cron_opennotebook_python3_root:
-        command: "source /cvmfs/sft.cern.ch/lcg/views/LCG_101swan/x86_64-centos7-gcc8-opt/setup.sh && ( timeout 20s python -m JupyROOT.kernel.rootkernel > /dev/null 2>&1 || true )"
-        minute: '*/15'
-      cron_opennotebook_python3nx_ipy:
-        command: "source /cvmfs/sft.cern.ch/lcg/views/LCG_95apython3_nxcals/x86_64-centos7-gcc7-opt/setup.sh && ( timeout 20s python -m ipykernel > /dev/null 2>&1 || true )"
-        minute: '*/15'
-      cron_opennotebook_python3nx_spark:
-        command: "source /cvmfs/sft.cern.ch/lcg/views/LCG_100_nxcals/x86_64-centos7-gcc9-opt/setup.sh && ( timeout 20s python -c 'import pyspark' > /dev/null 2>&1 || true )"
-        minute: '*/15'
-      cron_opennotebook_cuda_tensorflow:
-        command: "(lsmod | grep nvidia) && source /cvmfs/sft.cern.ch/lcg/views/LCG_101cuda/x86_64-centos7-gcc8-opt/setup.sh && ( timeout 60s python -c 'import tensorflow' > /dev/null 2>&1 || true )"
-        minute: '5,20,35,50'
-      cron_opennoteook_cuda_torch:
-        command: "(lsmod | grep nvidia) && source /cvmfs/sft.cern.ch/lcg/views/LCG_101cuda/x86_64-centos7-gcc8-opt/setup.sh && ( timeout 60s python -c 'import torch' > /dev/null 2>&1 || true )"
-        minute: '10,25,40,55'
 
 #
 # EOS access
