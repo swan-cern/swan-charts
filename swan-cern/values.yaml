@@ -134,7 +134,7 @@ swan:
           exchange_tokens:
             - eos-service
             - cernbox-service
-          logout_redirect_uri: https://cern.ch/swan
+          logout_redirect_url: https://cern.ch/swan
           auto_login: True
           username_key: preferred_username
           client_id: # placeholder, check secrets
