@@ -260,13 +260,13 @@
         {
             "type": "selection",
             "lcg": {
-                "value": "dev3/latest",
+                "value": "devswan/latest",
                 "text": "Bleeding Edge"
             },
             "platforms": [
                 {
-                    "value": "x86_64-centos7-gcc8-opt",
-                    "text": "CentOS 7 (gcc8)"
+                    "value": "x86_64-centos7-gcc11-opt",
+                    "text": "CentOS 7 (gcc11)"
                 }
             ],
             "cores": [
@@ -312,8 +312,8 @@
             },
             "platforms": [
                 {
-                    "value": "x86_64-centos7-gcc9-opt",
-                    "text": "CentOS 7 (gcc9)"
+                    "value": "x86_64-centos7-gcc11-opt",
+                    "text": "CentOS 7 (gcc11)"
                 }
             ],
             "cores": [
