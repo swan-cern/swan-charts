@@ -4,7 +4,7 @@ metadata:
   name: swan-scripts-cern
   namespace: {{ .Release.Namespace }}
 data:
-{{ (.Files.Glob "files/options_form_config.json").AsConfig | indent 2 }}
+  options_form_config.json: {{ .Values.optionsform | toJson }}
 {{ (.Files.Glob "files/swan_config_cern.py").AsConfig | indent 2 }}
 {{ (.Files.Glob "files/swan_spark_config.py").AsConfig | indent 2 }}
 {{ (.Files.Glob "files/private/cull_check_ticket.sh").AsConfig | indent 2 }}

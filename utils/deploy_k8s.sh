@@ -1,14 +1,16 @@
 ROOT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.."; pwd;)
 
-echo "# USAGE: ${ROOT_DIR}/utils/deploy_k8s.sh --env <qa/prod> (--upgrade-db) (--no-clean-repo)"
+echo "# USAGE: ${ROOT_DIR}/utils/deploy_k8s.sh --env <qa/prod> (--options-form <path to releases json>) (--upgrade-db) (--no-clean-repo)"
 echo ""
 
 SWAN_ENV=""
 UPGRADE_DB="false"
 CLEAN_REPO=true
+OPTIONS_FORM="swan-cern/options_config_form.json"
 
 while [[ "$#" -gt 0 ]]; do case $1 in
   --env) SWAN_ENV="$2"; shift;;
+  --options-form) OPTIONS_FORM="$2"; shift;;
   --upgrade-db) UPGRADE_DB="true";;
   --no-clean-repo) CLEAN_REPO=false;;
   *) echo "Unknown parameter passed: $1"; exit 1;;
@@ -22,6 +24,11 @@ fi
 
 if [ "$CLEAN_REPO" = true -a -n "$(git status --porcelain)" ]; then
     echo "ERROR: Cannot proceed as repository has not commited changes"
+    exit 1
+fi
+
+if [ ! -f "$OPTIONS_FORM" ]; then
+    echo "ERROR: the path you provided for the configuration options form does not exist"
     exit 1
 fi
 
@@ -80,6 +87,7 @@ helm upgrade --install --namespace swan  \
 --set swanCern.secrets.hadoop.cred=$HADOOP_AUTH_KEYTAB_ENCODED \
 --set swanCern.secrets.eos.cred=$EOS_AUTH_KEYTAB_ENCODED \
 --set swanCern.secrets.sparkk8s.cred=$SPARKK8S_AUTH_TOKEN_ENCODED \
+--set-file optionsform=$OPTIONS_FORM \
 swan swan/swan-cern
 
 HELMRETURN=$?

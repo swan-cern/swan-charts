@@ -32,6 +32,11 @@ swan:
     deployCsiDriver: &eosDeployCSI true
     useCsiDriver: &eosUseCSI true
   jupyterhub:
+    singleuser:
+      memory:
+        guarantee: 4G
+      cpu:
+        guarantee: 1
     hub:
       extraVolumeMounts:
         - name: swan-jh-cern
