@@ -308,6 +308,45 @@
             "type": "selection",
             "lcg": {
                 "value": "devnxcals/latest",
+                "text": "NXCals Spark3 (QA)"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc9-opt",
+                    "text": "CentOS 7 (gcc9)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "4",
+                    "text": "4"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "10",
+                    "text": "10 GB"
+                },
+                {
+                    "value": "16",
+                    "text": "16 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "hadoop-nxcals",
+                    "text": "BE NXCALS (NXCals)"
+                },
+                {
+                    "value": "none",
+                    "text": "None"
+                }
+            ]
+        },
+        {
+            "type": "selection",
+            "lcg": {
+                "value": "devnxcals/latest",
                 "text": "NXCals Spark3 (dev snapshot)"
             },
             "platforms": [
