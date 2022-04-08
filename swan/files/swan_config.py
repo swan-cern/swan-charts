@@ -79,11 +79,10 @@ class SwanPodHookHandler:
         user_roles = self.spawner.user_roles
         lcg_rel = self.spawner.user_options[self.spawner.lcg_rel_field]
 
-        if "cu" in lcg_rel and "swan-gpu" not in user_roles:
-            raise ValueError("Access to GPUs is not granted; please contact swan-admins@cern.ch")
-        elif "cu" in lcg_rel:
+        if "cu" in lcg_rel:
             return True
-        return False
+        else:
+            return False
 
     def _init_pod_affinity(self, pod_labels):
         """

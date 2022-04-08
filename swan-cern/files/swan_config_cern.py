@@ -197,6 +197,24 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
         # assigning pod spec containers
         self.pod.spec.containers = pod_spec_containers
 
+    def _gpu_enabled(self):
+        """
+        Helper function to determine if gpu is allowed for given spawn
+        raise exception if user has not access to the gpu
+        return True if gpu is selected and user has access to gpu
+        return False if gpu is not selected
+        """
+
+        user_roles = self.spawner.user_roles
+        lcg_rel = self.spawner.user_options[self.spawner.lcg_rel_field]
+
+        if "cu" in lcg_rel and "swan-gpu" not in user_roles:
+            raise ValueError("""Access to GPUs is not granted;
+    please <a href="https://cern.service-now.com/service-portal?id=functional_element&name=swan" target="_blank">open a Support Ticket</a>""")
+        elif "cu" in lcg_rel:
+            return True
+        return False
+
 # https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html
 # This is defined in the configuration to allow overring iindependently 
 # of which config file is loaded first
