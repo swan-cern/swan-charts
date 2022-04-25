@@ -2,7 +2,7 @@ apiVersion: v2
 #
 name: swan
 type: application
-version: 0.1.6
+version: 0.2.0
 appVersion: 0.1.2 # Using swanhub version
 #
 description: A fully-fledged SWAN instance with jupyterhub, EOS, and CVMFS
@@ -10,7 +10,7 @@ icon: https://swan.docs.cern.ch/images/logos/logo_swan_letters.png
 #
 dependencies:
   - name: binderhub
-    version: 0.2.0-n870.h3d61c7a
+    version: 0.2.0-n905.h3d3e24e
     repository: https://jupyterhub.github.io/helm-chart/
 
   - name: fusex
