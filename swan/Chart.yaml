@@ -10,7 +10,7 @@ icon: https://swan.docs.cern.ch/images/logos/logo_swan_letters.png
 #
 dependencies:
   - name: binderhub
-    version: 0.2.0-n870.h3d61c7a
+    version: 0.2.0-n905.h3d3e24e
     repository: https://jupyterhub.github.io/helm-chart/
 
   - name: fusex

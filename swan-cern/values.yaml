@@ -192,6 +192,7 @@ swan:
                 pass
             c.KeyCloakAuthenticator.pre_spawn_hook = pre_spawn_hook
           01-hook-swancern: |
+
           02-spawnError: |
             SPAWN_ERROR_MESSAGE = """SWAN could not start a session for your user, please try again. If the problem persists, please check:
             <ul>
@@ -200,8 +201,8 @@ swan:
                 <li>If none of the options apply, please open a <a href="https://cern.service-now.com/service-portal?id=functional_element&name=swan" target="_blank">Support Ticket</a>.</li>
             </ul>"""
 
-          # SWAN@CERN error message
-          c.SpawnHandlersConfigs.spawn_error_message = SPAWN_ERROR_MESSAGE
+            # SWAN@CERN error message
+            c.SpawnHandlersConfigs.spawn_error_message = SPAWN_ERROR_MESSAGE
       db:
         type: postgres
         # placeholder for postgres connection url
