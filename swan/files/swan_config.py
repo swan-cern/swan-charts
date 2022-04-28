@@ -66,6 +66,9 @@ class SwanPodHookHandler:
                 ),
             )
 
+        # Disable adding environment variables from Kubernetes services in the same namespace
+        self.pod.spec.enable_service_links = False
+
         return self.pod
 
     def _gpu_enabled(self):
