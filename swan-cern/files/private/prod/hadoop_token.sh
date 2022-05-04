@@ -28,6 +28,6 @@ source "${HADOOP_CONF_HOME}/hadoop-swan-setconf.sh" "${CLUSTER}"
 
 kinit -V -kt /hadoop-token-generator/hadoop.cred hswan@CERN.CH -c "${KRB5CCNAME}"
 
-/usr/hdp/hadoop-fetchdt-0.2.0/hadoop-fetchdt -required hdfs,yarn -proxyuser "${USER}" -tokenfile "${TOKEN_FILE_PATH}"
+/usr/hdp/hadoop-fetchdt-0.2.0/hadoop-fetchdt -required hdfs,yarn -proxyuser "${USER}" -tokenfile "${TOKEN_FILE_PATH}" -awaitTokenSec 15
 
 kdestroy -c "${KRB5CCNAME}"
