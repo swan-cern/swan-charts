@@ -2,7 +2,7 @@ apiVersion: v2
 #
 name: swan
 type: application
-version: 0.1.9
+version: 0.1.10
 appVersion: 0.1.2 # Using swanhub version
 #
 description: A fully-fledged SWAN instance with jupyterhub, EOS, and CVMFS
@@ -18,7 +18,7 @@ dependencies:
     repository: https://registry.cern.ch/chartrepo/eos
     condition: eos.deployDaemonSet
   - name: eosxd
-    version: 0.3.1
+    version: 0.3.3
     repository: http://registry.cern.ch/chartrepo/cern
     condition: eos.deployCsiDriver
 

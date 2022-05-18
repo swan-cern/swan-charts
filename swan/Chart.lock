@@ -7,12 +7,12 @@ dependencies:
   version: 0.1.2
 - name: eosxd
   repository: http://registry.cern.ch/chartrepo/cern
-  version: 0.3.1
+  version: 0.3.3
 - name: cvmfs
   repository: https://registry.cern.ch/chartrepo/sciencebox
   version: 0.0.5
 - name: cvmfs-csi
   repository: http://registry.cern.ch/chartrepo/cern
   version: 0.1.0
-digest: sha256:f5ea77e62573808ee9bc442a08f8991a51f28cb17f1d6b2ce62f42c91342f868
-generated: "2022-04-06T21:30:18.325958511+02:00"
+digest: sha256:c986ea346e50cb9cabe648fa57613fa76f207afe065c7956599f6c4d7e49917f
+generated: "2022-05-18T14:02:02.9185092+02:00"
