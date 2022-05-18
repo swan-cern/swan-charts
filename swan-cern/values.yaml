@@ -333,22 +333,12 @@ fluentd:
       @type concat
       key log
 
-      # concat long json logs (e.g. swan env debug)
-      stream_identity_key container_id
-      multiline_end_regexp /\n$/
-      separator ""
-      timeout_label @swan.logs.multiline
-    </filter>
-    <filter {swan.logs}>
-      @type concat
-      key log
-
       # parse jupyterhub multiline debug log with indent
-      stream_identity_key container_id
-      multiline_start_regexp /^(\[.*\] pod jupyter-\w+ events before launch)/
-      continuous_line_regexp /^(\s)/
-      separator ""
+      stream_identity_key docker.container_id
+      multiline_start_regexp /^(\[.*\] pod \w+/jupyter-\w+ events before launch)/
+      continuous_line_regexp /^(\s).*\[/
       flush_interval 1
+      separator "\n"
       timeout_label @swan.logs.multiline
     </filter>
     <filter {swan.logs}>
@@ -357,10 +347,10 @@ fluentd:
 
       # parse python multiline error logs with indent
       # handle also timeout waiting for new log lines
-      stream_identity_key container_id
-      multiline_start_regexp /^(\[E.*\])/
+      stream_identity_key docker.container_id
+      multiline_start_regexp /^(\[.*\] E)/
       continuous_line_regexp /^(\s)/
-      separator ""
+      separator "\n"
       flush_interval 1
       timeout_label @swan.logs.multiline
     </filter>
