@@ -177,7 +177,7 @@
             "type": "selection",
             "lcg": {
                 "value": "LCG_100_nxcals",
-                "text": "NXCals Spark 3"
+                "text": "100 NXCALS PRO"
             },
             "platforms": [
                 {
@@ -307,8 +307,8 @@
         {
             "type": "selection",
             "lcg": {
-                "value": "devnxcals/latest",
-                "text": "NXCals Spark3 (QA)"
+                "value": "LCG_100_nxcals_testbed",
+                "text": "100 NXCALS TESTBED"
             },
             "platforms": [
                 {
@@ -347,7 +347,7 @@
             "type": "selection",
             "lcg": {
                 "value": "devnxcals/latest",
-                "text": "NXCals Spark3 (dev snapshot)"
+                "text": "Bleeding Edge NXCALS TESTBED"
             },
             "platforms": [
                 {
