@@ -3,7 +3,7 @@ swan:
     hub:
       image:
         name: "gitlab-registry.cern.ch/swan/docker-images/jupyterhub"
-        tag: "v1.13"
+        tag: "v1.22"
       config:
         KeyCloakAuthenticator:
           allowed_roles:
