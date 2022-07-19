@@ -347,7 +347,20 @@ def spark_modify_pod_hook(spawner, pod):
     spark_pod_hook_handler = SwanSparkPodHookHandler(spawner, pod)
     return spark_pod_hook_handler.get_swan_user_pod()
 
-# Get configuration parameters from environment variables
-# swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
+
+def spark_cleanup_services(spawner):
+    """
+    :param spawner: Swan Kubernetes Spawner
+    :type spawner: swanspawner.SwanKubeSpawner
+    
+    """
+    spark_cluster = spawner.user_options[spawner.spark_cluster_field]
+    if spark_cluster and spark_cluster != 'none':
+        username = spawner.user.name
+        spark_ports_service = f"spark-ports-{username}"
+        spawner.log.info('Deleting service %s', spark_ports_service)
+        swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
+        spawner.api.delete_namespaced_service(spark_ports_service, swan_container_namespace)
 
 c.SwanKubeSpawner.modify_pod_hook = spark_modify_pod_hook
+c.SwanKubeSpawner.post_stop_hook = spark_cleanup_services
