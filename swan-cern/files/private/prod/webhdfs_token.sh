@@ -8,6 +8,7 @@ elif [ "$1" == "hadoop-qa" ]; then HDFSNAMESPACE='hdpqa'
 else HDFSNAMESPACE=$1
 fi
 NAMENODES=$(xmllint --xpath '/configuration//property[name="dfs.ha.namenodes.'"$HDFSNAMESPACE"'"]/value/text()' /cvmfs/sft.cern.ch/lcg/etc/hadoop-confext/conf/etc/$1/hadoop.$1/hdfs-site.xml)
+echo "$NAMENODES"
 }
 
 CLUSTER=$1
