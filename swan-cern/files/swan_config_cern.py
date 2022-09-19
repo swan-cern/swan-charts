@@ -1,4 +1,4 @@
-import os, subprocess
+
 
 from kubernetes import client
 from kubernetes.client.rest import ApiException
@@ -190,6 +190,19 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
             )
         )
 
+        #the notebook container needs to run as root as it needs to 
+        #add an user and switch to that user
+        #it also need to set command and args to none in order to
+        #run the systemuser.sh script as defined in the image
+        #(we set jupyterhub-singleuser in the values as that is what 
+        #is needed for authenticated binder)
+
+        run_as_root=client.V1SecurityContext(run_as_user=0)
+
+        notebook_container.security_context=run_as_root
+        notebook_container.command=None
+        notebook_container.args=None
+
         # add the base containers after side container (to start after side container)
         existing_containers = self.pod.spec.containers
         pod_spec_containers.extend(existing_containers)
@@ -218,11 +231,11 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
 # https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html
 # This is defined in the configuration to allow overring iindependently 
 # of which config file is loaded first
-# c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook
+# c.SwanSpawner.modify_pod_hook = swan_pod_hook
 def swan_pod_hook_prod(spawner, pod):
     """
     :param spawner: Swan Kubernetes Spawner
-    :type spawner: swanspawner.SwanKubeSpawner
+    :type spawner: swanspawner.SwanSpawner
     :param pod: default pod definition set by jupyterhub
     :type pod: client.V1Pod
 
@@ -237,7 +250,4 @@ swan_cull_period = get_config('custom.cull.every', 600)
 # Get configuration parameters from environment variables
 swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
 
-c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook_prod
-
-# Required for swan systemuser.sh
-c.SwanKubeSpawner.cmd = None
+c.SwanSpawner.modify_pod_hook = swan_pod_hook_prod

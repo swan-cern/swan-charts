@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "jupyterhub.ingress.fullname" . }}
+  labels:
+    {{- include "jupyterhub.labels" . | nindent 4 }}
+  {{- with .Values.binderhub.jupyterhub.ingress.annotations }}
+  annotations:
+    {{- . | toYaml | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.binderhub.jupyterhub.ingress.ingressClassName }}
+  ingressClassName: "{{ . }}"
+  {{- end }}
+  rules:
+    {{- range $host := .Values.binderhub.jupyterhub.ingress.hosts | default (list "") }}
+    - http:
+        paths:
+          - path: {{ $.Values.binderhub.jupyterhub.hub.baseUrl | trimSuffix "/" }}/binder
+            pathType: {{ $.Values.binderhub.jupyterhub.ingress.pathType }}
+            backend:
+              service:
+                name: binder
+                port:
+                  number: 80
+      {{- if $host }}
+      host: {{ $host | quote }}
+      {{- end }}
+    {{- end }}
+  {{- with .Values.binderhub.jupyterhub.ingress.tls }}
+  tls:
+    {{- . | toYaml | nindent 4 }}
+  {{- end }}

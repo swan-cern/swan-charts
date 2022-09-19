@@ -9,8 +9,8 @@ description: A fully-fledged SWAN instance with jupyterhub, EOS, and CVMFS
 icon: https://swan.docs.cern.ch/images/logos/logo_swan_letters.png
 #
 dependencies:
-  - name: jupyterhub
-    version: 1.2.0
+  - name: binderhub
+    version: 0.2.0-n905.h3d3e24e
     repository: https://jupyterhub.github.io/helm-chart/
 
   - name: fusex

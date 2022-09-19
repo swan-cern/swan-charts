@@ -31,13 +31,13 @@ spec:
               name: hub
               key: hub.services.hadoop-token-generator.apiToken
         - name: HADOOP_CONF_HOME
-          value: {{ .Values.swan.jupyterhub.custom.spark.configurationPath }} 
+          value: {{ .Values.swan.binderhub.jupyterhub.custom.spark.configurationPath }} 
 
         livenessProbe:
           exec:
             command:
             - ls
-            - {{ .Values.swan.jupyterhub.custom.spark.configurationPath }}
+            - {{ .Values.swan.binderhub.jupyterhub.custom.spark.configurationPath }}
           initialDelaySeconds: 5
           periodSeconds: 5
 
