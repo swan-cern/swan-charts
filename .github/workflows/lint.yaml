@@ -1,0 +1,24 @@
+name: Lint
+
+on:
+  # Allow calling this workflow from other workflows
+  workflow_call:
+  # Allow triggering this workflow manually from the github UI
+  workflow_dispatch:
+  # Lint pull requests
+  pull_request:
+    branches:
+      - master
+      - qa
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Temporarily change swan-cern to use local file://../swan
+        uses: mikefarah/yq@1f0881fb5faf371694bfa108753cda0b824f5037 # v4.28.2
+        with:
+          cmd: yq -i '(.dependencies[] | select(.name == "swan")).repository = "file://../swan"' swan-cern/Chart.yaml
+      - run: helm dependency update swan && helm lint swan && helm package swan
+      - run: helm dependency update swan-cern && helm lint swan-cern && helm package swan-cern

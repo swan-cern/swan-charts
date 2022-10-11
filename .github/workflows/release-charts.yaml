@@ -1,0 +1,118 @@
+# Workflow to tag and publish swan/ and swan-cern/ charts in this repository
+# - uses secrets.WORKFLOW_ACCESS_TOKEN (GitHub PAT with admin permissions on repostiory) to push commits and tags
+
+name: Release Charts
+run-name: Release ${{ inputs.bump }} version of all charts with changes by @${{ github.actor }}
+concurrency: release # Only run one 'release' workflow at a time
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Bump version"
+        required: true
+        default: patch
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+jobs:
+  check_branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if not on master branch
+        if: github.ref != 'refs/heads/master'
+        run: exit 1
+  lint:
+    needs: [check_branch]
+    uses: ./.github/workflows/lint.yaml
+
+  list_changed_charts:
+    needs: [check_branch]
+    runs-on: ubuntu-latest
+    outputs:
+      swan_has_changed: ${{ steps.diff.outputs.swan_has_changed }}
+      swan-cern_has_changed: ${{ steps.diff.outputs.swan-cern_has_changed }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Fetch all tags and history to check for changes
+      - name: List charts with changes since last tag
+        id: diff
+        run: |
+          set -euxo pipefail
+          ./.github/workflows/list-changed-charts.sh >> $GITHUB_OUTPUT
+      - name: Fail if no charts have changes
+        if: steps.diff.outputs.swan_has_changed != 'true' && steps.diff.outputs.swan-cern_has_changed != 'true'
+        run: exit 1
+  
+
+  tag_swan:
+    needs: [lint, list_changed_charts]
+    if: needs.list_changed_charts.outputs.swan_has_changed == 'true'
+    uses: ./.github/workflows/tag-chart.yaml
+    with:
+      chart: swan
+      bump: ${{ inputs.bump }}
+      HELM_REPO_BASE_URL: https://registry.cern.ch/chartrepo/krraghav-test
+    secrets:
+      WORKFLOW_ACCESS_TOKEN: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
+      HELM_REPO_USERNAME: ${{ secrets.HELM_REPO_USERNAME }}
+      HELM_REPO_PASSWORD: ${{ secrets.HELM_REPO_PASSWORD }}
+
+  update_dependency:
+    # Update 'swan-cern' chart to use as dependency the new tagged version of 'swan' chart
+    needs: [tag_swan]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false # To use WORKFLOW_ACCESS_TOKEN instead of GITHUB_TOKEN in later steps
+          ref: ${{ github.ref_name }} # Checkout latest commit on branch including new commits created in earlier steps
+
+      - name: Update version of swan on swan-cern/Chart.yaml
+        uses: mikefarah/yq@1f0881fb5faf371694bfa108753cda0b824f5037 # v4.28.2
+        with:
+          cmd: yq -i '(.dependencies[] | select(.name == "swan")).version = "${{ needs.tag_swan.outputs.new_version }}"' 'swan-cern/Chart.yaml'
+
+      - name: Commit changes
+        run: |
+          set -x
+          helm dependency update swan-cern
+          cd swan-cern
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "Update swan-cern to use swan@${{ needs.tag_swan.outputs.new_version }}"
+
+      - name: Push commit
+        uses: ad-m/github-push-action@4dcce6dea3e3c8187237fc86b7dfdc93e5aaae58
+        with:
+          github_token: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
+          branch: ${{ github.ref_name }}
+
+  tag_swan_cern:
+    needs: [lint, list_changed_charts, tag_swan, update_dependency]
+    if: |
+      always() && 
+      needs.lint.result == 'success' && 
+      needs.list_changed_charts.result == 'success' &&
+      needs.tag_swan.result != 'failure' && 
+      needs.update_dependency.result != 'failure' && 
+      (needs.list_changed_charts.outputs.swan_has_changed == 'true' || needs.list_changed_charts.outputs.swan-cern_has_changed == 'true')
+    uses: ./.github/workflows/tag-chart.yaml
+    with:
+      chart: swan-cern
+      bump: ${{ inputs.bump }}
+      HELM_REPO_BASE_URL: https://registry.cern.ch/chartrepo/krraghav-test
+    secrets:
+      WORKFLOW_ACCESS_TOKEN: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
+      HELM_REPO_USERNAME: ${{ secrets.HELM_REPO_USERNAME }}
+      HELM_REPO_PASSWORD: ${{ secrets.HELM_REPO_PASSWORD }}

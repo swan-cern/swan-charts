@@ -1,0 +1,120 @@
+# Reusable workflow to tag a single chart and push it to a helm registry
+name: Tag Chart
+run-name: Tag ${{ inputs.bump }} version of ${{ inputs.chart }} by @${{ github.actor }}
+
+permissions:
+  contents: write
+
+on:
+  workflow_call:
+    inputs:
+      chart:
+        description: Name of chart to tag
+        required: true
+        type: string
+      bump:
+        description: "Bump version"
+        required: true
+        default: patch
+        type: string
+      HELM_REPO_BASE_URL:
+        type: string
+        description: Helm repository base url
+        required: true
+
+    secrets:
+      WORKFLOW_ACCESS_TOKEN:
+        description: "A GitHub PAT token with permissions to push to master branch"
+        required: true
+      HELM_REPO_USERNAME:
+        description: "Robot account user for the helm registry"
+        required: true
+      HELM_REPO_PASSWORD:
+        description: "Password for the helm registry"
+        required: true
+
+    outputs:
+      new_version:
+        value: ${{ jobs.publish_chart.outputs.new_version }}
+
+jobs:
+  publish_chart:
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.version.outputs.new_version }}
+      new_tag: ${{ steps.version.outputs.new_tag }}
+      last_tag: ${{ steps.version.outputs.last_tag }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false # To use WORKFLOW_ACCESS_TOKEN instead of GITHUB_TOKEN in later steps
+          ref: ${{ github.ref_name }} # Checkout latest commit on branch including new commits created in earlier steps
+
+      - name: Fetch chart dependencies
+        run: helm dependency update ${{ inputs.chart }}
+
+      - name: Configure git author
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+      - name: bump2version
+        run: pip install bump2version==1.0.1
+
+      - name: Calculate next version
+        id: version
+        run: |
+          set -x
+          cd ${{ inputs.chart }}
+          NEW_VERSION="$(bump2version --dry-run ${{ inputs.bump }} --list | grep new_version= |  sed -r s,"^.*=",,)"
+          LAST_VERSION="$(bump2version --dry-run ${{ inputs.bump }} --list | grep current_version= |  sed -r s,"^.*=",,)"
+          NEW_TAG="${{ inputs.chart }}@${NEW_VERSION}"
+          LAST_TAG="${{ inputs.chart }}@${LAST_VERSION}"
+          echo "new_version=${NEW_VERSION}" >> $GITHUB_OUTPUT
+          echo "new_tag=${NEW_TAG}" >> $GITHUB_OUTPUT
+          echo "last_tag=${LAST_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Bump version and create local commit with tag
+        run: |
+          cd ${{ inputs.chart }}
+          bump2version ${{ inputs.bump }} --verbose
+
+      - name: Push commit + tag to origin
+        uses: ad-m/github-push-action@4dcce6dea3e3c8187237fc86b7dfdc93e5aaae58
+        with:
+          github_token: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
+          branch: ${{ github.ref_name }}
+          tags: true
+          atomic: true
+
+      - name: Push to helm registry
+        env:
+          HELM_REPO_USERNAME: ${{ secrets.HELM_REPO_USERNAME }}
+          HELM_REPO_PASSWORD: ${{ secrets.HELM_REPO_PASSWORD }}
+        run: |
+          set -x
+          helm plugin install https://github.com/chartmuseum/helm-push --version v0.10.3
+          helm cm-push ${{ inputs.chart }}/ ${{ inputs.HELM_REPO_BASE_URL }}
+
+  publish_github_release:
+    needs: [publish_chart]
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NEW_TAG: ${{ needs.publish_chart.outputs.new_tag }}
+      LAST_TAG: ${{ needs.publish_chart.outputs.last_tag }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Fetch all tags and history to check for changes
+          ref: ${{ github.ref_name }}
+      - name: Create GitHub Release
+        run: |
+          temp_file=$(mktemp) 
+          git log ${LAST_TAG}..${NEW_TAG} --pretty='- %h %s' -- ${{ inputs.chart }} > ${temp_file}
+          gh release create $NEW_TAG --notes-file ${temp_file} --repo ${{ github.repository }}
