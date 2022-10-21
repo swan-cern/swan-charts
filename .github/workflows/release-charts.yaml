@@ -51,7 +51,7 @@ jobs:
         run: exit 1
   check_charts:
     needs: [check_branch]
-    uses: ./.github/workflows/check_charts.yaml
+    uses: ./.github/workflows/check-charts.yaml
 
   list_changed_charts:
     needs: [check_branch]
