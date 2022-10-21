@@ -48,7 +48,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          persist-credentials: false # To use WORKFLOW_ACCESS_TOKEN instead of GITHUB_TOKEN in later steps
+          persist-credentials: false # To use a different token with admin privileges instead of GITHUB_TOKEN in later steps
           ref: ${{ github.ref_name }} # Checkout latest commit on branch including new commits created in earlier steps
 
       - name: Fetch chart dependencies
@@ -102,7 +102,7 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     permissions:
-      contents: write
+      contents: write # Required to create a 'GitHub Release' on the repository using $GITHUB_TOKEN
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       NEW_TAG: ${{ needs.publish_chart.outputs.new_tag }}
