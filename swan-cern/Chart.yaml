@@ -2,7 +2,8 @@ apiVersion: v2
 #
 name: swan-cern
 type: application
-version: 0.1.11  # set by bump2version
+# version set by bump2version search/replace
+version: 0.1.11 # __swan-cern_version__
 appVersion: 0.0.3
 #
 description: The chart to deploy SWAN at CERN

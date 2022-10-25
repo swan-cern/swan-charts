@@ -2,7 +2,10 @@ apiVersion: v2
 #
 name: swan
 type: application
-version: 0.1.11 # set by bump2version
+
+# version set by bump2version search/replace
+version: 0.1.11 # __swan_version__
+
 appVersion: 0.1.2 # Using swanhub version
 #
 description: A fully-fledged SWAN instance with jupyterhub, EOS, and CVMFS
