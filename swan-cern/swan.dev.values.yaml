@@ -29,23 +29,12 @@ swan:
               path: swan_config_cern.py
             - key: swan_spark_config.py
               path: swan_spark_config.py
-        - name: swan-cull-scripts
-          configMap:
-            name: swan-scripts-cern
-            items:
-            - key: cull_check_ticket.sh
-              path: cull_check_ticket.sh
-            - key: cull_delete_ticket.sh
-              path: cull_delete_ticket.sh
-            defaultMode: 356 # 0544 perm
         - name: swan-tokens-scripts
           configMap:
             name: swan-scripts-env-dev
             items:
             - key: webhdfs_token.sh
               path: webhdfs_token.sh
-            - key: eos_token.sh
-              path: eos_token.sh
             - key: sparkk8s_token.sh
               path: sparkk8s_token.sh
             defaultMode: 356 # 0544 perm
@@ -53,8 +42,6 @@ swan:
           secret:
             secretName: swan-cern
             items:
-            - key: eos.cred
-              path: eos.cred
             - key: hadoop.cred
               path: hadoop.cred
             - key: sparkk8s.cred
