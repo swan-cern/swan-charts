@@ -33,6 +33,10 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
                 se_linux_options = spc_t_selinux
             )
             self.pod.spec.security_context = security_context
+        else:
+            # TODO: temporary setting to match non-gpu user pods to non-gpu nodes.
+            # To try to prevent EOS error in crowded gpu nodes until we update to EOS5
+            self.pod.spec.node_selector = {'beta.kubernetes.io/instance-type': 'm2.2xlarge'}
 
         return self.pod
 
