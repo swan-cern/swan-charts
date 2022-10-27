@@ -125,7 +125,11 @@ jupyterhub:
         cpu: 200m
         memory: 512Mi
     livenessProbe:
-      enabled: false
+      enabled: true
+      initialDelaySeconds: 300
+      periodSeconds: 15
+      failureThreshold: 20
+      timeoutSeconds: 10
     readinessProbe:
       enabled: false
     image:
