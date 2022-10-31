@@ -111,7 +111,7 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .
-          git commit -m "Update swan-cern to use swan@${{ needs.tag_swan.outputs.new_version }}"
+          git commit -m "Update swan-cern to use swan@${{ needs.tag_swan.outputs.new_version }} by @${{ github.actor }}"
 
       - name: Push commit
         uses: ad-m/github-push-action@4dcce6dea3e3c8187237fc86b7dfdc93e5aaae58

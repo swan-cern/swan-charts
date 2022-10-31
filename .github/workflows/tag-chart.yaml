@@ -78,7 +78,7 @@ jobs:
       - name: Bump version and create local commit with tag
         run: |
           cd ${{ inputs.chart }}
-          bump2version ${{ inputs.bump }} --verbose
+          bump2version ${{ inputs.bump }} --verbose --message 'Bump chart ${{ inputs.chart }}/ version: {current_version} → {new_version} by @${{ github.actor }}'
 
       - name: Push commit + tag to origin
         uses: ad-m/github-push-action@4dcce6dea3e3c8187237fc86b7dfdc93e5aaae58
