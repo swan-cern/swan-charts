@@ -62,6 +62,9 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
             secret_meta = client.V1ObjectMeta()
             secret_meta.name = eos_secret_name
             secret_meta.namespace = swan_container_namespace
+            secret_meta.labels = {
+                "swan_user": username
+            }
             secret_data.metadata = secret_meta
             secret_data.data = {}
             secret_data.data['krb5cc'] = eos_token_base64
