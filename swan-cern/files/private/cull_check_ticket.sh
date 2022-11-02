@@ -15,6 +15,27 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# The request body with the token exceeds the bash argument size limits.
+# So use a file with 'curl --data'
+REQUEST_BODY_FILE=$(mktemp)
+trap "rm -f ${REQUEST_BODY_FILE}" EXIT
+
+cat << EOF > $REQUEST_BODY_FILE
+{
+    "kind": "Secret",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "$EOS_TOKENS_SECRET_NAME",
+        "labels": {
+            "swan_user":"$USER"
+        }
+    },
+    "data": {
+        "krb5cc": "$KRB5CC_BASE64"
+    }
+}
+EOF
+
 # Create new secret with renewed token
 STATUS_REPLACE=$(curl -ik \
     -s \
@@ -24,16 +45,7 @@ STATUS_REPLACE=$(curl -ik \
     -H "Authorization: Bearer $TOKEN" \
     -H 'Accept: application/json' \
     -H 'Content-Type: application/json' \
-    -d '{
-    "kind": "Secret",
-    "apiVersion": "v1",
-    "metadata": {
-        "name": "'"$EOS_TOKENS_SECRET_NAME"'"
-    },
-    "data": {
-        "krb5cc": "'"$KRB5CC_BASE64"'"
-    }
-    }' \
+    -d "@$REQUEST_BODY_FILE" \
     https://kubernetes.default.svc/api/v1/namespaces/${EOS_TOKENS_SECRET_NAMESPACE}/secrets/${EOS_TOKENS_SECRET_NAME})
 
 echo "Replacing a secret ${EOS_TOKENS_SECRET_NAMESPACE}/${EOS_TOKENS_SECRET_NAME} with token ${EOS_TOKENS_SECRET_NAMESPACE} status-create: ${STATUS_REPLACE}"
