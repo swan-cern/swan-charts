@@ -13,7 +13,7 @@
 # - uses secrets.HELM_REPO_USERNAME and secrets.HELM_REPO_PASSWORD for a robot account on harbor with permissions to list and create helm chart versions
 
 name: Release Charts
-run-name: Release ${{ inputs.bump_swan }}, ${{ inputs.bump_swan_cern }} versions of swan,swan-cern charts by @${{ github.actor }}
+run-name: "Release swan: ${{ inputs.bump_swan }}, swan-cern: ${{ inputs.bump_swan_cern }}"
 concurrency: release # Only run one 'release' workflow at a time
 
 permissions:
