@@ -33,8 +33,11 @@ cvmfs:
   prefetcher:
     enabled: true
     jobs:
-      cron_opennotebook_python3_ipy:
-        command: "source /cvmfs/sft.cern.ch/lcg/views/LCG_101swan/x86_64-centos7-gcc8-opt/setup.sh && ( timeout 20s python -m ipykernel > /dev/null 2>&1 || true )"
+      # Python3 kernel
+      cron_opennotebook_python3_kernel:
+        command: >-
+          source /cvmfs/sft.cern.ch/lcg/views/LCG_102swan/x86_64-centos7-gcc11-opt/setup.sh &&
+          (timeout 20s python3 -m ipykernel > /dev/null 2>&1 || true)
         minute: '*/15'
 
 #
