@@ -82,7 +82,6 @@ echo ""
 helm upgrade --install --namespace swan  \
 --kubeconfig $KUBECONFIG \
 --values $SWAN_SECRET_VALUES_PATH \
---set swan.jupyterhub.hub.annotations.version="release-$(date +%s)" \
 --set swan.jupyterhub.hub.db.upgrade=$UPGRADE_DB \
 --set swanCern.secrets.hadoop.cred=$HADOOP_AUTH_KEYTAB_ENCODED \
 --set swanCern.secrets.eos.cred=$EOS_AUTH_KEYTAB_ENCODED \
