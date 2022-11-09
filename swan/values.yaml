@@ -36,7 +36,7 @@ cvmfs:
       # Python3 kernel
       cron_opennotebook_python3_kernel:
         command: >-
-          source /cvmfs/sft.cern.ch/lcg/views/LCG_102swan/x86_64-centos7-gcc11-opt/setup.sh &&
+          source /cvmfs/sft.cern.ch/lcg/views/LCG_102b_swan/x86_64-centos7-gcc11-opt/setup.sh &&
           (timeout 20s python3 -m ipykernel > /dev/null 2>&1 || true)
         minute: '*/15'
 
