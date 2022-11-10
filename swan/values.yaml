@@ -90,6 +90,8 @@ jupyterhub:
       ip: 169.254.169.254
     networkPolicy:
       enabled: false
+    extraAnnotations:
+      kubectl.kubernetes.io/default-logs-container: notebook
   ingress:
     enabled: true
     annotations:
