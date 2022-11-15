@@ -163,7 +163,7 @@ swan:
             - eos-service
             - cernbox-service
           logout_redirect_url: https://cern.ch/swan
-          auto_login: True
+          auto_login: False
           username_key: preferred_username
           client_id: # placeholder, check secrets
           client_secret: # placeholder, check secrets
