@@ -11,8 +11,8 @@
         {
             "type": "selection",
             "lcg": {
-                "value": "LCG_102swan",
-                "text": "102"
+                "value": "LCG_102b_swan",
+                "text": "102b"
             },
             "platforms": [
                 {
@@ -160,8 +160,8 @@
         {
             "type": "selection",
             "lcg": {
-                "value": "LCG_102cuda",
-                "text": "102 Cuda 11.2 (GPU)"
+                "value": "LCG_102b_cuda",
+                "text": "102b Cuda 11.7.1 (GPU)"
             },
             "platforms": [
                 {
@@ -371,6 +371,96 @@
                 "value": "label3",
                 "text": "Other releases"
             }
+        },
+        {
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_102swan",
+                "text": "102"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc11-opt",
+                    "text": "CentOS 7 (gcc11)"
+                },
+                {
+                    "value": "x86_64-centos7-gcc8-opt",
+                    "text": "CentOS 7 (gcc8)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2"
+                },
+                {
+                    "value": "4",
+                    "text": "4"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "8",
+                    "text": "8 GB"
+                },
+                {
+                    "value": "10",
+                    "text": "10 GB"
+                },
+                {
+                    "value": "16",
+                    "text": "16 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                },
+                {
+                    "value": "analytix",
+                    "text": "General Purpose (Analytix)"
+                },
+                {
+                    "value": "k8s",
+                    "text": "Cloud Containers (K8s)"
+                },
+                {
+                    "value": "hadoop-qa",
+                    "text": "QA"
+                }
+            ]
+        },
+        {
+            "type": "selection",
+            "lcg": {
+                "value": "LCG_102cuda",
+                "text": "102 Cuda 11.2 (GPU)"
+            },
+            "platforms": [
+                {
+                    "value": "x86_64-centos7-gcc8-opt",
+                    "text": "CentOS 7 (gcc8)"
+                }
+            ],
+            "cores": [
+                {
+                    "value": "2",
+                    "text": "2CPU, 1GPU"
+                }
+            ],
+            "memory": [
+                {
+                    "value": "16",
+                    "text": "16 GB"
+                }
+            ],
+            "clusters": [
+                {
+                    "value": "none",
+                    "text": "None"
+                }
+            ]
         },
         {
             "type": "selection",
@@ -696,13 +786,6 @@
                     "text": "None"
                 }
             ]
-        },
-        {
-            "type": "label",
-            "label": {
-                "value": "empty1",
-                "text": ""
-            }
         },
         {
             "type": "selection",
