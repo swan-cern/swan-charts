@@ -78,7 +78,7 @@ echo ""
 echo "Updating swan env ${SWAN_ENV}, upgrade db ${UPGRADE_DB}"
 echo ""
 
-# Annotation is required in order to restart jupyterhub server on swan_config.py or jupyterhub_form.html changes
+# Annotation is required in order to restart jupyterhub server on swan_config.py changes
 helm upgrade --install --namespace swan  \
 --kubeconfig $KUBECONFIG \
 --values $SWAN_SECRET_VALUES_PATH \

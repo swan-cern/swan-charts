@@ -15,8 +15,6 @@ swan:
           configMap:
             name: swan-scripts
             items:
-            - key: jupyterhub_form.html
-              path: jupyterhub_form.html
             - key: swan_config.py
               path: swan_config.py
         - name: swan-jh-cern
