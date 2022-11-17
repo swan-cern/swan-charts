@@ -5,5 +5,4 @@ metadata:
   namespace: {{ .Release.Namespace }}
 data:
 {{ (.Files.Glob "files/options_form_config.json").AsConfig | indent 2 }}
-{{ (.Files.Glob "files/jupyterhub_form.html").AsConfig | indent 2 }}
 {{ (.Files.Glob "files/swan_config.py").AsConfig | indent 2 }}

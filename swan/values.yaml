@@ -146,9 +146,6 @@ jupyterhub:
         mountPath: /srv/jupyterhub/options_form_config.json
         subPath: options_form_config.json
       - name: swan-jh
-        mountPath: /srv/jupyterhub/jupyterhub_form.html
-        subPath: jupyterhub_form.html
-      - name: swan-jh
         mountPath: /usr/local/etc/jupyterhub/jupyterhub_config.d/1_swan_config.py
         subPath: swan_config.py
     extraVolumes:
@@ -158,8 +155,6 @@ jupyterhub:
           items:
           - key: options_form_config.json
             path: options_form_config.json
-          - key: jupyterhub_form.html
-            path: jupyterhub_form.html
           - key: swan_config.py
             path: swan_config.py
     config:
