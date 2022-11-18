@@ -94,7 +94,7 @@ jupyterhub:
     networkPolicy:
       enabled: false
     extraAnnotations:
-      kubectl.kubernetes.io/default-logs-container: notebook
+      kubectl.kubernetes.io/default-container: notebook
   ingress:
     enabled: true
     annotations:
