@@ -95,6 +95,8 @@ jupyterhub:
       enabled: false
     extraAnnotations:
       kubectl.kubernetes.io/default-container: notebook
+    extraEnv:
+      SWAN_DISABLE_NOTIFICATIONS: "true"
   ingress:
     enabled: true
     annotations:
