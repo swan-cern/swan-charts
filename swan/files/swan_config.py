@@ -32,17 +32,6 @@ class SwanPodHookHandler:
         # init pod affinity
         self.pod.spec.affinity = self._init_pod_affinity(pod_labels)
 
-        notebook_container = self._get_pod_container('notebook')
-
-        # Disable pinging for maintenance notifications when running on Kubernetes
-        notebook_container.env = self._add_or_replace_by_name(
-            notebook_container.env,
-            client.V1EnvVar(
-                name='SWAN_DISABLE_NOTIFICATIONS',
-                value='true'
-            ),
-        )
-
         if self._gpu_enabled():
             # currently no cern customisation required
             self.pod.spec.volumes.append(
@@ -51,6 +40,8 @@ class SwanPodHookHandler:
                     name='nvidia-driver'
                 )
             )
+
+            notebook_container = self._get_pod_container('notebook')
 
             notebook_container.volume_mounts.append(
                 client.V1VolumeMount(
