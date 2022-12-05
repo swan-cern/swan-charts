@@ -309,6 +309,7 @@ hadoopTokenGenerator:
             path: hadoop_token.sh
         defaultMode: 500
 fluentd:
+  containerRuntime: containerd
   plugins:
     - fluent-plugin-rewrite-tag-filter
     - fluent-plugin-out-http
