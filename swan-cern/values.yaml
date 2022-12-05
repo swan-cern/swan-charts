@@ -60,6 +60,9 @@ swan:
         guarantee: 4G
       cpu:
         guarantee: 1
+      extraEnv:
+        # Enable HTCondor service configuration for CERN in the user image
+        CERN_HTCONDOR: "true"   
     hub:
       extraVolumeMounts:
         - name: swan-jh-cern
@@ -167,10 +170,6 @@ swan:
           # skip refreshing tokens if already refreshed in last 15 minutes
           # this assumes tokens provided by keycloak are valid for 20 minutes
           auth_refresh_age: 900
-        SwanSpawner:
-          environment: 
-            # Enable HTCondor service configuration for CERN the in user image
-            CERN_HTCONDOR: "true"
         JupyterHub:
           allow_named_servers: False
       extraConfig:
