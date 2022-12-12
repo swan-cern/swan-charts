@@ -319,18 +319,22 @@ fluentd:
     endpoint: http://monit-logs.cern.ch:10012/
     includeInternal: false
   parsingConfig: |
+    # Initial tagging of logs:
+    # - user: user session pods
+    # - hub: hub pod
+    # - logs: other pods
     <match kubernetes.**>
         @type rewrite_tag_filter
         capitalize_regex_backreference true
         <rule>
             key $.kubernetes.labels.component
             pattern /^singleuser-server$/
-            tag user # user logs + metrics
+            tag user
         </rule>
         <rule>
             key $.kubernetes.labels.component
             pattern /^hub$/
-            tag hub # hub logs + metrics
+            tag hub
         </rule>
         <rule>
             key $.kubernetes.pod_name
@@ -339,10 +343,12 @@ fluentd:
         </rule>
     </match>
 
+    # Retag user and hub logs to:
+    # - metrics: jupyter and jupyterhub custom log messages, used to emit metrics
+    # - logs: rest of log messages
     <match {user,hub}>
         @type rewrite_tag_filter
         capitalize_regex_backreference true
-        # jupyter or jupyterhub custom swan metrics
         <rule>
             key $.log
             pattern /^.*?user: .*?, host: .*?, metric: .*?, value: .*$/
@@ -355,8 +361,12 @@ fluentd:
         </rule>
     </match>
 
-    ### SWAN Metrics logs parsing and output ###
-
+    # Extract relevant information from metric logs:
+    # - user
+    # - host
+    # - metric key: name of the metric
+    # - metric context (optional): additional qualifiers for the metric
+    # - metric value
     <filter {metrics}>
         @type parser
         key_name log
@@ -364,7 +374,6 @@ fluentd:
         reserve_data true
         emit_invalid_record_to_error true
 
-        # grok parsing
         <parse>
             @type grok
 
@@ -382,6 +391,9 @@ fluentd:
         </parse>
     </filter>
 
+    # Store extracted metric information in a new "metrics" field, as part of the JSON
+    # of the log message. Use metric key as first attribute under "metrics".
+    # Format: metrics.metric_key.user|context|value
     <filter {metrics}>
         @type record_transformer
         enable_ruby
@@ -393,7 +405,8 @@ fluentd:
         remove_keys ["_metric_user_", "_metric_key_", "_metric_context_", "_metric_value_"]
     </filter>
 
-
+    # Emit general log records with type "logs"
+    # Accessible in OpenSearch with pattern monit_private_swan_logs_logs
     <filter {logs}>
         @type record_transformer
         <record>
@@ -401,6 +414,8 @@ fluentd:
         </record>
     </filter>
 
+    # Emit metric log records with type "metrics"
+    # Accessible in OpenSearch with pattern monit_private_swan_logs_metrics
     <filter {metrics}>
         @type record_transformer
         <record>
@@ -408,18 +423,20 @@ fluentd:
         </record>
     </filter>
 
+    # Set MONIT producer for all logs
+    # Keep raw log data in "raw" field
     <filter {logs,metrics}>
         @type record_transformer
         enable_ruby
         <record>
             timestamp ${(time.to_f * 1000).to_i}
-            # define monit producer
             producer "#{ENV['OUTPUT_PRODUCER']}"
-            raw ${record["log"]} # field named raw is indexed by MONIT/ES
+            raw ${record["log"]} # field named raw is indexed by MONIT/OpenSearch
         </record>
         remove_keys ["log"]
     </filter>
 
+    # Push logs to MONIT endpoint
     <match {logs,metrics}>
         @type http
         endpoint_url    "#{ENV['OUTPUT_ENDPOINT']}"
@@ -427,9 +444,7 @@ fluentd:
         http_method     post
     </match>
 
-    ### Common error handling ###
-
-    # rescue errors to fluentd pod stdout for debugging
+    # Forward errors in this pipeline to fluentd pod stdout for debugging
     <label @ERROR>
         <match **>
             @type stdout
