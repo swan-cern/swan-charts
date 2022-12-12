@@ -315,7 +315,6 @@ fluentd:
     - fluent-plugin-out-http
     - fluent-plugin-grok-parser
   output:
-    producer: swan
     endpoint: http://monit-logs.cern.ch:10012/
     includeInternal: false
   parsingConfig: |
