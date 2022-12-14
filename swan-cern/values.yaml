@@ -400,6 +400,14 @@ fluentd:
             metrics.${record['_metric_key_']}.user ${record['_metric_user_']}
             metrics.${record['_metric_key_']}.context ${record['_metric_context_']}
             metrics.${record['_metric_key_']}.value ${record['_metric_value_']}
+
+            # the below field is needed to run queries that group values by the last segment of the metric context (segments split by '.')
+            # which looks like "metrics.{record['_metric_key_']}_lastelementofmetric_context = {record['metric_value']}"
+            # for example, for a record with below fields
+            #     "data.metrics.spawn.context = LCG_xxx.some_spark_cluster.exception_class"
+            #     "data.metrics.spawn.value = None"
+            # it emits a field "data.metrics.spawn_exception_class = None
+            metrics.${record['_metric_key_']}_${record['_metric_context_'].gsub('-','_').split('.')[-1]} ${record['_metric_value_']}
         </record>
         remove_keys ["_metric_user_", "_metric_key_", "_metric_context_", "_metric_value_"]
     </filter>
