@@ -135,12 +135,21 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
             )
         )
 
-        # define eos auth environment for the notebook container
+        # define eos kerberos credentials path for Jupyter server in notebook container
         notebook_container.env = self._add_or_replace_by_name(
             notebook_container.env,
             client.V1EnvVar(
                 name='KRB5CCNAME',
                 value='/srv/notebook/tokens/krb5cc'
+            ),
+        )
+
+        # define eos kerberos credentials path for notebook and terminal processes in notebook container
+        notebook_container.env = self._add_or_replace_by_name(
+            notebook_container.env,
+            client.V1EnvVar(
+                name='KRB5CCNAME_NB_TERM',
+                value='/srv/notebook/tokens/writable/krb5cc_nb_term'
             ),
         )
 

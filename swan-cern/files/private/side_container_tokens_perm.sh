@@ -4,9 +4,11 @@ USER_ID=$1
 USER_GID=$2
 CULL_PERIOD=$3
 
-# make sure the contents of /srv/notebook/tokens cannot be accidentally deleted
-mkdir -p /srv/notebook/tokens
-chown root:root /srv/notebook/tokens
+# Create a directory to store the tokens. Those intended to be read-only for the
+# user are stored in tokens, those that can be overwritten by the user are stored
+# in tokens/writable
+mkdir -p /srv/notebook/tokens/writable
+chmod 777 /srv/notebook/tokens/writable
 
 copy_token_to_notebook() {
     # make sure token in target dir has always correct permissions
@@ -46,10 +48,23 @@ else
     echo "k8s-user.config not required, skipping"
 fi
 
-echo "start refreshing /srv/notebook/tokens/krb5cc in user container"
+echo "start refreshing EOS kerberos tickets in user container"
 copy_token_to_notebook /srv/side-container/eos/krb5cc /srv/notebook/tokens/krb5cc
+copy_token_to_notebook /srv/side-container/eos/krb5cc /srv/notebook/tokens/writable/krb5cc_nb_term
 klist -c /srv/notebook/tokens/krb5cc
 while true; do
     sleep $CULL_PERIOD
+
+    # Check whether the kerberos ticket for the Jupyter server (krb5cc) and the one for
+    # notebooks and terminals (krb5cc_nb_term) differ. If they do, it means the user ran
+    # a kinit from their session and overwrote krb5cc_nb_term. In such a case, the krb5cc_nb_term
+    # ticket is not refreshed: the user is now responsible for it.
+    diff /srv/notebook/tokens/krb5cc /srv/notebook/tokens/writable/krb5cc_nb_term &> /dev/null
+    if [ $? == 0 ]
+    then
+        copy_token_to_notebook /srv/side-container/eos/krb5cc /srv/notebook/tokens/writable/krb5cc_nb_term
+    fi
+
+    # The Jupyter server ticket is always refreshed. It can't be overwritten by the user
     copy_token_to_notebook /srv/side-container/eos/krb5cc /srv/notebook/tokens/krb5cc
 done
