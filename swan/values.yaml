@@ -97,6 +97,7 @@ jupyterhub:
       kubectl.kubernetes.io/default-container: notebook
     extraEnv:
       SWAN_DISABLE_NOTIFICATIONS: "true"
+      GALLERY_URL: "https://swan-gallery.web.cern.ch"
   ingress:
     enabled: true
     annotations:
