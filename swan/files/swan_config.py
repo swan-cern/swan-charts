@@ -29,9 +29,6 @@ class SwanPodHookHandler:
             pod_labels
         )
 
-        # init pod affinity
-        self.pod.spec.affinity = self._init_pod_affinity(pod_labels)
-
         if self._gpu_enabled():
             # currently no cern customisation required
             self.pod.spec.volumes.append(
@@ -86,29 +83,6 @@ class SwanPodHookHandler:
             return True
         else:
             return False
-
-    def _init_pod_affinity(self, pod_labels):
-        """
-        schedule pods to nodes that satisfy the specified label/affinity expressions 
-        """
-        try:
-            del pod_labels["swan_user"]
-        except KeyError:
-            pass
-        aff = client.V1Affinity()
-        pod_affinity = client.V1PodAffinity(
-            preferred_during_scheduling_ignored_during_execution=[client.V1WeightedPodAffinityTerm(
-                pod_affinity_term=client.V1PodAffinityTerm(
-                    label_selector=client.V1LabelSelector(
-                        match_labels=pod_labels
-                    ),
-                    topology_key="kubernetes.io/hostname"
-                ),
-                weight=100
-            )]
-        )
-        aff.pod_affinity = pod_affinity
-        return aff
 
     def _get_pod_container(self, container_name):
         """
