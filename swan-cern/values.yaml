@@ -92,6 +92,10 @@ swan:
       extraEnv:
         # Enable HTCondor service configuration for CERN in the user image
         CERN_HTCONDOR: "true"   
+    scheduling:
+      userPods:
+        nodeAffinity:
+          matchNodePurpose: ignore
     hub:
       extraVolumeMounts:
         - name: swan-jh-cern
