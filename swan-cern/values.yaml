@@ -60,29 +60,6 @@ swan:
     deployDaemonSet: &eosDeployDS false
     deployCsiDriver: &eosDeployCSI true
     useCsiDriver: &eosUseCSI true
-  eosxd:
-    # we need to specify the mounts here otherwise cms/atlas won't be mounted properly
-    mounts:
-      ams: {}
-      atlas: {}
-      cms: {}
-      experiment: {}
-      hepdata: {}
-      opendata: {}
-      pps: {}
-      project:
-        project-i00: a e j g v k q y
-        project-i01: l h b p s f w n o
-        project-i02: d c i r m t u x z
-      theory: {}
-      user:
-        home-i00: d l n t z
-        home-i01: a g j k w
-        home-i02: h o r s y
-        home-i03: b e m v x
-        home-i04: c f i p q u
-      web: {}
-      workspace: {}
   jupyterhub:
     singleuser:
       memory:
