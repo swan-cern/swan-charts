@@ -66,10 +66,6 @@ fusex:
 # Ensure file versions are shown to allow notebook checkpoints
 # (the fusex chart already sets this as default)
 eosxd:
-  # onDelete gives us better control than RollingUpdate
-  # and prevents stopping all user sessions when we update EOS
-  updateStrategy:
-    type: OnDelete
   fuseconf:
     options:
       hide-versions: 0
