@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eosxd-config
+  labels:
+    app: {{ template "eosxd.name" .Subcharts.eosxd }}
+    chart: {{ template "eosxd.chart" .Subcharts.eosxd }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  {{- range $area, $mountpoints := .Values.eosxd.mounts }}
+    {{- if $mountpoints }}
+      {{- range $mountpoint, $letters := $mountpoints }}
+        {{- if $letters }}
+  fuse.{{ $mountpoint }}.conf: |+
+      {"name":"{{ $mountpoint }}","hostport":"eos{{ $mountpoint }}.cern.ch","localmountdir":"/eos/{{ $mountpoint }}/", "remotemountdir":"/eos/{{ $area }}/", "bind":"{{ $letters }}", "options":{"hide-versions":0}}
+        {{- else }}
+  fuse.{{ $area }}.conf: |+
+      {"name":"{{ $area }}","hostport":"eos{{ $mountpoint }}.cern.ch","localmountdir":"/eos/{{ $area }}/", "remotemountdir":"/eos/{{ $area }}/", "options":{"hide-versions":0}}
+        {{- end }}
+      {{- end }}
+    {{- else }}
+  fuse.{{ $area }}.conf: |+
+      {"name":"{{ $area }}","hostport":"eos{{ $area }}.cern.ch","localmountdir":"/eos/{{ $area }}/", "remotemountdir":"/eos/{{ $area }}/", "options":{"hide-versions":0}}
+
+    {{- end }}
+  {{- end }}
