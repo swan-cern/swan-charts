@@ -56,10 +56,17 @@ swan:
       - projects.cern.ch
       - sw.hsf.org
       - sndlhc.cern.ch
+    resources:
+      requests:
+        memory: 1.5G
   eos:
     deployDaemonSet: &eosDeployDS false
     deployCsiDriver: &eosDeployCSI true
     useCsiDriver: &eosUseCSI true
+  eosxd:
+    resources:
+      requests:
+        memory: 1.5G
   jupyterhub:
     singleuser:
       cpu:
