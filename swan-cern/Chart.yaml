@@ -10,7 +10,7 @@ description: The chart to deploy SWAN at CERN
 #
 dependencies:
   - name: swan
-    version: 0.2.1
+    version: 0.2.2
     repository: https://registry.cern.ch/chartrepo/swan
   - name: fluentd
     repository: http://registry.cern.ch/chartrepo/cern
