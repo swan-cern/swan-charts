@@ -66,9 +66,10 @@ fusex:
 # Ensure file versions are shown to allow notebook checkpoints
 # (the fusex chart already sets this as default)
 eosxd:
-  fuseconf:
-    options:
-      hide-versions: 0
+  config:
+    global:
+      options:
+        hide-versions: 0
 
 #
 # JupyerHub
