@@ -21,7 +21,7 @@ dependencies:
     repository: https://registry.cern.ch/chartrepo/eos
     condition: eos.deployDaemonSet
   - name: eosxd
-    version: 5.1.5-1
+    version: 5.1.5-2
     repository: http://registry.cern.ch/chartrepo/cern
     condition: eos.deployCsiDriver
 
