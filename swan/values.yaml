@@ -72,7 +72,7 @@ eosxd:
         hide-versions: 0
 
 #
-# JupyerHub
+# JupyterHub
 #
 jupyterhub:
   singleuser:
