@@ -348,19 +348,31 @@ def spark_modify_pod_hook(spawner, pod):
     return spark_pod_hook_handler.get_swan_user_pod()
 
 
-def spark_cleanup_services(spawner):
+def spark_post_stop_hook(spawner):
     """
     :param spawner: Swan Kubernetes Spawner
     :type spawner: swanspawner.SwanKubeSpawner
-    
     """
+    
+    # Call the parent hook defined in the swan_config_cern.py config file
+    # This function is assumed to be available as a global, because the config files 
+    # are concatenated before execution by the chart.
+    swan_cern_post_stop_hook(spawner)
+
     spark_cluster = spawner.user_options[spawner.spark_cluster_field]
     if spark_cluster and spark_cluster != 'none':
         username = spawner.user.name
+        swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
+
+        # Delete NodePort service opening ports for the user spark processes
         spark_ports_service = f"spark-ports-{username}"
         spawner.log.info('Deleting service %s', spark_ports_service)
-        swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
         spawner.api.delete_namespaced_service(spark_ports_service, swan_container_namespace)
+        
+        # Delete Kubernetes Secret with hadoop delegation tokens
+        hadoop_secret_name = f"hadoop-tokens-{username}"
+        spawner.log.info('Deleting secret %s', hadoop_secret_name)
+        spawner.api.delete_namespaced_secret(hadoop_secret_name, swan_container_namespace)
 
 c.SwanKubeSpawner.modify_pod_hook = spark_modify_pod_hook
-c.SwanKubeSpawner.post_stop_hook = spark_cleanup_services
+c.SwanKubeSpawner.post_stop_hook = spark_post_stop_hook

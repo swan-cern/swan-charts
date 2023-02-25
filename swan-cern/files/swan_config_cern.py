@@ -251,5 +251,15 @@ swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
 
 c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook_prod
 
+def swan_cern_post_stop_hook(spawner):
+    # Delete Kubernetes Secret storing eos kerberos ticket of the user
+    username = spawner.user.name
+    eos_secret_name = f"eos-tokens-{username}"
+    swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
+    spawner.log.info('Deleting secret %s', eos_secret_name)
+    spawner.api.delete_namespaced_secret(eos_secret_name, swan_container_namespace)
+
+c.SwanKubeSpawner.post_stop_hook = swan_cern_post_stop_hook
+
 # Required for swan systemuser.sh
 c.SwanKubeSpawner.cmd = None
