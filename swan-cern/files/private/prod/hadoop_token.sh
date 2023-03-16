@@ -19,7 +19,7 @@ USER_GROUP="${USER}:def-cg"
 
 # Generate HDFS, YARN, HIVE tokens
 export KRB5CCNAME=$(mktemp /tmp/hswan.XXXXXXXXX)
-LCG_VIEW=/cvmfs/sft.cern.ch/lcg/views/LCG_94/x86_64-slc6-gcc62-opt
+LCG_VIEW=/cvmfs/sft.cern.ch/lcg/views/LCG_103/x86_64-centos9-gcc11-opt
 export OVERRIDE_HADOOP_MAPRED_HOME="${LCG_VIEW}"
 
 source "${LCG_VIEW}/setup.sh"
