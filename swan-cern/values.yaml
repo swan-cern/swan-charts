@@ -101,21 +101,6 @@ swan:
         - name: swan-secrets
           mountPath: /srv/jupyterhub/private/sparkk8s.cred
           subPath: sparkk8s.cred
-        - name: swan-cull-scripts
-          mountPath: /srv/jupyterhub/culler/check_ticket.sh
-          subPath: cull_check_ticket.sh
-        - name: swan-cull-scripts
-          mountPath: /srv/jupyterhub/culler/delete_ticket.sh
-          subPath: cull_delete_ticket.sh
-        - name: swan-tokens-scripts
-          mountPath: /srv/jupyterhub/private/eos_token.sh
-          subPath: eos_token.sh
-        - name: swan-tokens-scripts
-          mountPath: /srv/jupyterhub/private/webhdfs_token.sh
-          subPath: webhdfs_token.sh
-        - name: swan-tokens-scripts
-          mountPath: /srv/jupyterhub/private/sparkk8s_token.sh
-          subPath: sparkk8s_token.sh
         - name: cvmfs
           mountPath: /cvmfs
       extraVolumes:
@@ -139,26 +124,6 @@ swan:
               path: swan_config_cern.py
             - key: swan_spark_config.py
               path: swan_spark_config.py
-        - name: swan-cull-scripts
-          configMap:
-            name: swan-scripts-cern
-            items:
-            - key: cull_check_ticket.sh
-              path: cull_check_ticket.sh
-            - key: cull_delete_ticket.sh
-              path: cull_delete_ticket.sh
-            defaultMode: 356 # 0544 perm
-        - name: swan-tokens-scripts
-          configMap:
-            name: swan-scripts-env-prod
-            items:
-            - key: webhdfs_token.sh
-              path: webhdfs_token.sh
-            - key: eos_token.sh
-              path: eos_token.sh
-            - key: sparkk8s_token.sh
-              path: sparkk8s_token.sh
-            defaultMode: 356 # 0544 perm
         - name: swan-secrets
           secret:
             secretName: swan-cern
@@ -288,15 +253,6 @@ swanCern:
     sparkk8s:
       cred:
 
-hadoopTokenGenerator:
-  extraVolumes:
-    - name: swan-tokens-scripts
-      configMap:
-        name: swan-scripts-env-prod
-        items:
-          - key: hadoop_token.sh
-            path: hadoop_token.sh
-        defaultMode: 500
 fluentd:
   containerRuntime: containerd
   plugins:
