@@ -62,9 +62,6 @@ spec:
         - name: swan-secrets
           mountPath: /hadoop-token-generator/hadoop.cred
           subPath: hadoop.cred
-        - name: swan-tokens-scripts
-          mountPath: /hadoop-token-generator/hadoop_token.sh
-          subPath: hadoop_token.sh
 
       volumes:
       - name: cvmfs
@@ -78,9 +75,6 @@ spec:
           items:
             - key: hadoop.cred
               path: hadoop.cred
-      {{- with .Values.hadoopTokenGenerator.extraVolumes }}
-        {{- . | toYaml | nindent 6 }}
-      {{- end }}
 ---
 apiVersion: v1
 kind: Service
