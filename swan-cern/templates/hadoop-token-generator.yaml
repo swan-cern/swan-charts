@@ -41,7 +41,7 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 5
 
-        image: gitlab-registry.cern.ch/swan/docker-images/hadoop-token-generator:v1.0.0 
+        image: {{ .Values.hadoopTokenGenerator.image }}
         imagePullPolicy: Always
         ports:
         - containerPort: 80
