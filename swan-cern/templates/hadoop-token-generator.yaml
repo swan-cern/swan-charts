@@ -33,7 +33,7 @@ spec:
         - name: HADOOP_CONF_HOME
           value: {{ .Values.swan.jupyterhub.custom.spark.configurationPath }}
         - name: SWAN_DEV
-          value: {{ .Values.development | default "false" | quote }}
+          value: {{ .Values.swanCern.development | default "false" | quote }}
 
         livenessProbe:
           exec:

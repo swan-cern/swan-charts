@@ -44,7 +44,7 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
         try:
             # Retrieve eos token for user
             eos_token_base64 = subprocess.check_output(
-                ['sudo', '/srv/jupyterhub/private/eos_token.sh', username], timeout=60
+                ['sudo', '--preserve-env=SWAN_DEV', '/srv/jupyterhub/private/eos_token.sh', username], timeout=60
             ).decode('ascii')
         except Exception as e:
             raise ValueError("Could not create required user credential")
