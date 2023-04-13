@@ -45,7 +45,7 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
             try:
                 # Setup the user and generate user kube config
                 k8suser_config_base64 = subprocess.check_output(
-                    ['sudo', '/srv/jupyterhub/private/sparkk8s_token.sh', username], timeout=60
+                    ['sudo', '--preserve-env=SWAN_DEV', '/srv/jupyterhub/private/sparkk8s_token.sh', username], timeout=60
                 ).decode('ascii')
             except Exception as e:
                 # if no access, all good for now
@@ -54,7 +54,7 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
             try:
                 # Retrieve hdfs token for user
                 webhdfs_token_base64 = subprocess.check_output(
-                    ['sudo', '/srv/jupyterhub/private/webhdfs_token.sh', hdfs_cluster, username], timeout=60
+                    ['sudo', '--preserve-env=SWAN_DEV', '/srv/jupyterhub/private/webhdfs_token.sh', hdfs_cluster, username], timeout=60
                 ).decode('ascii')
             except Exception as e:
                 # if no access, all good for now
@@ -63,7 +63,7 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
             try:
                 # Retrieve hdfs token for user
                 webhdfs_token_base64 = subprocess.check_output(
-                    ['sudo', '/srv/jupyterhub/private/webhdfs_token.sh', cluster, username], timeout=60
+                    ['sudo', '--preserve-env=SWAN_DEV', '/srv/jupyterhub/private/webhdfs_token.sh', cluster, username], timeout=60
                 ).decode('ascii')
             except Exception as e:
                 # if no access, all good for now
