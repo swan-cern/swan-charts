@@ -81,7 +81,6 @@ jobs:
     with:
       chart: swan
       bump: ${{ inputs.bump_swan }}
-      HELM_REPO_BASE_URL: https://registry.cern.ch/chartrepo/swan
     secrets:
       WORKFLOW_ACCESS_TOKEN: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
       HELM_REPO_USERNAME: ${{ secrets.HELM_REPO_USERNAME }}
@@ -132,7 +131,6 @@ jobs:
     with:
       chart: swan-cern
       bump: ${{ inputs.bump_swan_cern }}
-      HELM_REPO_BASE_URL: https://registry.cern.ch/chartrepo/swan
     secrets:
       WORKFLOW_ACCESS_TOKEN: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
       HELM_REPO_USERNAME: ${{ secrets.HELM_REPO_USERNAME }}

@@ -17,10 +17,6 @@ on:
         required: true
         default: patch
         type: string
-      HELM_REPO_BASE_URL:
-        type: string
-        description: Helm repository base url
-        required: true
 
     secrets:
       WORKFLOW_ACCESS_TOKEN:
@@ -89,13 +85,10 @@ jobs:
           atomic: true
 
       - name: Push to helm registry
-        env:
-          HELM_REPO_USERNAME: ${{ secrets.HELM_REPO_USERNAME }}
-          HELM_REPO_PASSWORD: ${{ secrets.HELM_REPO_PASSWORD }}
         run: |
-          set -x
-          helm plugin install https://github.com/chartmuseum/helm-push --version v0.10.3
-          helm cm-push ${{ inputs.chart }}/ ${{ inputs.HELM_REPO_BASE_URL }}
+          helm registry login -u ${{ secrets.HELM_REPO_USERNAME }} -p ${{ secrets.HELM_REPO_PASSWORD }} ${{ vars.HELM_HARBOR_URL }}
+          helm package ${{ inputs.chart }}
+          helm push ${{ inputs.chart }}-${{ steps.version.outputs.new_version }}.tgz ${{ vars.HELM_REPO_BASE_URL }}
 
   publish_github_release:
     needs: [publish_chart]
