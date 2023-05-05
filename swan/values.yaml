@@ -165,6 +165,7 @@ jupyterhub:
           - profile
           - email
           - offline_access
+          - openid
         exchange_tokens: []
         logout_redirect_url: https://cern.ch/swan
         auto_login: True
