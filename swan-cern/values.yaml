@@ -254,7 +254,7 @@ swanCern:
       cred:
 
 hadoopTokenGenerator:
-  image: gitlab-registry.cern.ch/swan/docker-images/hadoop-token-generator:v2.1.0
+  image: gitlab-registry.cern.ch/swan/docker-images/hadoop-token-generator:v2.1.1
 
 fluentd:
   containerRuntime: containerd
