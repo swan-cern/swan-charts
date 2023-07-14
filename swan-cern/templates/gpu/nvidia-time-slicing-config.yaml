@@ -1,0 +1,27 @@
+{{- if index .Values "gpu-operator" "enabled" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nvidia-time-slicing-config
+  namespace: {{ .Release.Namespace }}
+data:
+  slice-4: |-
+    version: v1
+    sharing:
+      timeSlicing:
+        renameByDefault: true
+        failRequestsGreaterThanOne: true
+        resources:
+        - name: nvidia.com/gpu
+          replicas: 4
+  slice-10: |-
+    version: v1
+    sharing:
+      timeSlicing:
+        renameByDefault: true
+        failRequestsGreaterThanOne: true
+        resources:
+        - name: nvidia.com/gpu
+          replicas: 10
+{{- end }}
+

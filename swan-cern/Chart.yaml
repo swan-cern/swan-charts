@@ -15,3 +15,7 @@ dependencies:
   - name: fluentd
     repository: http://registry.cern.ch/chartrepo/cern
     version: 0.1.5
+  - name: gpu-operator
+    version: 22.9.1
+    repository: https://helm.ngc.nvidia.com/nvidia
+
