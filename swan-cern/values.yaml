@@ -186,8 +186,8 @@ swan:
           
     custom:
       cull:
-        # 6 hours
-        timeout: 21600
+        # 4 hours
+        timeout: 14400
         checkEosAuth: true
         hooksDir: /srv/jupyterhub/culler
       cvmfs:
