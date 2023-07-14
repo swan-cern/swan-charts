@@ -5,5 +5,8 @@ dependencies:
 - name: fluentd
   repository: http://registry.cern.ch/chartrepo/cern
   version: 0.1.5
-digest: sha256:068b2c9f16e719c1717b44dc219af14e6d797234d3b411ccc58490eeafb6f544
-generated: "2023-06-29T14:03:35.04806036Z"
+- name: gpu-operator
+  repository: https://helm.ngc.nvidia.com/nvidia
+  version: v22.9.1
+digest: sha256:6fd67e2ad601ac5814df06cbdf8dff8eaa7d8329f802374b4a5836441c97c055
+generated: "2023-07-14T14:23:08.362777625+02:00"
