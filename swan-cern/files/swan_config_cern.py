@@ -1,7 +1,25 @@
 import os, subprocess
 
-from kubernetes import client
-from kubernetes.client.rest import ApiException
+import asyncio
+
+from kubernetes_asyncio.client.models import (
+    V1EmptyDirVolumeSource,
+    V1EnvVar,
+    V1EnvVarSource,
+    V1ConfigMapVolumeSource,
+    V1Container,
+    V1KeyToPath,
+    V1ObjectFieldSelector,
+    V1ObjectMeta,
+    V1PodSecurityContext,
+    V1Secret,
+    V1SecretVolumeSource,
+    V1SELinuxOptions,
+    V1Volume,
+    V1VolumeMount,
+)
+
+from kubernetes_asyncio.client.rest import ApiException
 
 """
 Class handling KubeSpawner.modify_pod_hook(spawner,pod) call
@@ -10,7 +28,7 @@ Class handling KubeSpawner.modify_pod_hook(spawner,pod) call
 
 class SwanPodHookHandlerProd(SwanPodHookHandler):
 
-    def get_swan_user_pod(self):
+    async def get_swan_user_pod(self):
         super().get_swan_user_pod()
 
         # ATTENTION Spark requires this side container, so we need to create it!!
@@ -19,14 +37,14 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
         #     not self.spawner.local_home:
 
         # get eos token
-        eos_secret_name = self._init_eos_secret()
+        eos_secret_name = await self._init_eos_secret()
 
         # init user containers (notebook and side-container)
         self._init_eos_containers(eos_secret_name)
 
         return self.pod
 
-    def _init_eos_secret(self):
+    async def _init_eos_secret(self):
         username = self.spawner.user.name
         user_uid = self.spawner.user_uid
         eos_secret_name ='eos-tokens-%s' % username
@@ -39,34 +57,29 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
         except Exception as e:
             raise ValueError("Could not create required user credential")
 
-
         # ITHADOOP-819 - Ports need to be opened using service creation, and later assigning allocated service nodeport to a pod 
         # Create V1Secret with eos token
+        secret_data = V1Secret()
+
+        secret_meta = V1ObjectMeta()
+        secret_meta.name = eos_secret_name
+        secret_meta.namespace = swan_container_namespace
+        secret_meta.labels = {
+            "swan_user": username
+        }
+        secret_data.metadata = secret_meta
+        secret_data.data = {}
+        secret_data.data['krb5cc'] = eos_token_base64
+
         try:
-            secret_data = client.V1Secret()
-
-            secret_meta = client.V1ObjectMeta()
-            secret_meta.name = eos_secret_name
-            secret_meta.namespace = swan_container_namespace
-            secret_meta.labels = {
-                "swan_user": username
-            }
-            secret_data.metadata = secret_meta
-            secret_data.data = {}
-            secret_data.data['krb5cc'] = eos_token_base64
-
+            # eos-tokens secret is cleaned when user session ends, so try creating it
+            await self.spawner.api.create_namespaced_secret(swan_container_namespace, secret_data)
+        except ApiException:
+            # A secret with the same name exists, probably a remnant of a wrongly-terminated session, then replace it
             try:
-                self.spawner.api.read_namespaced_secret(eos_secret_name, swan_container_namespace)
-                exists = True
-            except ApiException:
-                exists = False
-
-            if exists:
-                self.spawner.api.replace_namespaced_secret(eos_secret_name, swan_container_namespace, secret_data)
-            else:
-                self.spawner.api.create_namespaced_secret(swan_container_namespace, secret_data)
-        except ApiException as e:
-            raise Exception("Could not create required eos secret: %s\n" % e)
+                await self.spawner.api.replace_namespaced_secret(eos_secret_name, swan_container_namespace, secret_data)
+            except ApiException as e:
+                raise Exception("Could not create required eos secret: %s\n" % e)
 
         return eos_secret_name
 
@@ -82,15 +95,15 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
 
         # Shared directory between notebook and side-container for tokens with correct privileges
         self.pod.spec.volumes.append(
-            client.V1Volume(
+            V1Volume(
                 name='shared-pod-volume',
-                empty_dir=client.V1EmptyDirVolumeSource(
+                empty_dir=V1EmptyDirVolumeSource(
                     medium='Memory'
                 )
             )
         )
         side_container_volume_mounts.append(
-            client.V1VolumeMount(
+            V1VolumeMount(
                 name='shared-pod-volume',
                 mount_path='/srv/notebook'
             )
@@ -98,7 +111,7 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
 
         # Mount shared tokens volume that contains tokens with correct permissions
         notebook_container.volume_mounts.append(
-            client.V1VolumeMount(
+            V1VolumeMount(
                 name='shared-pod-volume',
                 mount_path='/srv/notebook'
             )
@@ -107,15 +120,15 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
         # pod volume to mount generated eos tokens and
         # side-container volume mount with generated tokens
         self.pod.spec.volumes.append(
-            client.V1Volume(
+            V1Volume(
                 name=eos_secret_name,
-                secret=client.V1SecretVolumeSource(
+                secret=V1SecretVolumeSource(
                     secret_name='eos-tokens-%s' % username,
                 )
             )
         )
         side_container_volume_mounts.append(
-            client.V1VolumeMount(
+            V1VolumeMount(
                 name=eos_secret_name,
                 mount_path='/srv/side-container/eos'
             )
@@ -124,7 +137,7 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
         # define eos kerberos credentials path for Jupyter server in notebook container
         notebook_container.env = self._add_or_replace_by_name(
             notebook_container.env,
-            client.V1EnvVar(
+            V1EnvVar(
                 name='KRB5CCNAME',
                 value='/srv/notebook/tokens/krb5cc'
             ),
@@ -133,7 +146,7 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
         # define eos kerberos credentials path for notebook and terminal processes in notebook container
         notebook_container.env = self._add_or_replace_by_name(
             notebook_container.env,
-            client.V1EnvVar(
+            V1EnvVar(
                 name='KRB5CCNAME_NB_TERM',
                 value='/srv/notebook/tokens/writable/krb5cc_nb_term'
             ),
@@ -142,10 +155,10 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
         # Set server hostname of the pod running jupyterhub
         notebook_container.env = self._add_or_replace_by_name(
             notebook_container.env,
-            client.V1EnvVar(
+            V1EnvVar(
                 name='SERVER_HOSTNAME',
-                value_from=client.V1EnvVarSource(
-                    field_ref=client.V1ObjectFieldSelector(
+                value_from=V1EnvVarSource(
+                    field_ref=V1ObjectFieldSelector(
                         field_path='spec.nodeName'
                     )
                 )
@@ -155,12 +168,12 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
         # append as first (it will be first to spawn) side container which currently:
         #  - refreshes the kerberos token and adjust permissions for the user
         self.pod.spec.volumes.append(
-            client.V1Volume(
+            V1Volume(
                 name='side-container-scripts',
-                config_map=client.V1ConfigMapVolumeSource(
+                config_map=V1ConfigMapVolumeSource(
                     name='swan-scripts-cern',
                     items=[
-                        client.V1KeyToPath(
+                        V1KeyToPath(
                             key='side_container_tokens_perm.sh',
                             path='side_container_tokens_perm.sh',
                         )
@@ -170,7 +183,7 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
             )
         )
         side_container_volume_mounts.append(
-            client.V1VolumeMount(
+            V1VolumeMount(
                 name='side-container-scripts',
                 mount_path='/srv/side-container/side_container_tokens_perm.sh',
                 sub_path='side_container_tokens_perm.sh',
@@ -179,7 +192,7 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
 
         env = self.spawner.get_env()
         pod_spec_containers.append(
-            client.V1Container(
+            V1Container(
                 name='side-container',
                 image='cern/cc7-base:20181210',
                 command=['/srv/side-container/side_container_tokens_perm.sh'],
@@ -203,18 +216,18 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
 # This is defined in the configuration to allow overring iindependently 
 # of which config file is loaded first
 # c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook
-def swan_pod_hook_prod(spawner, pod):
+async def swan_pod_hook_prod(spawner, pod):
     """
     :param spawner: Swan Kubernetes Spawner
     :type spawner: swanspawner.SwanKubeSpawner
     :param pod: default pod definition set by jupyterhub
-    :type pod: client.V1Pod
+    :type pod: V1Pod
 
     :returns: dynamically customized pod specification for user session
-    :rtype: client.V1Pod
+    :rtype: V1Pod
     """
     pod_hook_handler = SwanPodHookHandlerProd(spawner, pod)
-    return pod_hook_handler.get_swan_user_pod()
+    return await pod_hook_handler.get_swan_user_pod()
 
 
 swan_cull_period = get_config('custom.cull.every', 600)
@@ -222,16 +235,6 @@ swan_cull_period = get_config('custom.cull.every', 600)
 swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
 
 c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook_prod
-
-def swan_cern_post_stop_hook(spawner):
-    # Delete Kubernetes Secret storing eos kerberos ticket of the user
-    username = spawner.user.name
-    eos_secret_name = f"eos-tokens-{username}"
-    swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
-    spawner.log.info('Deleting secret %s', eos_secret_name)
-    spawner.api.delete_namespaced_secret(eos_secret_name, swan_container_namespace)
-
-c.SwanKubeSpawner.post_stop_hook = swan_cern_post_stop_hook
 
 # Required for swan systemuser.sh
 c.SwanKubeSpawner.cmd = None

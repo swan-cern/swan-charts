@@ -1,7 +1,13 @@
 import logging, os, subprocess
 
-from kubernetes import client
-from kubernetes.client.rest import ApiException
+from kubernetes_asyncio.client.models import (
+    V1EmptyDirVolumeSource,
+    V1EnvVar,
+    V1HostPathVolumeSource,
+    V1PersistentVolumeClaimVolumeSource,
+    V1Volume,
+    V1VolumeMount,
+)
 
 """
 Class handling KubeSpawner.modify_pod_hook(spawner,pod) call
@@ -11,7 +17,7 @@ class SwanPodHookHandler:
     def __init__(self, spawner, pod):
         """
         :type spawner: swanspawner.SwanKubeSpawner
-        :type pod: client.V1Pod
+        :type pod: V1Pod
         """
         self.spawner = spawner
         self.pod = pod
@@ -37,7 +43,7 @@ class SwanPodHookHandler:
     def _get_pod_container(self, container_name):
         """
         :returns: required container from pod spec
-        :rtype: client.V1Container
+        :rtype: V1Container
         """
         for container in self.pod.spec.containers:
             if container.name == container_name:
@@ -67,10 +73,10 @@ def swan_pod_hook(spawner, pod):
     :param spawner: Swan Kubernetes Spawner
     :type spawner: swanspawner.SwanKubeSpawner
     :param pod: default pod definition set by jupyterhub
-    :type pod: client.V1Pod
+    :type pod: V1Pod
 
     :returns: dynamically customized pod specification for user session
-    :rtype: client.V1Pod
+    :rtype: V1Pod
     """
     pod_hook_handler = SwanPodHookHandler(spawner, pod)
     return pod_hook_handler.get_swan_user_pod()
@@ -140,15 +146,15 @@ c.SwanKubeSpawner.volume_mounts = []
 
 # add /dev/shm (for pyTorch and others)
 c.SwanKubeSpawner.volumes.append(
-    client.V1Volume(
+    V1Volume(
         name='devshm',
-       empty_dir=client.V1EmptyDirVolumeSource(
+       empty_dir=V1EmptyDirVolumeSource(
             medium='Memory'
         )
     )
 )
 c.SwanKubeSpawner.volume_mounts.append(
-    client.V1VolumeMount(
+    V1VolumeMount(
         name='devshm',
         mount_path='/dev/shm',
     )
@@ -159,16 +165,16 @@ if get_config("custom.eos.deployDaemonSet", False):
     # Access via bind-mount from the host
     logging.info("EOS access via DaemonSet")
     c.SwanKubeSpawner.volume_mounts.append(
-        client.V1VolumeMount(
+        V1VolumeMount(
             name='eos',
             mount_path='/eos',
             mount_propagation='HostToContainer'
         ),
     )
     c.SwanKubeSpawner.volumes.append(
-        client.V1Volume(
+        V1Volume(
             name='eos',
-            host_path=client.V1HostPathVolumeSource(
+            host_path=V1HostPathVolumeSource(
                 path='/var/eos'
             )
         ),
@@ -178,16 +184,16 @@ elif (get_config("custom.eos.deployCsiDriver", False) or \
     # Access via CSI driver (still a bind-mount in practical terms)
     logging.info("EOS access via CSI driver")
     c.SwanKubeSpawner.volume_mounts.append(
-        client.V1VolumeMount(
+        V1VolumeMount(
             name='eos',
             mount_path='/eos',
             mount_propagation='HostToContainer'
         ),
     )
     c.SwanKubeSpawner.volumes.append(
-        client.V1Volume(
+        V1Volume(
             name='eos',
-            host_path=client.V1HostPathVolumeSource(
+            host_path=V1HostPathVolumeSource(
                 path='/var/eos'
             )
         ),
@@ -202,15 +208,15 @@ if get_config("custom.cvmfs.deployDaemonSet", False):
     # Access via bind-mount from the host
     logging.info("CVMFS access via DaemonSet")
     c.SwanKubeSpawner.volumes.append(
-        client.V1Volume(
+        V1Volume(
             name='cvmfs',
-            host_path=client.V1HostPathVolumeSource(
+            host_path=V1HostPathVolumeSource(
                 path='/var/cvmfs'
             )
         )
     )
     c.SwanKubeSpawner.volume_mounts.append(
-        client.V1VolumeMount(
+        V1VolumeMount(
             name='cvmfs',
             mount_path='/cvmfs',
             mount_propagation='HostToContainer'
@@ -224,15 +230,15 @@ elif (get_config("custom.cvmfs.deployCsiDriver", False) or \
     for cvmfs_repo_path in cvmfs_repos:
         cvmfs_repo_id = cvmfs_repo_path['mount'].replace('.', '-')
         c.SwanKubeSpawner.volumes.append(
-            client.V1Volume(
+            V1Volume(
                 name='cvmfs-'+cvmfs_repo_id,
-                persistent_volume_claim=client.V1PersistentVolumeClaimVolumeSource(
+                persistent_volume_claim=V1PersistentVolumeClaimVolumeSource(
                     claim_name='cvmfs-'+cvmfs_repo_id+'-pvc'
                 )
             )
         )
         c.SwanKubeSpawner.volume_mounts.append(
-            client.V1VolumeMount(
+            V1VolumeMount(
                 name='cvmfs-'+cvmfs_repo_id,
                 mount_path='/cvmfs/'+cvmfs_repo_path['mount'],
                 read_only=True

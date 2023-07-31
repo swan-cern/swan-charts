@@ -1,7 +1,21 @@
 import os, subprocess, time, pwd, jwt
 
-from kubernetes import client
-from kubernetes.client.rest import ApiException
+from kubernetes_asyncio.client.models import (
+    V1EnvVar,
+    V1EnvVarSource,
+    V1ContainerPort,
+    V1ObjectMeta,
+    V1Secret,
+    V1SecretKeySelector,
+    V1SecretVolumeSource,
+    V1Service,
+    V1ServicePort,
+    V1ServiceSpec,
+    V1Volume,
+    V1VolumeMount,
+)
+
+from kubernetes_asyncio.client.rest import ApiException
 
 import swanspawner
 
@@ -12,22 +26,22 @@ Class handling KubeSpawner.modify_pod_hook(spawner,pod) call
 
 class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
 
-    def get_swan_user_pod(self):
-        super().get_swan_user_pod()
+    async def get_swan_user_pod(self):
+        await super().get_swan_user_pod()
 
         # get hadoop token
         hadoop_secret_name = None
         if self._spark_enabled():
             # cern customisation for spark clusters
-            hadoop_secret_name = self._init_hadoop_secret()
-            self._init_spark(self.pod.metadata.labels)
+            hadoop_secret_name = await self._init_hadoop_secret()
+            await self._init_spark(self.pod.metadata.labels)
 
         # init user containers (notebook and side-container)
         self._init_spark_containers(hadoop_secret_name)
 
         return self.pod
 
-    def _init_hadoop_secret(self):
+    async def _init_hadoop_secret(self):
 
         cluster = self.spawner.user_options[self.spawner.spark_cluster_field]
 
@@ -71,9 +85,9 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
 
         # Create V1Secret with eos token
         try:
-            secret_data = client.V1Secret()
+            secret_data = V1Secret()
 
-            secret_meta = client.V1ObjectMeta()
+            secret_meta = V1ObjectMeta()
             secret_meta.name = hadoop_secret_name
             secret_meta.namespace = swan_container_namespace
             secret_data.metadata = secret_meta
@@ -82,15 +96,15 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
             secret_data.data['webhdfs.toks'] = webhdfs_token_base64
 
             try:
-                self.spawner.api.read_namespaced_secret(hadoop_secret_name, swan_container_namespace)
+                await self.spawner.api.read_namespaced_secret(hadoop_secret_name, swan_container_namespace)
                 exists = True
             except ApiException:
                 exists = False
 
             if exists:
-                self.spawner.api.replace_namespaced_secret(hadoop_secret_name, swan_container_namespace, secret_data)
+                await self.spawner.api.replace_namespaced_secret(hadoop_secret_name, swan_container_namespace, secret_data)
             else:
-                self.spawner.api.create_namespaced_secret(swan_container_namespace, secret_data)
+                await self.spawner.api.create_namespaced_secret(swan_container_namespace, secret_data)
         except ApiException as e:
             raise Exception("Could not create required hadoop secret: %s\n" % e)
 
@@ -112,15 +126,15 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
             # side-container volume mount with generated tokens
             self.pod.spec.volumes.append(
                 # V1Secret for tokens without adjusted permissions
-                client.V1Volume(
+                V1Volume(
                     name=hadoop_secret_name,
-                    secret=client.V1SecretVolumeSource(
+                    secret=V1SecretVolumeSource(
                         secret_name=hadoop_secret_name,
                     )
                 )
             )
             side_container.volume_mounts.append(
-                client.V1VolumeMount(
+                V1VolumeMount(
                     name=hadoop_secret_name,
                     mount_path='/srv/side-container/hadoop'
                 )
@@ -129,31 +143,31 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
             # instruct sparkconnector to fetch delegation tokens from service
             notebook_container.env = self._add_or_replace_by_name(
                 notebook_container.env,
-                client.V1EnvVar(
+                V1EnvVar(
                     name='SWAN_FETCH_HADOOP_TOKENS',
                     value='true'
                 ),
             )
             notebook_container.env = self._add_or_replace_by_name(
                 notebook_container.env,
-                client.V1EnvVar(
+                V1EnvVar(
                     name='SWAN_HADOOP_TOKEN_GENERATOR_URL',
                     value='http://hadoop-token-generator:80'
                 ),
             )
             notebook_container.env = self._add_or_replace_by_name(
                 notebook_container.env,
-                client.V1EnvVar(
+                V1EnvVar(
                     name='KUBECONFIG',
                     value='/srv/notebook/tokens/k8s-user.config'
                 ),
             )
             notebook_container.env = self._add_or_replace_by_name(
                 notebook_container.env,
-                client.V1EnvVar(
+                V1EnvVar(
                     name='WEBHDFS_TOKEN',
-                    value_from=client.V1EnvVarSource(
-                        secret_key_ref=client.V1SecretKeySelector(
+                    value_from=V1EnvVarSource(
+                        secret_key_ref=V1SecretKeySelector(
                             key='webhdfs.toks',
                             name=hadoop_secret_name
                         )
@@ -190,7 +204,7 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
             return True
         return False
 
-    def _init_spark(self, pod_labels):
+    async def _init_spark(self, pod_labels):
         """
         Set cern related configuration for spark cluster and open ports
         """
@@ -209,21 +223,21 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
 
         notebook_container.env = self._add_or_replace_by_name(
             notebook_container.env,
-            client.V1EnvVar(
+            V1EnvVar(
                 name='SPARK_CLUSTER_NAME',
                 value=cluster
             )
         )
         notebook_container.env = self._add_or_replace_by_name(
             notebook_container.env,
-            client.V1EnvVar(
+            V1EnvVar(
                 name='SPARK_USER',
                 value=username
             )
         )
         notebook_container.env = self._add_or_replace_by_name(
             notebook_container.env,
-            client.V1EnvVar(
+            V1EnvVar(
                 name='MAX_MEMORY',
                 value=max_mem
             )
@@ -238,7 +252,7 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
 
         notebook_container.env = self._add_or_replace_by_name(
             notebook_container.env,
-            client.V1EnvVar(
+            V1EnvVar(
                 name='SPARK_AUTH_REQUIRED',
                 value=auth_required
             )
@@ -253,7 +267,7 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
 
         notebook_container.env = self._add_or_replace_by_name(
             notebook_container.env,
-            client.V1EnvVar(
+            V1EnvVar(
                 name='SPARK_CONFIG_SCRIPT',
                 value=spark_conf_script
             )
@@ -268,18 +282,18 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
             spark_ports_per_pod = 18
             for port_id in range(1, spark_ports_per_pod + 1):
                 service_template_ports.append(
-                    client.V1ServicePort(
+                    V1ServicePort(
                         name="spark-port-" + str(port_id),
                         port=port_id
                     )
                 )
-            service_template = client.V1Service(
+            service_template = V1Service(
                 api_version="v1",
                 kind="Service",
-                metadata=client.V1ObjectMeta(
+                metadata=V1ObjectMeta(
                     name=spark_ports_service
                 ),
-                spec=client.V1ServiceSpec(
+                spec=V1ServiceSpec(
                     selector=pod_labels,  # attach this service to the pod with label {spark_pod_label}
                     ports=service_template_ports,
                     type="NodePort"
@@ -289,18 +303,21 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
             # Create V1Service which allocates random ports for spark in k8s cluster
             try:
                 # use existing if possible
-                self.spawner.api.delete_namespaced_service(spark_ports_service, swan_container_namespace)
-                service = self.spawner.api.read_namespaced_service(spark_ports_service, swan_container_namespace)
+                await self.spawner.api.delete_namespaced_service(spark_ports_service, swan_container_namespace)
+                service = await self.spawner.api.read_namespaced_service(spark_ports_service, swan_container_namespace)
             except ApiException:
                 # not existing, create
-                service = self.spawner.api.create_namespaced_service(swan_container_namespace, service_template)
+                try:
+                    service = await self.spawner.api.create_namespaced_service(swan_container_namespace, service_template)
+                except ApiException as e:
+                    raise Exception("Could not create service that allocates random ports for Spark in k8s cluster: %s\n" % e)
 
             # Replace the service with allocated nodeports to map nodeport:targetport
             # and set these ports for the notebook container
             for port_id in range(len(service.spec.ports)):
                 name = service.spec.ports[port_id].name
                 node_port = service.spec.ports[port_id].node_port
-                service.spec.ports[port_id] = client.V1ServicePort(
+                service.spec.ports[port_id] = V1ServicePort(
                     name=name,
                     node_port=node_port,
                     port=node_port,
@@ -313,19 +330,20 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
                 # Open proper ports in the notebook container to map nodeport:targetport
                 notebook_container.ports = self._add_or_replace_by_name(
                     notebook_container.ports,
-                    client.V1ContainerPort(
+                    V1ContainerPort(
                         name=name,
                         container_port=node_port,
                         # this is needed - hadoop-yarn webapp crashes on ApplicationProxy UI
                         host_port=node_port,
                     )
                 )
-            self.spawner.api.replace_namespaced_service(spark_ports_service, swan_container_namespace, service)
+
+            await self.spawner.api.replace_namespaced_service(spark_ports_service, swan_container_namespace, service)
 
             # Add ports env for spark
             notebook_container.env = self._add_or_replace_by_name(
                 notebook_container.env,
-                client.V1EnvVar(
+                V1EnvVar(
                     name='SPARK_PORTS',
                     value=','.join(spark_ports_env)
                 )
@@ -339,40 +357,13 @@ def spark_modify_pod_hook(spawner, pod):
     :param spawner: Swan Kubernetes Spawner
     :type spawner: swanspawner.SwanKubeSpawner
     :param pod: default pod definition set by jupyterhub
-    :type pod: client.V1Pod
+    :type pod: V1Pod
 
     :returns: dynamically customized pod specification for user session
-    :rtype: client.V1Pod
+    :rtype: V1Pod
     """
     spark_pod_hook_handler = SwanSparkPodHookHandler(spawner, pod)
     return spark_pod_hook_handler.get_swan_user_pod()
 
 
-def spark_post_stop_hook(spawner):
-    """
-    :param spawner: Swan Kubernetes Spawner
-    :type spawner: swanspawner.SwanKubeSpawner
-    """
-    
-    # Call the parent hook defined in the swan_config_cern.py config file
-    # This function is assumed to be available as a global, because the config files 
-    # are concatenated before execution by the chart.
-    swan_cern_post_stop_hook(spawner)
-
-    spark_cluster = spawner.user_options[spawner.spark_cluster_field]
-    if spark_cluster and spark_cluster != 'none':
-        username = spawner.user.name
-        swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
-
-        # Delete NodePort service opening ports for the user spark processes
-        spark_ports_service = f"spark-ports-{username}"
-        spawner.log.info('Deleting service %s', spark_ports_service)
-        spawner.api.delete_namespaced_service(spark_ports_service, swan_container_namespace)
-        
-        # Delete Kubernetes Secret with hadoop delegation tokens
-        hadoop_secret_name = f"hadoop-tokens-{username}"
-        spawner.log.info('Deleting secret %s', hadoop_secret_name)
-        spawner.api.delete_namespaced_secret(hadoop_secret_name, swan_container_namespace)
-
 c.SwanKubeSpawner.modify_pod_hook = spark_modify_pod_hook
-c.SwanKubeSpawner.post_stop_hook = spark_post_stop_hook
