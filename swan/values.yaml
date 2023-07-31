@@ -118,7 +118,8 @@ jupyterhub:
     # placeholder for hub secret token
     secretToken:
   hub:
-    fsGid: 0
+    podSecurityContext:
+      fsGroup: 0
     containerSecurityContext:
       runAsUser: 0
       runAsGroup: 0
@@ -206,8 +207,6 @@ jupyterhub:
     # placeholder for hub cookieSecret
     # when empty, it generates a new randomly
     cookieSecret:
-  rbac:
-    enabled: true
   scheduling:
     userScheduler:
       enabled: false
