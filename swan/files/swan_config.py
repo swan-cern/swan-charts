@@ -29,60 +29,10 @@ class SwanPodHookHandler:
             pod_labels
         )
 
-        if self._gpu_enabled():
-            # currently no cern customisation required
-            self.pod.spec.volumes.append(
-                client.V1Volume(
-                    host_path=client.V1HostPathVolumeSource(path="/opt/nvidia-driver"),
-                    name='nvidia-driver'
-                )
-            )
-
-            notebook_container = self._get_pod_container('notebook')
-
-            notebook_container.volume_mounts.append(
-                client.V1VolumeMount(
-                name='nvidia-driver',
-                mount_path='/opt/nvidia-driver'
-                )
-            )
-
-            notebook_container.env = self._add_or_replace_by_name(
-                notebook_container.env,
-                client.V1EnvVar(
-                    name='NVIDIA_LIB_PATH',
-                    value='/opt/nvidia-driver/lib64'
-                ),
-            )
-
-            notebook_container.env = self._add_or_replace_by_name(
-                notebook_container.env,
-                client.V1EnvVar(
-                    name='NVIDIA_PATH',
-                    value='/opt/nvidia-driver/bin'
-                ),
-            )
-
         # Disable adding environment variables from Kubernetes services in the same namespace
         self.pod.spec.enable_service_links = False
 
         return self.pod
-
-    def _gpu_enabled(self):
-        """
-        Helper function to determine if gpu is allowed for given spawn
-        raise exception if user has not access to the gpu
-        return True if gpu is selected and user has access to gpu
-        return False if gpu is not selected
-        """
-
-        user_roles = self.spawner.user_roles
-        lcg_rel = self.spawner.user_options[self.spawner.lcg_rel_field]
-
-        if "cu" in lcg_rel:
-            return True
-        else:
-            return False
 
     def _get_pod_container(self, container_name):
         """
