@@ -63,15 +63,6 @@ class SwanPodHookHandler:
                 ),
             )
 
-            # Configure OpenCL to use NVIDIA backend
-            notebook_container.env = self._add_or_replace_by_name(
-                notebook_container.env,
-                client.V1EnvVar(
-                    name='OCL_ICD_FILENAMES',
-                    value='libnvidia-opencl.so.1'
-                ),
-            )
-
         # Disable adding environment variables from Kubernetes services in the same namespace
         self.pod.spec.enable_service_links = False
 
