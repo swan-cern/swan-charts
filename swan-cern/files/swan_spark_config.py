@@ -178,7 +178,7 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
            raise ValueError(
               """
               Access to the Analytix cluster is not granted. 
-              Please <a href="https://hadoop.web.cern.ch/" target="_blank">request access</a>
+              Please <a href="https://cern.service-now.com/service-portal?id=sc_cat_item&name=access-cluster-hadoop&se=Hadoop-Service" target="_blank">request access</a>
               """)
         elif cluster == "hadoop-nxcals" and "hadoop-nxcals" not in user_roles:
            raise ValueError(
