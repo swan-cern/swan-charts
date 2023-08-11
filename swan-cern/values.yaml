@@ -54,6 +54,7 @@ swan:
       - na61.cern.ch
       - na62.cern.ch
       - projects.cern.ch
+      - ship.cern.ch
       - sw.hsf.org
       - sndlhc.cern.ch
     resources:
