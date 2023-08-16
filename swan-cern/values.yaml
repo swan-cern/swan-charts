@@ -138,6 +138,7 @@ swan:
       config:
         KeyCloakAuthenticator:
           oidc_issuer: https://auth.cern.ch/auth/realms/cern
+          admin_role: swan-admins
           exchange_tokens:
             - eos-service
             - cernbox-service

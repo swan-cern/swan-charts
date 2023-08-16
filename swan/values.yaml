@@ -161,16 +161,13 @@ jupyterhub:
       KeyCloakAuthenticator:
         # Config missing
         oidc_issuer:
-        admin_role: swan-admins
         scope:
           - profile
           - email
           - offline_access
           - openid
         exchange_tokens: []
-        logout_redirect_url: https://cern.ch/swan
         auto_login: True
-        username_key: preferred_username
         client_id: # placeholder, check secrets
         client_secret: # placeholder, check secrets
         oauth_callback_url: # placeholder, check secrets
