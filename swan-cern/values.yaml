@@ -144,7 +144,7 @@ swan:
             - cernbox-service
           logout_redirect_url: https://cern.ch/swan
           auto_login: False
-          username_key: preferred_username
+          username_claim: preferred_username
           client_id: # placeholder, check secrets
           client_secret: # placeholder, check secrets
           oauth_callback_url: # placeholder, check secrets
