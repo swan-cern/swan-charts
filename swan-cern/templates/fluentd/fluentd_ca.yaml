@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluentd-ca
+  namespace: {{ .Release.Namespace }}
+data:
+{{ (.Files.Glob "files/ca-certs/ca-bundle.crt").AsConfig | indent 2 }}

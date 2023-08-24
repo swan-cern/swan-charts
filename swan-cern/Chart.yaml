@@ -13,8 +13,8 @@ dependencies:
     version: 0.6.4
     repository: oci://registry.cern.ch/swan/charts
   - name: fluentd
-    repository: http://registry.cern.ch/chartrepo/cern
-    version: 0.1.5
+    version: 0.4.3
+    repository: https://fluent.github.io/helm-charts
   - name: gpu-operator
     version: 22.9.1
     repository: https://helm.ngc.nvidia.com/nvidia

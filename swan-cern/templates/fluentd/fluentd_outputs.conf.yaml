@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluentd-outputs-conf-{{ include "fluentd.shortReleaseName" . }}
+  namespace: {{ .Release.namespace }}
+data:
+  outputs.conf: |-
+      # Push logs to MONIT endpoint
+      <match {logs,metrics}>
+          @type http
+          endpoint_url    {{ .Values.fluentd.output.endpoint }}
+          serializer      json
+          http_method     post
+          cacert_file     {{ .Values.fluentd.output.cacert }}
+          authentication  basic
+          username        {{ .Values.fluentd.output.username }}
+          password        {{ .Values.fluentd.output.password }}
+      </match>
+      # Forward errors in this pipeline to fluentd pod stdout for debugging
+      <label @ERROR>
+          <match **>
+              @type stdout
+          </match>
+      </label>
