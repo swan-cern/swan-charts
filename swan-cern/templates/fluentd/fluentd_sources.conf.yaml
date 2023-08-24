@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluentd-sources-conf-{{ include "fluentd.shortReleaseName" . }}
+  namespace: {{ .Release.namespace }}
+data:
+  sources.conf: |-
+      # Do not collect fluentd logs to avoid infinite loops.
+      <match kubernetes.var.log.containers.**fluentd**>
+          @type null
+      </match>
+
+      {{ if not .Values.fluentd.output.includeInternal }}
+      <match kubernetes.var.log.containers.**_kube-system_**>
+          @type null
+      </match>
+      {{ end }}  
+
+      # Read from container logs
+      <source>
+          @type tail
+          @id in_tail_container_logs
+          path /var/log/containers/*.log
+          pos_file /var/log/fluentd-containers.log.pos
+          tag kubernetes.*
+          read_from_head true
+          <parse>
+              @type regexp
+              expression /^(?<time>.+) (?<stream>stdout|stderr) [^ ]* (?<log>.*)$/
+              time_format '%Y-%m-%dT%H:%M:%S.%NZ'
+              keep_time_key false
+          </parse>
+          emit_unmatched_lines true
+      </source>
+    
+      # Add some basic kubernetes metadata (e.g. pod name) to the logs
+      <filter kubernetes.**>
+        @type kubernetes_metadata
+        @id filter_kube_metadata
+      </filter>

@@ -1,0 +1,131 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluentd-filters-conf-{{ include "fluentd.shortReleaseName" . }}
+  namespace: {{ .Release.namespace }}
+data:
+  filters.conf: |-
+      # Initial tagging of logs:
+      # - user: user session pods
+      # - hub: hub pod
+      # - logs: other pods
+      <match kubernetes.**>
+          @type rewrite_tag_filter
+          capitalize_regex_backreference true
+          <rule>
+              key $.kubernetes.labels.component
+              pattern /^singleuser-server$/
+              tag user
+          </rule>
+          <rule>
+              key $.kubernetes.labels.component
+              pattern /^hub$/
+              tag hub
+          </rule>
+          <rule>
+              key $.kubernetes.pod_name
+              pattern /.?/
+              tag logs
+          </rule>
+      </match>
+
+      # Retag user and hub logs to:
+      # - metrics: jupyter and jupyterhub custom log messages, used to emit metrics
+      # - logs: rest of log messages
+      <match {user,hub}>
+          @type rewrite_tag_filter
+          capitalize_regex_backreference true
+          <rule>
+              key $.log
+              pattern /^.*?user: .*?, host: .*?, metric: .*?, value: .*$/
+              tag metrics
+          </rule>
+          <rule>
+              key $.log
+              pattern /.?/
+              tag logs
+          </rule>
+      </match>    
+
+      # Extract relevant information from metric logs:
+      # - user
+      # - host
+      # - metric key: name of the metric
+      # - metric context (optional): additional qualifiers for the metric
+      # - metric value
+      <filter {metrics}>
+          @type parser
+          key_name log
+
+          reserve_data true
+          emit_invalid_record_to_error true
+
+          <parse>
+              @type grok
+
+              # keep unmatched logs
+              grok_failure_key grokfailure
+
+              <grok>
+                  # messages printed with "metric: metric_key.metric_context", where metric_context can have dots
+                  pattern user: %{DATA:_metric_user_}, host: %{DATA}, metric: (?<_metric_key_>(\w*))(\.)(?<_metric_context_>(.*)), value: %{GREEDYDATA:_metric_value_}
+              </grok>
+              <grok>
+                  # messages printed with "metric: metric_key"
+                  pattern user: %{DATA:_metric_user_}, host: %{DATA}, metric: (?<_metric_key_>(.*))(?<_metric_context_>(.*)), value: %{GREEDYDATA:_metric_value_}
+              </grok>
+          </parse>
+      </filter>        
+
+      # Store extracted metric information in a new "metrics" field, as part of the JSON
+      # of the log message. Use metric key as first attribute under "metrics".
+      # Format: metrics.metric_key.user|context|value
+      <filter {metrics}>
+          @type record_transformer
+          enable_ruby
+          <record>
+              metrics.${record['_metric_key_']}.user ${record['_metric_user_']}
+              metrics.${record['_metric_key_']}.context ${record['_metric_context_']}
+              metrics.${record['_metric_key_']}.value ${record['_metric_value_']}
+
+              # the below field is needed to run queries that group values by the last segment of the metric context (segments split by '.')
+              # which looks like "metrics.{record['_metric_key_']}_lastelementofmetric_context = {record['metric_value']}"
+              # for example, for a record with below fields
+              #     "data.metrics.spawn.context = LCG_xxx.some_spark_cluster.exception_class"
+              #     "data.metrics.spawn.value = None"
+              # it emits a field "data.metrics.spawn_exception_class = None
+              metrics.${record['_metric_key_']}_${record['_metric_context_'].gsub('-','_').split('.')[-1]} ${record['_metric_value_']}
+          </record>
+          remove_keys ["_metric_user_", "_metric_key_", "_metric_context_", "_metric_value_"]
+      </filter>
+
+      # Emit general log records with type "logs"
+      # Accessible in OpenSearch with pattern monit_private_swan_logs_logs
+      <filter {logs}>
+          @type record_transformer
+          <record>
+              type "logs"
+          </record>
+      </filter>
+
+      # Emit metric log records with type "metrics"
+      # Accessible in OpenSearch with pattern monit_private_swan_logs_metrics
+      <filter {metrics}>
+          @type record_transformer
+          <record>
+              type "metrics"
+          </record>
+      </filter>  
+
+      # Set MONIT producer for all logs
+      # Keep raw log data in "raw" field
+      <filter {logs,metrics}>
+          @type record_transformer
+          enable_ruby
+          <record>
+              timestamp ${(time.to_f * 1000).to_i}
+              producer {{ .Values.fluentd.output.producer }}
+              raw ${record["log"]} # field named raw is indexed by MONIT/OpenSearch
+          </record>
+          remove_keys ["log"]
+      </filter>
