@@ -1,3 +1,16 @@
+hpc: &hpc
+  # When enabling and configuring hpc, ensure that
+  # jupyterhub.custom.hpc references that config
+  # like below
+  enabled: false
+  # monitors: 
+  # rootPath:
+  # mountPath:
+  # role: 
+  # user:
+  #   id: 
+  #   key:
+
 swan:
   cvmfs:
     deployDaemonSet: &cvmfsDeployDS true
@@ -189,6 +202,8 @@ swan:
           scopes: ['read:metrics']
           services: [prometheus-service-monitor]
     custom:
+      hpc:
+        << : *hpc
       cull:
         # 4 hours
         timeout: 14400
