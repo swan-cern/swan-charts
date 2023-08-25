@@ -1,3 +1,16 @@
+hpc: &hpc
+  # When enabling and configuring hpc, ensure that
+  # jupyterhub.custom.hpc references that config
+  # like below
+  enabled: false
+  # monitors: 
+  # rootPath:
+  # mountPath:
+  # role: 
+  # user:
+  #   id: 
+  #   key:
+
 swan:
   cvmfs:
     deployDaemonSet: &cvmfsDeployDS true
@@ -90,6 +103,9 @@ swan:
         - name: swan-jh-cern
           mountPath: /usr/local/etc/jupyterhub/jupyterhub_config.d/3_swan_computing_config.py
           subPath: swan_computing_config.py
+        - name: swan-jh-cern
+          mountPath: /usr/local/etc/jupyterhub/jupyterhub_config.d/4_swan_hpc_config.py
+          subPath: swan_hpc_config.py
         - name: swan-secrets
           mountPath: /srv/jupyterhub/private/eos.cred
           subPath: eos.cred
@@ -122,6 +138,8 @@ swan:
               path: swan_config_cern.py
             - key: swan_computing_config.py
               path: swan_computing_config.py
+            - key: swan_hpc_config.py
+              path: swan_hpc_config.py
         - name: swan-secrets
           secret:
             secretName: swan-cern
@@ -189,6 +207,8 @@ swan:
           scopes: ['read:metrics']
           services: [prometheus-service-monitor]
     custom:
+      hpc:
+        << : *hpc
       cull:
         # 4 hours
         timeout: 14400
