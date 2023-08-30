@@ -129,6 +129,7 @@ if get_config("custom.cull.enabled", False):
             "name": "cull-idle",
             "admin": True,
             "command": cull_cmd,
+            "environment": {'SWAN_DEV': os.environ.get('SWAN_DEV', 'false')}
         }
     )
 
