@@ -19,7 +19,7 @@ spec:
   endpoints:
   - port: hub
     interval: 30s
-    path: /metrics
+    path: /hub/metrics
     bearerTokenSecret:
       name: hub
       key: hub.services.prometheus-service-monitor.apiToken
