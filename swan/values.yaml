@@ -168,6 +168,7 @@ jupyterhub:
           - openid
         exchange_tokens: []
         auto_login: True
+        allow_all: True
         client_id: # placeholder, check secrets
         client_secret: # placeholder, check secrets
         oauth_callback_url: # placeholder, check secrets
