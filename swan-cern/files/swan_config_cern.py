@@ -1,4 +1,5 @@
 import os, subprocess
+import escapism
 
 from kubernetes_asyncio.client.models import (
     V1EmptyDirVolumeSource,
@@ -41,8 +42,11 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
         return self.pod
 
     async def _init_eos_secret(self):
-        username = self.spawner.user.name
-        eos_secret_name ='eos-tokens-%s' % username
+
+        username = escapism.escape(
+            self.spawner.user.name, safe = self.spawner.safe_chars, escape_char = '-'
+        ).lower()
+        eos_secret_name = 'eos-tokens-%s' % username
 
         try:
             # Retrieve eos token for user
