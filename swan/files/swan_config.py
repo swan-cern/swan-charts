@@ -1,8 +1,7 @@
-import logging, os, subprocess
+import logging
 
 from kubernetes_asyncio.client.models import (
     V1EmptyDirVolumeSource,
-    V1EnvVar,
     V1HostPathVolumeSource,
     V1PersistentVolumeClaimVolumeSource,
     V1Volume,
