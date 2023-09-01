@@ -1,4 +1,4 @@
-import os, subprocess, time, pwd, jwt
+import subprocess
 
 from kubernetes_asyncio.client.models import (
     V1EnvVar,
@@ -16,8 +16,6 @@ from kubernetes_asyncio.client.models import (
 )
 
 from kubernetes_asyncio.client.rest import ApiException
-
-import swanspawner
 
 """
 Class handling KubeSpawner.modify_pod_hook(spawner,pod) call
@@ -116,10 +114,6 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
         """
         notebook_container = self._get_pod_container('notebook')
         side_container = self._get_pod_container('side-container')
-        username = self.spawner.user.name
-
-        pod_spec_containers = []
-        side_container_volume_mounts = []
 
         if hadoop_secret_name:
             # pod volume to mount generated hadoop tokens and

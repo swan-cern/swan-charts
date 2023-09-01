@@ -1,7 +1,5 @@
 import os, subprocess
 
-import asyncio
-
 from kubernetes_asyncio.client.models import (
     V1EmptyDirVolumeSource,
     V1EnvVar,
@@ -11,10 +9,8 @@ from kubernetes_asyncio.client.models import (
     V1KeyToPath,
     V1ObjectFieldSelector,
     V1ObjectMeta,
-    V1PodSecurityContext,
     V1Secret,
     V1SecretVolumeSource,
-    V1SELinuxOptions,
     V1Volume,
     V1VolumeMount,
 )
@@ -46,7 +42,6 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
 
     async def _init_eos_secret(self):
         username = self.spawner.user.name
-        user_uid = self.spawner.user_uid
         eos_secret_name ='eos-tokens-%s' % username
 
         try:
