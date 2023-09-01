@@ -26,8 +26,7 @@ class SwanPodHookHandler:
 
         # pod labels
         pod_labels = dict(
-            lcg_release = self.spawner.user_options[self.spawner.lcg_rel_field].split('/')[0],
-            swan_user = self.spawner.user.name
+            lcg_release = self.spawner.user_options[self.spawner.lcg_rel_field].split('/')[0]
         )
 
         # update pod labels
