@@ -73,7 +73,22 @@ swan:
         guarantee: 1
       extraEnv:
         # Enable HTCondor service configuration for CERN in the user image
-        CERN_HTCONDOR: "true"   
+        CERN_HTCONDOR: "true"
+        # Rucio configuration
+        RUCIO_MODE: "download"
+        RUCIO_WILDCARD_ENABLED: "1"
+        RUCIO_BASE_URL: "https://vre-rucio.cern.ch"
+        RUCIO_AUTH_URL: "https://vre-rucio-auth.cern.ch"
+        RUCIO_WEBUI_URL: "https://vre-rucio-ui.cern.ch"
+        RUCIO_DISPLAY_NAME: "CERN VRE"
+        RUCIO_NAME: "vre"
+        RUCIO_SITE_NAME: "CERN"
+        RUCIO_VOMS_ENABLED: "1"
+        RUCIO_VOMS_VOMSES_PATH: "/etc/vomses"
+        RUCIO_VOMS_CERTDIR_PATH: "/etc/grid-security/certificates"
+        RUCIO_VOMS_VOMSDIR_PATH: "/etc/grid-security/vomsdir"
+        RUCIO_CA_CERT: "/opt/rucio/rucio_ca.pem"
+        RUCIO_DEFAULT_INSTANCE: "vre"
     scheduling:
       userPods:
         nodeAffinity:
