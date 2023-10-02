@@ -9,7 +9,7 @@ swan:
         # ROOT
         cron_opennotebook_root_kernel:
           command: >-
-            source /cvmfs/sft.cern.ch/lcg/views/LCG_103swan/x86_64-centos7-gcc11-opt/setup.sh &&
+            source /cvmfs/sft.cern.ch/lcg/views/LCG_104a_swan/x86_64-centos7-gcc11-opt/setup.sh &&
             (timeout 20s python3 -m JupyROOT.kernel.rootkernel > /dev/null 2>&1 || true)
           minute: '*/15'
         # NXCALS
@@ -23,7 +23,7 @@ swan:
         cron_opennotebook_cuda:
           command: >-
             (lsmod | grep nvidia) &&
-            source /cvmfs/sft.cern.ch/lcg/views/LCG_103cuda/x86_64-centos7-gcc11-opt/setup.sh &&
+            source /cvmfs/sft.cern.ch/lcg/views/LCG_104a_cuda/x86_64-centos7-gcc11-opt/setup.sh &&
             (timeout 20s python3 -c 'import tensorflow' || true) &&
             (timeout 20s python3 -c 'import torch' || true)
           minute: '*/15'
