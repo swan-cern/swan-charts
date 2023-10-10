@@ -7,12 +7,12 @@ dependencies:
   version: 0.1.3
 - name: eosxd
   repository: http://registry.cern.ch/chartrepo/cern
-  version: 5.1.5-2
+  version: 5.1.27-1
 - name: cvmfs
   repository: oci://registry.cern.ch/sciencebox/charts
   version: 0.0.8
 - name: cvmfs-csi
   repository: http://registry.cern.ch/chartrepo/cern
   version: 0.1.0
-digest: sha256:081a2f677c7aa675046fcc921154f23ab1540054b486945e31b85b15fedeae64
-generated: "2023-10-10T11:25:22.337926212+02:00"
+digest: sha256:33fccf759bbb9ad7bec12055009bad06339834c4e6abbf5aa54207103d07bd71
+generated: "2023-10-10T17:24:39.307933+02:00"
