@@ -10,9 +10,9 @@ dependencies:
   version: 5.1.5-2
 - name: cvmfs
   repository: oci://registry.cern.ch/sciencebox/charts
-  version: 0.0.5
+  version: 0.0.8
 - name: cvmfs-csi
   repository: http://registry.cern.ch/chartrepo/cern
   version: 0.1.0
-digest: sha256:25df2468586e868a540bd0cc870a75bf2ce13f5a02a256d856ae2bc5b3b5eefc
-generated: "2023-04-27T13:32:07.58374326+02:00"
+digest: sha256:081a2f677c7aa675046fcc921154f23ab1540054b486945e31b85b15fedeae64
+generated: "2023-10-10T11:25:22.337926212+02:00"
