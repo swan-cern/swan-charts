@@ -98,6 +98,19 @@ c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook
 
 # Culling of users and ticket refresh
 if get_config("custom.cull.enabled", False):
+    swan_idle_culler_role = {
+        "name": "swan-idle-culler",
+        "scopes": [
+            "list:users",
+            "read:users:activity",
+            "read:servers",
+            "delete:servers",
+            # "admin:users", # dynamically added if --cull-users is passed
+        ],
+        # assign the role to a jupyterhub service, so it gains these permissions
+        "services": ["swan-idle-culler"],
+    }
+
     cull_cmd = ["swanculler"]
     base_url = c.JupyterHub.get("base_url", "/")
     cull_cmd.append("--url=http://localhost:8081" + url_path_join(base_url, "hub/api"))
@@ -112,6 +125,7 @@ if get_config("custom.cull.enabled", False):
 
     if get_config("custom.cull.users"):
         cull_cmd.append("--cull-users=True")
+        swan_idle_culler_role["scopes"].append("admin:users")
 
     if get_config("custom.cull.removeNamedServers"):
         cull_cmd.append("--remove-named-servers")
@@ -130,12 +144,13 @@ if get_config("custom.cull.enabled", False):
 
     c.JupyterHub.services.append(
         {
-            "name": "cull-idle",
+            "name": "swan-idle-culler",
             "admin": True,
             "command": cull_cmd,
             "environment": {'SWAN_DEV': os.environ.get('SWAN_DEV', 'false')}
         }
     )
+    c.JupyterHub.load_roles.append(swan_idle_culler_role)
 
 
 # Init lists for volumes and volume_mounts
