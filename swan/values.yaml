@@ -217,8 +217,6 @@ jupyterhub:
       enabled: false
     containerSecurityContext:
       allowPrivilegeEscalation: true
-  debug:
-    enabled: true
   # disable upstream cull, but enable custom one
   cull:
     enabled: false
