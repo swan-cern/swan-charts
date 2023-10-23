@@ -148,10 +148,10 @@ swan:
           client_id: # placeholder, check secrets
           client_secret: # placeholder, check secrets
           oauth_callback_url: # placeholder, check secrets
-
           # skip refreshing tokens if already refreshed in last 110 minutes
           # this assumes tokens provided by keycloak are valid for 120 minutes
           auth_refresh_age: 6600
+          refresh_pre_spawn: False
         JupyterHub:
           allow_named_servers: False
         SwanKubeSpawner:
