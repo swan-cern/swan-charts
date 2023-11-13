@@ -178,8 +178,6 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
         """
 
         user_roles = self.spawner.user_roles
-        print(self.spawner.user_options)
-        print(self.spawner.user_roles)
         cluster = self.spawner.user_options[self.spawner.spark_cluster_field]
 
         if cluster == "analytix" and "analytix" not in user_roles:
