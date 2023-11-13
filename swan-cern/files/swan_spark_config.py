@@ -295,7 +295,6 @@ class SwanSparkPodHookHandler(SwanPodHookHandlerProd):
             # Create V1Service which allocates random ports for spark in k8s cluster
             try:
                 # use existing if possible
-                await self.spawner.api.delete_namespaced_service(spark_ports_service, swan_container_namespace)
                 service = await self.spawner.api.read_namespaced_service(spark_ports_service, swan_container_namespace)
             except ApiException:
                 # not existing, create
