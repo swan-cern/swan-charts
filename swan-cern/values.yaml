@@ -88,8 +88,8 @@ swan:
           mountPath: /usr/local/etc/jupyterhub/jupyterhub_config.d/2_swan_config_cern.py
           subPath: swan_config_cern.py
         - name: swan-jh-cern
-          mountPath: /usr/local/etc/jupyterhub/jupyterhub_config.d/3_swan_spark_config.py
-          subPath: swan_spark_config.py
+          mountPath: /usr/local/etc/jupyterhub/jupyterhub_config.d/3_swan_computing_config.py
+          subPath: swan_computing_config.py
         - name: swan-secrets
           mountPath: /srv/jupyterhub/private/eos.cred
           subPath: eos.cred
@@ -120,8 +120,8 @@ swan:
               path: options_form_config.json
             - key: swan_config_cern.py
               path: swan_config_cern.py
-            - key: swan_spark_config.py
-              path: swan_spark_config.py
+            - key: swan_computing_config.py
+              path: swan_computing_config.py
         - name: swan-secrets
           secret:
             secretName: swan-cern
