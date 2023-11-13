@@ -72,9 +72,6 @@ swan:
     singleuser:
       cpu:
         guarantee: 1
-      extraEnv:
-        # Enable HTCondor service configuration for CERN in the user image
-        CERN_HTCONDOR: "true"   
     scheduling:
       userPods:
         nodeAffinity:
