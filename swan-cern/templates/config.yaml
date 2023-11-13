@@ -6,5 +6,5 @@ metadata:
 data:
   options_form_config.json: {{ .Values.optionsform | toJson }}
 {{ (.Files.Glob "files/swan_config_cern.py").AsConfig | indent 2 }}
-{{ (.Files.Glob "files/swan_spark_config.py").AsConfig | indent 2 }}
+{{ (.Files.Glob "files/swan_computing_config.py").AsConfig | indent 2 }}
 {{ (.Files.Glob "files/private/side_container_tokens_perm.sh").AsConfig | indent 2 }}
