@@ -120,7 +120,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
             else:
                 await self.spawner.api.create_namespaced_secret(swan_container_namespace, secret_data)
         except ApiException as e:
-            raise Exception(f'Could not create required hadoop secret: {e}\n')
+            raise RuntimeError('Could not create required hadoop secret') from e
 
         return hadoop_secret_name
 
@@ -334,7 +334,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
                 try:
                     service = await self.spawner.api.create_namespaced_service(swan_container_namespace, service_template)
                 except ApiException as e:
-                    raise Exception(f'Could not create service that allocates random ports for computing integrations: {e}\n')
+                    raise RuntimeError('Could not create service that allocates random ports for computing integrations') from e
 
             # Replace the service with allocated nodeports to map nodeport:targetport
             # and set these ports for the notebook container
@@ -373,7 +373,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
                 )
             )
         except ApiException as e:
-            raise Exception(f'Could not create required user ports: {e}\n')
+            raise RuntimeError('Could not create required user ports') from e
 
 
 def computing_modify_pod_hook(spawner, pod):
