@@ -63,7 +63,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
             return None
 
         username = self.spawner.user.name
-        hadoop_secret_name ='hadoop-tokens-%s' % username
+        hadoop_secret_name = f'hadoop-tokens-{username}'
 
         webhdfs_token_base64 = ''
         k8suser_config_base64 = ''
@@ -120,7 +120,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
             else:
                 await self.spawner.api.create_namespaced_secret(swan_container_namespace, secret_data)
         except ApiException as e:
-            raise Exception("Could not create required hadoop secret: %s\n" % e)
+            raise Exception(f'Could not create required hadoop secret: {e}\n')
 
         return hadoop_secret_name
 
@@ -299,7 +299,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         computing resources.
         """
 
-        computing_ports_service = "computing-ports-" + self.spawner.user.name
+        computing_ports_service = f'computing-ports-{self.spawner.user.name}'
         notebook_container = self._get_pod_container('notebook')
 
         try:
@@ -308,7 +308,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
             for port_id in range(1, num_ports + 1):
                 service_template_ports.append(
                     V1ServicePort(
-                        name="comp-port-" + str(port_id),
+                        name=f'comp-port-{str(port_id)}',
                         port=port_id
                     )
                 )
@@ -334,7 +334,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
                 try:
                     service = await self.spawner.api.create_namespaced_service(swan_container_namespace, service_template)
                 except ApiException as e:
-                    raise Exception("Could not create service that allocates random ports for computing integrations: %s\n" % e)
+                    raise Exception(f'Could not create service that allocates random ports for computing integrations: {e}\n')
 
             # Replace the service with allocated nodeports to map nodeport:targetport
             # and set these ports for the notebook container
@@ -373,7 +373,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
                 )
             )
         except ApiException as e:
-            raise Exception("Could not create required user ports: %s\n" % e)
+            raise Exception(f'Could not create required user ports: {e}\n')
 
 
 def computing_modify_pod_hook(spawner, pod):
