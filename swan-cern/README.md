@@ -124,6 +124,8 @@ $ ssh swan-spare003.cern.ch
 $ /srv/swan-k8s/source/utils/deploy_k8s.sh --env <qa|prod>
 ```
 
+To connect to a Rucio instance for data management, configure `jupyterhub.singleuser.extraEnv` according to the [documentation](https://github.com/rucio/jupyterlab-extension/blob/master/CONFIGURATION.md). The default is to connect to the Rucio [VRE instance](https://github.com/vre-hub) at CERN in *download* mode.
+
 ### Monitoring
 
 Cluster Monitoring
