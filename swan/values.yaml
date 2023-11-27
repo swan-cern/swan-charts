@@ -81,8 +81,8 @@ jupyterhub:
     storage:
       type: none
     image:
-      name: "gitlab-registry.cern.ch/swan/docker-images/systemuser"
-      tag: "v6.0.0"
+      name: "gitlab-registry.cern.ch/swan/docker-images/jupyter/swan-cern"
+      tag: "v0.0.1"
       pullPolicy: "Always"
     cloudMetadata:
       # until we configure networkPolicy
@@ -183,6 +183,7 @@ jupyterhub:
       SwanKubeSpawner:
         # set home directory to EOS
         local_home: False
+        centos7_image: "gitlab-registry.cern.ch/swan/docker-images/systemuser:v6.0.0"
       SpawnHandlersConfigs:
         # disable some defaults of swanspawner that do now work for kube-spawner
         # FIXME remove this from the spawner once we support only k8s
