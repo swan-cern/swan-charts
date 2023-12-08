@@ -1,12 +1,12 @@
 dependencies:
 - name: swan
   repository: oci://registry.cern.ch/swan/charts
-  version: 1.0.2
+  version: 1.1.0
 - name: fluentd
   repository: https://fluent.github.io/helm-charts
   version: 0.4.3
 - name: gpu-operator
   repository: https://helm.ngc.nvidia.com/nvidia
   version: v22.9.1
-digest: sha256:7b1780a0b94932238d4606cca67d0ad5bb4befd247af0c8366deb2ebd67b1335
-generated: "2023-10-27T12:36:43.428039059Z"
+digest: sha256:37257cb12cd6989f6116c34405fefdad1f772cb39abc573fabf088cef9ed600c
+generated: "2023-12-08T08:53:19.71394672Z"
