@@ -365,10 +365,13 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
             await self.spawner.api.replace_namespaced_service(computing_ports_service, swan_container_namespace, service)
 
             # Add ports env for computing integrations
+            # Keep old SPARK_PORTS variable name for as long as we support the CentOS7 image, since the port
+            # allocator version of such image expects a variable with that name
+            ports_var_name = 'COMPUTING_PORTS' if 'swan-cern' in notebook_container.image else 'SPARK_PORTS'
             notebook_container.env = self._add_or_replace_by_name(
                 notebook_container.env,
                 V1EnvVar(
-                    name='COMPUTING_PORTS',
+                    name=ports_var_name,
                     value=','.join(ports)
                 )
             )
