@@ -23,7 +23,7 @@ swan:
         cron_opennotebook_cuda:
           command: >-
             (lsmod | grep nvidia) &&
-            source /cvmfs/sft.cern.ch/lcg/views/LCG_104a_cuda/x86_64-centos7-gcc11-opt/setup.sh &&
+            source /cvmfs/sft.cern.ch/lcg/views/LCG_105_cuda/x86_64-centos7-gcc11-opt/setup.sh &&
             (timeout 20s python3 -c 'import tensorflow' || true) &&
             (timeout 20s python3 -c 'import torch' || true)
           minute: '*/15'
