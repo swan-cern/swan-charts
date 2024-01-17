@@ -71,7 +71,7 @@ swan:
   jupyterhub:
     singleuser:
       cpu:
-        guarantee: 1
+        guarantee: 0.5
     scheduling:
       userPods:
         nodeAffinity:
