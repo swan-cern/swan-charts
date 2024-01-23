@@ -386,23 +386,24 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         """
         Mount the CEPHFS share of HPC in the user container
         """
-        self.pod.spec.volumes.append(
-            V1Volume(
-                name='hpc-volume',
-                persistent_volume_claim=V1PersistentVolumeClaimVolumeSource(
-                    claim_name='hpc-volume-pvc'
+        for i, volume in enumerate(get_config('custom.hpc.cephVolumes', [])):
+            self.pod.spec.volumes.append(
+                V1Volume(
+                    name=f'hpc-volume-{i}',
+                    persistent_volume_claim=V1PersistentVolumeClaimVolumeSource(
+                        claim_name=f'hpc-volume-{i}-pvc'
+                    )
                 )
             )
-        )
 
-        notebook_container = self._get_pod_container('notebook')
-        mount_path = get_config('custom.hpc.mountPath', '/hpc')
-        notebook_container.volume_mounts.append(
-            V1VolumeMount(
-                name='hpc-volume',
-                mount_path=mount_path
+            notebook_container = self._get_pod_container('notebook')
+            mount_path = volume['mountPath'] if 'mountPath' in volume else f'/hpc-{i}'
+            notebook_container.volume_mounts.append(
+                V1VolumeMount(
+                    name=f'hpc-volume-{i}',
+                    mount_path=mount_path
+                )
             )
-        )
 
     def _hpc_enabled(self):
         """

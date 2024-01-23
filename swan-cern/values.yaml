@@ -3,13 +3,14 @@ hpc: &hpc
   # jupyterhub.custom.hpc references that config
   # like below
   enabled: false
-  # monitors: 
-  # rootPath:
-  # mountPath:
-  # role: 
-  # user:
-  #   id: 
-  #   key:
+  # required_role: 
+  # cephVolumes:
+  #   - monitors: 
+  #     rootPath:
+  #     mountPath:
+  #     user:
+  #       id: 
+  #       key:
 
 swan:
   cvmfs:

@@ -1,8 +1,9 @@
 {{ if .Values.hpc.enabled }}
+{{- range $i, $volume := .Values.hpc.cephVolumes }}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: hpc-volume
+  name: hpc-volume-{{ $i }}
   namespace: {{ $.Release.Namespace }}
 spec:
   accessModes:
@@ -11,22 +12,22 @@ spec:
     storage: 1Gi
   csi:
     driver: cephfs.csi.ceph.com
-    volumeHandle: hpc-volume
+    volumeHandle: hpc-volume-{{ $i }}
     nodeStageSecretRef:
-      name: hpc-volume-secret
+      name: hpc-volume-{{ $i }}-secret
       namespace: {{ $.Release.Namespace }}
     nodePublishSecretRef:
-      name: hpc-volume-secret
+      name: hpc-volume-{{ $i }}-secret
       namespace: {{ $.Release.Namespace }}
     volumeAttributes:
-      monitors: {{ $.Values.hpc.monitors }}
-      rootPath: {{ $.Values.hpc.rootPath }}
+      monitors: {{ $volume.monitors }}
+      rootPath: {{ $volume.rootPath }}
       provisionVolume: "false"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: hpc-volume-pvc
+  name: hpc-volume-{{ $i }}-pvc
   namespace: {{ $.Release.Namespace }}
 spec:
   accessModes:
@@ -34,5 +35,6 @@ spec:
   resources:
     requests:
       storage: 1Gi
-  volumeName: hpc-volume
+  volumeName: hpc-volume-{{ $i }}
+{{- end }}
 {{- end }}
