@@ -15,7 +15,7 @@ swan:
         # NXCALS
         cron_opennotebook_nxcals:
           command: >-
-            source /cvmfs/sft.cern.ch/lcg/views/LCG_102b_nxcals_pro_pytimber_pro/x86_64-centos7-gcc11-opt/setup.sh &&
+            source /cvmfs/sft.cern.ch/lcg/views/LCG_105a_nxcals_pro/x86_64-centos7-gcc11-opt/setup.sh &&
             (timeout 20s python3 -m ipykernel > /dev/null 2>&1 || true) &&
             (timeout 20s python3 -c 'import pyspark' || true)
           minute: '*/15'
