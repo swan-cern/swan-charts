@@ -224,7 +224,7 @@ if get_config("custom.cvmfs.deployDaemonSet", False):
         V1Volume(
             name='cvmfs',
             host_path=V1HostPathVolumeSource(
-                path='/var/cvmfs'
+                path=get_config("custom.cvmfs.mountOptions.hostMountpoint", "/var/cvmfs")
             )
         )
     )

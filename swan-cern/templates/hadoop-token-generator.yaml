@@ -68,7 +68,7 @@ spec:
       volumes:
       - name: cvmfs
         hostPath:
-          path: /var/cvmfs
+          path: {{ .Values.swan.cvmfs.mountOptions.hostMountpoint }}
           type: Directory
       - name: swan-secrets
         secret:
