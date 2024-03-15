@@ -27,7 +27,7 @@ cvmfs:
     - cvmfs-config.cern.ch
     - sft.cern.ch
     - sft-nightlies.cern.ch
-  mountOptions:
+  mountOptions: &cvmfsMountOptions
     hostMountpoint: /var/cvmfs
   # Prefetcher is provided only by the daemonSet
   prefetcher:
@@ -236,6 +236,7 @@ jupyterhub:
       deployCsiDriver: *cvmfsDeployCSI
       useCsiDriver: *cvmfsUseCSI
       repositories: *cvmfsRepos
+      mountOptions: *cvmfsMountOptions
     eos:
       deployDaemonSet: *eosDeployDS
       deployCsiDriver: *eosDeployCSI
