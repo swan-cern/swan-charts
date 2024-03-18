@@ -10,34 +10,13 @@ cvmfs-csi:
 
 #
 # EOS access
-# - deployDaemonSet deploys EOS fusex pods exposing `/eos` path on the host.
-#     Access to EOS is provided by bind-mounting `/eos` from the host.
-# - deployCsiDriver deploys a cluster-wide storage driver for EOS.
-#     Access to EOS is provided by persistent volume claims.
-# - useCsiDriver has to be used in case the hosting infrastructure provides
-#       a CSI driver to access EOS (i.e., it is not needed to deploy additional pods).
-#     Access to EOS is provided by persistent volume claims (identical to deployCsiDriver).
+# - We deploy a cluster-wide storage driver for EOS, provided by the
+#   Kubernetes team at CERN (https://gitlab.cern.ch/kubernetes/storage/eosxd-csi).
+#   This solution is based on automounting.
 #
-# Warning:
-# - It is discouraged to enable more than one at once.
-# - By setting all to false, access to EOS will not be possible.
-#     You will need to set `juyterhub.hub.config.SwanKubeSpawner.local_home: true`
-#
-eos:
-  deployDaemonSet: &eosDeployDS true
-  deployCsiDriver: &eosDeployCSI false
-  useCsiDriver: &eosUseCSI false
-fusex:
-  fusex:
-    hostMountpoint: /var/eos
-
-# Ensure file versions are shown to allow notebook checkpoints
-# (the fusex chart already sets this as default)
-eosxd:
-  config:
-    global:
-      options:
-        hide-versions: 0
+eosxd-csi:
+  enabled:  &eosEnabled true
+  automountHostPath: &eosAutomountHostPath /var/eos-blue
 
 #
 # JupyterHub
@@ -200,9 +179,8 @@ jupyterhub:
       users: true
       checkEosAuth: false
     eos:
-      deployDaemonSet: *eosDeployDS
-      deployCsiDriver: *eosDeployCSI
-      useCsiDriver: *eosUseCSI
+      enabled: *eosEnabled
+      automountHostPath: *eosAutomountHostPath
 # placeholders for swan credentials
 swan:
   secrets:

@@ -49,15 +49,6 @@ swan:
               source /cvmfs/sft.cern.ch/lcg/views/{{ .Values.global.cuda.lcg }}/{{ .Values.global.cuda.platform }}/setup.sh &&
               (timeout 20s python3 -c 'import tensorflow' || true) &&
               (timeout 20s python3 -c 'import torch' || true)
-
-  eos:
-    deployDaemonSet: &eosDeployDS false
-    deployCsiDriver: &eosDeployCSI true
-    useCsiDriver: &eosUseCSI true
-  eosxd:
-    resources:
-      requests:
-        memory: 1.5G
   jupyterhub:
     singleuser:
       cpu:
@@ -187,10 +178,6 @@ swan:
         timeout: 14400
         checkEosAuth: true
         hooksDir: /srv/jupyterhub/culler
-      eos:
-        deployDaemonSet: *eosDeployDS
-        deployCsiDriver: *eosDeployCSI
-        useCsiDriver: *eosUseCSI
       spark:
         configurationPath: /cvmfs/sft.cern.ch/lcg/etc/hadoop-confext
 swanCern:
