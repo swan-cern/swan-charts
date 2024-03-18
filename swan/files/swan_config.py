@@ -174,9 +174,8 @@ c.SwanKubeSpawner.volume_mounts.append(
 )
 
 # Manage EOS access
-if get_config("custom.eos.deployDaemonSet", False):
+if get_config("custom.eos.enabled", False):
     # Access via bind-mount from the host
-    logging.info("EOS access via DaemonSet")
     c.SwanKubeSpawner.volume_mounts.append(
         V1VolumeMount(
             name='eos',
@@ -188,26 +187,7 @@ if get_config("custom.eos.deployDaemonSet", False):
         V1Volume(
             name='eos',
             host_path=V1HostPathVolumeSource(
-                path='/var/eos'
-            )
-        ),
-    )
-elif (get_config("custom.eos.deployCsiDriver", False) or \
-        get_config("custom.eos.useCsiDriver", False)):
-    # Access via CSI driver (still a bind-mount in practical terms)
-    logging.info("EOS access via CSI driver")
-    c.SwanKubeSpawner.volume_mounts.append(
-        V1VolumeMount(
-            name='eos',
-            mount_path='/eos',
-            mount_propagation='HostToContainer'
-        ),
-    )
-    c.SwanKubeSpawner.volumes.append(
-        V1Volume(
-            name='eos',
-            host_path=V1HostPathVolumeSource(
-                path='/var/eos'
+                path=get_config("custom.eos.automountHostPath", "/var/eos")
             )
         ),
     )
