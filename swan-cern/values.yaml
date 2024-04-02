@@ -232,6 +232,7 @@ swan:
           - mount: fcc.cern.ch
           - mount: ganga.cern.ch
           - mount: geant4.cern.ch
+          - mount: grid.cern.ch
           - mount: lhcb.cern.ch
             proxy: 'http://ca-proxy-lhcb.cern.ch:3128;http://ca-proxy.cern.ch:3128'
           - mount: lhcb-condb.cern.ch
