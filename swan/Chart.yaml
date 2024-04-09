@@ -24,12 +24,7 @@ dependencies:
     version: 5.1.27-1
     repository: http://registry.cern.ch/chartrepo/cern
     condition: eos.deployCsiDriver
-
-  - name: cvmfs
-    version: 0.0.8
-    repository: oci://registry.cern.ch/sciencebox/charts
-    condition: cvmfs.deployDaemonSet
   - name: cvmfs-csi
-    version: 0.1.0
-    repository: http://registry.cern.ch/chartrepo/cern
-    condition: cvmfs.deployCsiDriver
+    version: 2.5.0
+    repository: oci://registry.cern.ch/kubernetes/charts
+    condition: cvmfs-csi.deployCsiDriver

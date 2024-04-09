@@ -1,66 +1,52 @@
+global:
+  # These are placeholders for the LCG values defined in the GitOps repository
+  generic:
+    lcg: 
+    platform: 
+  cuda:
+    lcg: 
+    platform: 
+  nxcals:
+    lcg: 
+    platform: 
+
 swan:
-  cvmfs:
-    deployDaemonSet: &cvmfsDeployDS true
-    deployCsiDriver: &cvmfsDeployCSI false
-    useCsiDriver: &cvmfsUseCSI false
-    prefetcher:
-      enabled: true
-      jobs:
-        # ROOT
-        cron_opennotebook_root_kernel:
-          command: >-
-            source /cvmfs/sft.cern.ch/lcg/views/LCG_105a_swan/x86_64-centos7-gcc11-opt/setup.sh &&
-            (timeout 20s python3 -m JupyROOT.kernel.rootkernel > /dev/null 2>&1 || true)
-          minute: '*/15'
-        # NXCALS
-        cron_opennotebook_nxcals:
-          command: >-
-            source /cvmfs/sft.cern.ch/lcg/views/LCG_105a_nxcals_pro/x86_64-centos7-gcc11-opt/setup.sh &&
-            (timeout 20s python3 -m ipykernel > /dev/null 2>&1 || true) &&
-            (timeout 20s python3 -c 'import pyspark' || true)
-          minute: '*/15'
-        # CUDA
-        cron_opennotebook_cuda:
-          command: >-
-            (lsmod | grep nvidia) &&
-            source /cvmfs/sft.cern.ch/lcg/views/LCG_105a_cuda/x86_64-centos7-gcc11-opt/setup.sh &&
-            (timeout 20s python3 -c 'import tensorflow' || true) &&
-            (timeout 20s python3 -c 'import torch' || true)
-          minute: '*/15'
-    repositories:
-      - cvmfs-config.cern.ch
-      - sft.cern.ch
-      - sft-nightlies.cern.ch
-      - alice.cern.ch
-      - alice-ocdb.cern.ch
-      - alice-nightlies.cern.ch
-      - alpha.cern.ch
-      - ams.cern.ch
-      - atlas.cern.ch
-      - atlas-condb.cern.ch
-      - atlas-nightlies.cern.ch
-      - clicbp.cern.ch
-      - cms.cern.ch
-      - cms-ib.cern.ch
-      - cms-bril.cern.ch
-      - compass.cern.ch
-      - compass-condb.cern.ch
-      - fcc.cern.ch
-      - ganga.cern.ch
-      - geant4.cern.ch
-      - grid.cern.ch
-      - lhcb.cern.ch
-      - lhcb-condb.cern.ch
-      - lhcbdev.cern.ch
-      - na61.cern.ch
-      - na62.cern.ch
-      - projects.cern.ch
-      - ship.cern.ch
-      - sw.hsf.org
-      - sndlhc.cern.ch
-    resources:
-      requests:
-        memory: 1.5G
+  cvmfs-csi:
+    extraConfigMaps:
+      cvmfs-csi-default-local:
+        default.local: |
+          CVMFS_HTTP_PROXY="http://ca-proxy.cern.ch:3128"
+          CVMFS_QUOTA_LIMIT=20000
+          CVMFS_CACHE_BASE=/cvmfs-localcache
+    automountDaemonUnmountTimeout: 1800
+    cvmfs-csi-config-d:
+      sft.cern.ch.conf: |
+        CVMFS_HTTP_PROXY='http://ca-proxy-sft.cern.ch:3128;http://ca-proxy.cern.ch:3128'
+    nodeplugin:
+      prefetcher:
+        enabled: true
+        # Jobs to warmup ROOT, NXCALS and CUDA stacks respectively
+        jobs:
+          - name: cron-warmup-lcg-releases
+            schedule: "*/15 * * * *"
+            script: |-
+              #!/bin/bash
+
+              source /cvmfs/sft.cern.ch/lcg/views/{{ .Values.global.generic.lcg }}/{{ .Values.global.generic.platform }}/setup.sh &&
+              (timeout 20s python3 -m ipykernel > /dev/null 2>&1 || true)
+
+              source /cvmfs/sft.cern.ch/lcg/views/{{ .Values.global.generic.lcg }}/{{ .Values.global.generic.platform }}/setup.sh &&
+              (timeout 20s python3 -m JupyROOT.kernel.rootkernel > /dev/null 2>&1 || true)
+
+              source /cvmfs/sft.cern.ch/lcg/views/{{ .Values.global.nxcals.lcg }}/{{ .Values.global.nxcals.platform }}/setup.sh &&
+              (timeout 20s python3 -m ipykernel > /dev/null 2>&1 || true) &&
+              (timeout 20s python3 -c 'import pyspark' || true)
+
+              (lsmod | grep nvidia) &&
+              source /cvmfs/sft.cern.ch/lcg/views/{{ .Values.global.cuda.lcg }}/{{ .Values.global.cuda.platform }}/setup.sh &&
+              (timeout 20s python3 -c 'import tensorflow' || true) &&
+              (timeout 20s python3 -c 'import torch' || true)
+
   eos:
     deployDaemonSet: &eosDeployDS false
     deployCsiDriver: &eosDeployCSI true
@@ -102,11 +88,11 @@ swan:
           subPath: sparkk8s.cred
         - name: cvmfs
           mountPath: /cvmfs
+          mountPropagation: HostToContainer
       extraVolumes:
         - name: cvmfs
-          hostPath:
-            path: /var/cvmfs
-            type: Directory
+          persistentVolumeClaim:
+            claimName: cvmfs
         - name: swan-jh
           configMap:
             name: swan-scripts
@@ -195,54 +181,6 @@ swan:
         timeout: 14400
         checkEosAuth: true
         hooksDir: /srv/jupyterhub/culler
-      cvmfs:
-        deployDaemonSet: *cvmfsDeployDS
-        deployCsiDriver: *cvmfsDeployCSI
-        useCsiDriver: *cvmfsUseCSI
-        repositories:
-          - mount: cvmfs-config.cern.ch
-          - mount: sft.cern.ch
-            proxy: 'http://ca-proxy-sft.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: sft-nightlies.cern.ch
-            proxy: 'http://ca-proxy-sft.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: alice.cern.ch
-            proxy: 'http://ca-proxy-alice.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: alice-ocdb.cern.ch
-            proxy: 'http://ca-proxy-alice.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: alice-nightlies.cern.ch
-            proxy: 'http://ca-proxy-alice.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: alpha.cern.ch
-          - mount: ams.cern.ch
-          - mount: atlas.cern.ch
-            proxy: 'http://ca-proxy-atlas.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: atlas-condb.cern.ch
-            proxy: 'http://ca-proxy-atlas.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: atlas-nightlies.cern.ch
-            proxy: 'http://ca-proxy-atlas.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: clicbp.cern.ch
-          - mount: cms.cern.ch
-            proxy: 'http://cmsmeyproxy.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: cms-ib.cern.ch
-            proxy: 'http://cmsmeyproxy.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: cms-bril.cern.ch
-            proxy: 'http://cmsmeyproxy.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: compass.cern.ch
-            proxy: 'http://ca-proxy-compass.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: compass-condb.cern.ch
-            proxy: 'http://ca-proxy-compass.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: fcc.cern.ch
-          - mount: ganga.cern.ch
-          - mount: geant4.cern.ch
-          - mount: lhcb.cern.ch
-            proxy: 'http://ca-proxy-lhcb.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: lhcb-condb.cern.ch
-            proxy: 'http://ca-proxy-lhcb.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: lhcbdev.cern.ch
-            proxy: 'http://ca-proxy-lhcb.cern.ch:3128;http://ca-proxy.cern.ch:3128'
-          - mount: na61.cern.ch
-          - mount: na62.cern.ch
-          - mount: projects.cern.ch
-          - mount: sw.hsf.org
       eos:
         deployDaemonSet: *eosDeployDS
         deployCsiDriver: *eosDeployCSI

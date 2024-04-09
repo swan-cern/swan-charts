@@ -217,50 +217,21 @@ else:
     pass
 
 # Manage CVMFS access
-if get_config("custom.cvmfs.deployDaemonSet", False):
-    # Access via bind-mount from the host
-    logging.info("CVMFS access via DaemonSet")
-    c.SwanKubeSpawner.volumes.append(
-        V1Volume(
-            name='cvmfs',
-            host_path=V1HostPathVolumeSource(
-                path='/var/cvmfs'
-            )
+c.SwanKubeSpawner.volumes.append(
+    V1Volume(
+        name='cvmfs',
+        persistent_volume_claim=V1PersistentVolumeClaimVolumeSource(
+            claim_name='cvmfs'
         )
     )
-    c.SwanKubeSpawner.volume_mounts.append(
-        V1VolumeMount(
-            name='cvmfs',
-            mount_path='/cvmfs',
-            mount_propagation='HostToContainer'
-        )
+)
+c.SwanKubeSpawner.volume_mounts.append(
+    V1VolumeMount(
+        name='cvmfs',
+        mount_path='/cvmfs',
+        mount_propagation='HostToContainer'
     )
-elif (get_config("custom.cvmfs.deployCsiDriver", False) or \
-        get_config("custom.cvmfs.useCsiDriver", False)):
-    # Access via CSI driver (persistent volume claims)
-    logging.info("CVMFS access via CSI driver")
-    cvmfs_repos = get_config('custom.cvmfs.repositories', [])
-    for cvmfs_repo_path in cvmfs_repos:
-        cvmfs_repo_id = cvmfs_repo_path['mount'].replace('.', '-')
-        c.SwanKubeSpawner.volumes.append(
-            V1Volume(
-                name='cvmfs-'+cvmfs_repo_id,
-                persistent_volume_claim=V1PersistentVolumeClaimVolumeSource(
-                    claim_name='cvmfs-'+cvmfs_repo_id+'-pvc'
-                )
-            )
-        )
-        c.SwanKubeSpawner.volume_mounts.append(
-            V1VolumeMount(
-                name='cvmfs-'+cvmfs_repo_id,
-                mount_path='/cvmfs/'+cvmfs_repo_path['mount'],
-                read_only=True
-            )
-        )
-else:
-    # No access to CVMFS provided -- Nothing will work.
-    logging.warning("CVMFS access not provided -- singleuser session will fail. Please review your configuration.")
-    pass
+)
 
 # Required for swan systemuser.sh
 c.SwanKubeSpawner.cmd = None
