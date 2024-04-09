@@ -1,0 +1,19 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: cvmfs
+provisioner: cvmfs.csi.cern.ch
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cvmfs
+spec:
+  accessModes:
+  - ReadOnlyMany
+  resources:
+    requests:
+      # Volume size value has no effect and is ignored
+      # by the driver, but must be non-zero.
+      storage: 1
+  storageClassName: cvmfs
