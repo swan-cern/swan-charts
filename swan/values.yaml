@@ -1,44 +1,12 @@
 #
 # CVMFS access
-# - deployDaemonSet deploys CVMFS pods exposing `/cvmfs` path on the host.
-#     Access to CVMFS is provided by bind-mounting `/cvmfs` from the host.
-# - deployCsiDriver deploys a cluster-wide storage driver for CVMFS.
-#     Access to CVMFS is provided by persistent volume claims.
-# - useCsiDriver has to be used in case the hosting infrastructure provides
-#       a CSI driver to access CVMFS (i.e., it is not needed to deploy additional pods).
-#     Access to CVMFS is provided by persistent volume claims (identical to deployCsiDriver).
-# - repositories defines which CVMFS repos have to be mounted into singleusers' pods.
-#       The value passed depends on the method used, DaemonSet VS CSI driver.
+# - We deploy a cluster-wide storage driver for CVMFS, provided by the
+#   Kubernetes team at CERN (https://gitlab.cern.ch/kubernetes/storage/cvmfs-csi).
+#   This solution is based on automounting.
 #
-# Defaults best support a stand-alone small deployment:
-# - Deploy a DaemonSet pod with the CVMFS client running inside
-# - Chunks from upstream are fetched connecting to the CERN Stratum 1 server
-#
-# Warning:
-# - It is discouraged to enable more than one at once.
-# - By setting all to false, access to EOS will not be possible
-#     and singleuser's session will not be able to start.
-#
-cvmfs:
-  deployDaemonSet: &cvmfsDeployDS true
-  deployCsiDriver: &cvmfsDeployCSI false
-  useCsiDriver: &cvmfsUseCSI false
-  repositories: &cvmfsRepos
-    - cvmfs-config.cern.ch
-    - sft.cern.ch
-    - sft-nightlies.cern.ch
-  mountOptions:
-    hostMountpoint: /var/cvmfs
-  # Prefetcher is provided only by the daemonSet
-  prefetcher:
-    enabled: true
-    jobs:
-      # Python3 kernel
-      cron_opennotebook_python3_kernel:
-        command: >-
-          source /cvmfs/sft.cern.ch/lcg/views/LCG_105a_swan/x86_64-centos7-gcc11-opt/setup.sh &&
-          (timeout 20s python3 -m ipykernel > /dev/null 2>&1 || true)
-        minute: '*/15'
+cvmfs-csi:
+  automountHostPath: /var/cvmfs-blue
+  deployCsiDriver: true
 
 #
 # EOS access
@@ -231,11 +199,6 @@ jupyterhub:
       timeout: 7200
       users: true
       checkEosAuth: false
-    cvmfs:
-      deployDaemonSet: *cvmfsDeployDS
-      deployCsiDriver: *cvmfsDeployCSI
-      useCsiDriver: *cvmfsUseCSI
-      repositories: *cvmfsRepos
     eos:
       deployDaemonSet: *eosDeployDS
       deployCsiDriver: *eosDeployCSI
