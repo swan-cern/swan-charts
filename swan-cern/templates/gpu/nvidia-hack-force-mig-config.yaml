@@ -10,7 +10,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: nvidia-hack-force-mig-config
-  namespace: kube-system
+  namespace: {{ .Release.Namespace }}
 spec:
   selector:
     matchLabels:
@@ -22,12 +22,12 @@ spec:
     spec:
       serviceAccountName: admin
       containers:
-      - image: registry.cern.ch/kubernetes/ops:0.1.0
+      - image: registry.cern.ch/kubernetes/ops:0.4.0
         name: force-mig-config-sleep
         command: ["/bin/sh", "-c", "sleep inf"]
       initContainers:
       # check https://github.com/NVIDIA/k8s-device-plugin/issues/253 for why this is needed
-      - image: registry.cern.ch/kubernetes/ops:0.1.0
+      - image: registry.cern.ch/kubernetes/ops:0.4.0
         name: force-mig-config
         command:
         - /bin/bash
