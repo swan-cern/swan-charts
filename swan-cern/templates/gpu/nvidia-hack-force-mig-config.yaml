@@ -10,7 +10,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: nvidia-hack-force-mig-config
-  namespace: {{ .Release.Namespace }}
+  namespace: kube-system
 spec:
   selector:
     matchLabels:
