@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app: prometheus
+    release: cern-magnum
+  name: swan.rules
+  namespace: {{ .Release.Namespace }}
+spec:
+  groups:
+  - interval: 24h
+    name: swan.rules.users
+    rules:
+    - expr: count(last_over_time(kube_pod_status_phase{namespace="swan",phase="Running",pod=~"jupyter-[a-z]+"}[24h])>0) by (pod)
+      record: swan:users:unique:list:daily
+    - expr: max_over_time(count(count(kube_pod_status_phase{namespace="swan",phase="Running",pod=~"jupyter-[a-z]+"}>0) by (pod))[24h:5m])
+      record: swan:users:peak:daily
+    - expr: count(last_over_time(kube_pod_container_resource_requests{resource=~"nvidia_com_(gpu|mig.+)"}[24h])) by (pod)
+      record: swan:users:gpu:unique:list:daily
+    - expr: max_over_time(count(count(kube_pod_container_resource_requests{resource=~"nvidia_com_(gpu|mig.+)"}) by(pod))[24h:5m])
+      record: swan:users:gpu:peak:daily
