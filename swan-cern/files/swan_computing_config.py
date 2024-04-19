@@ -1,9 +1,14 @@
 import subprocess
 
 from kubernetes_asyncio.client.models import (
+    V1Affinity,
     V1EnvVar,
     V1EnvVarSource,
     V1ContainerPort,
+    V1NodeAffinity,
+    V1NodeSelector,
+    V1NodeSelectorRequirement,
+    V1NodeSelectorTerm,
     V1ObjectMeta,
     V1Secret,
     V1SecretKeySelector,
@@ -11,6 +16,7 @@ from kubernetes_asyncio.client.models import (
     V1Service,
     V1ServicePort,
     V1ServiceSpec,
+    V1Toleration,
     V1Volume,
     V1VolumeMount,
 )
@@ -32,6 +38,10 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
 
         required_ports = 0
 
+        if self._gpu_enabled():
+            # Configure GPU allocation
+            self._modify_pod_for_gpu()
+
         if self._spark_enabled():
             # Configure Spark clusters at CERN
             hadoop_secret_name = await self._init_hadoop_secret()
@@ -51,6 +61,67 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
             await self._open_ports(required_ports)
 
         return self.pod
+
+    def _modify_pod_for_gpu(self):
+        """
+        Configure a pod that requested a GPU.
+
+        Two scenarios are possible:
+        - Regular user: we need to add resource requests and limits for a
+        generic GPU resource to the notebook container.
+        - User who participates in a SWAN event: we need to add resource
+        requests and limits for the GPU resource that has been configured for
+        the event. In addition, we need to add a node affinity and a taint
+        toleration to the pod to ensure that event pods (and only them) are
+        scheduled on resources that have been allocated for the event (and
+        therefore have been labeled and tainted to host only event pods).
+        """
+        if events_role in self.spawner.user_roles:
+            # The user is a participant of an event hosted by SWAN.
+            # Their pod must be allocated on a node that has been
+            # provisioned exclusively for the event
+
+            # Get the GPU resource name in k8s that the user should be
+            # mapped to
+            gpu_resource_name = events_gpu_name
+
+            # Add affinity to nodes that have been provisioned for the
+            # event, i.e. labeled with the events role name
+            node_selector_req = V1NodeSelectorRequirement(
+                key = events_role,
+                operator = 'Exists'
+            )
+            node_selector_term = V1NodeSelectorTerm(
+                match_expressions = [ node_selector_req ]
+            )
+            node_selector = V1NodeSelector(
+                node_selector_terms = [ node_selector_term ]
+            )
+            node_affinity = V1NodeAffinity(
+                required_during_scheduling_ignored_during_execution = node_selector
+            )
+            self.pod.spec.affinity = V1Affinity(node_affinity = node_affinity)
+
+            # Add toleration to nodes that have been provisioned for the
+            # event, i.e. tainted with the events role name
+            toleration = V1Toleration(
+                key = events_role,
+                operator = 'Exists',
+                effect = 'NoSchedule'
+            )
+            self.pod.spec.tolerations = [ toleration ]
+
+        else:
+            # Regular user
+
+            # Request generic GPU resource name
+            gpu_resource_name = 'nvidia.com/gpu'
+
+        # Add to notebook container the requests and limits for the GPU
+        notebook_container = self._get_pod_container('notebook')
+        resources = notebook_container.resources
+        resources.requests[gpu_resource_name] = '1'
+        resources.limits[gpu_resource_name] = '1'
 
     async def _init_hadoop_secret(self):
         """
@@ -190,6 +261,12 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
                 )
             ),
         )
+
+    def _gpu_enabled(self):
+        """
+        return True if the user has requested a GPU
+        """
+        return self.spawner.gpu_requested()
 
     def _spark_enabled(self):
         """
@@ -391,6 +468,13 @@ def computing_modify_pod_hook(spawner, pod):
     """
     computing_pod_hook_handler = SwanComputingPodHookHandler(spawner, pod)
     return computing_pod_hook_handler.get_swan_user_pod()
+
+
+# Custom configuration options
+# Name of the role that is assigned to participants of events hosted by SWAN
+events_role = get_config('custom.events.role', 'swan-events')
+# Name in k8s of the GPU resource to be assigned to participants of an event in SWAN
+events_gpu_name = get_config('custom.events.gpu_name', 'nvidia.com/gpu')
 
 
 c.SwanKubeSpawner.modify_pod_hook = computing_modify_pod_hook
