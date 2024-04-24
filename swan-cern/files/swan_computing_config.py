@@ -123,6 +123,15 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         resources.requests[gpu_resource_name] = '1'
         resources.limits[gpu_resource_name] = '1'
 
+        # Configure OpenCL to use NVIDIA backend
+        notebook_container.env = self._add_or_replace_by_name(
+            notebook_container.env,
+            V1EnvVar(
+                name='OCL_ICD_FILENAMES',
+                value='libnvidia-opencl.so.1'
+            ),
+        )
+
     async def _init_hadoop_secret(self):
         """
         Create secret for Spark/Hadoop
@@ -266,7 +275,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         """
         return True if the user has requested a GPU
         """
-        return self.spawner.gpu_requested()
+        return "cu" in self.spawner.user_options[self.spawner.lcg_rel_field]
 
     def _spark_enabled(self):
         """
