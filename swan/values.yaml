@@ -82,7 +82,7 @@ jupyterhub:
       type: none
     image:
       name: "gitlab-registry.cern.ch/swan/docker-images/jupyter/swan-cern"
-      tag: "v0.0.17"
+      tag: "v0.0.7"
       pullPolicy: "Always"
     cloudMetadata:
       # until we configure networkPolicy
