@@ -59,17 +59,17 @@ spec:
         securityContext:
           allowPrivilegeEscalation: false
         volumeMounts:
-        - mountPath: /cvmfs
-          name: cvmfs
+        - name: cvmfs
+          mountPath: /cvmfs
+          mountPropagation: HostToContainer
         - name: swan-secrets
           mountPath: /hadoop-token-generator/hadoop.cred
           subPath: hadoop.cred
 
       volumes:
       - name: cvmfs
-        hostPath:
-          path: /var/cvmfs
-          type: Directory
+        persistentVolumeClaim:
+          claimName: cvmfs
       - name: swan-secrets
         secret:
           defaultMode: 400
