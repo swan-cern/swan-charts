@@ -277,7 +277,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         """
         return True if the user has requested a GPU
         """
-        return "cu" in self.spawner.user_options[self.spawner.lcg_rel_field]
+        return "cu" in self.spawner.user_options.get(self.spawner.lcg_rel_field, '')
 
     def _spark_enabled(self):
         """
