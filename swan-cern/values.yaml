@@ -48,6 +48,7 @@ swan:
       - fcc.cern.ch
       - ganga.cern.ch
       - geant4.cern.ch
+      - grid.cern.ch
       - lhcb.cern.ch
       - lhcb-condb.cern.ch
       - lhcbdev.cern.ch
