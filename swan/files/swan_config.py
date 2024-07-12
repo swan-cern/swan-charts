@@ -24,9 +24,16 @@ class SwanPodHookHandler:
     def get_swan_user_pod(self):
 
         # pod labels
-        pod_labels = dict(
-            lcg_release = self.spawner.user_options[self.spawner.lcg_rel_field].split('/')[0]
-        )
+        if self.spawner.user_options[self.spawner.software_source] == self.spawner.lcg_special_type:
+            pod_labels = dict(
+                lcg_release = self.spawner.user_options[self.spawner.lcg_rel_field].split('/')[0]
+            )
+        elif self.spawner.user_options[self.spawner.software_source] == self.spawner.customenv_special_type:
+            pod_labels = dict(
+                lcg_release = f'customenv-{self.spawner.builder}_{self.spawner.builder_version}'
+            )
+        else:
+            pod_labels = {}
 
         # update pod labels
         self.pod.metadata.labels.update(
