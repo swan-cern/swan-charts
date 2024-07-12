@@ -139,9 +139,6 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
 
         cluster = self.spawner.user_options[self.spawner.spark_cluster_field]
 
-        if cluster == 'none':
-            return None
-
         username = self.spawner.user.name
         hadoop_secret_name = f'hadoop-tokens-{username}'
 
@@ -275,7 +272,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         """
         return True if the user has requested a GPU
         """
-        return "cu" in self.spawner.user_options[self.spawner.lcg_rel_field]
+        return "cu" in self.spawner.user_options.get(self.spawner.lcg_rel_field, '')
 
     def _spark_enabled(self):
         """
@@ -286,7 +283,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         """
 
         user_roles = self.spawner.user_roles
-        cluster = self.spawner.user_options[self.spawner.spark_cluster_field]
+        cluster = self.spawner.user_options.get(self.spawner.spark_cluster_field, 'none')
 
         if cluster == "analytix" and "analytix" not in user_roles:
            raise ValueError(
@@ -314,9 +311,6 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
 
         cluster = self.spawner.user_options[self.spawner.spark_cluster_field]
         max_mem = self.spawner.user_options[self.spawner.user_memory]
-
-        if cluster == 'none':
-            return
 
         # add basic spark envs
 
@@ -376,7 +370,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         """
         return True if the user has selected an HTCondor pool.
         """
-        condor_pool = self.spawner.user_options[self.spawner.condor_pool]
+        condor_pool = self.spawner.user_options.get(self.spawner.condor_pool, 'none')
         return condor_pool != 'none'
 
     async def _open_ports(self, num_ports):
