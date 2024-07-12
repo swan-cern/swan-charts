@@ -139,9 +139,6 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
 
         cluster = self.spawner.user_options.get(self.spawner.spark_cluster_field, 'none')
 
-        if cluster == 'none':
-            return None
-
         username = self.spawner.user.name
         hadoop_secret_name = f'hadoop-tokens-{username}'
 
@@ -314,6 +311,9 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
 
         cluster = self.spawner.user_options[self.spawner.spark_cluster_field]
         max_mem = self.spawner.user_options[self.spawner.user_memory]
+
+        if cluster == 'none':
+            return
 
         # add basic spark envs
 
