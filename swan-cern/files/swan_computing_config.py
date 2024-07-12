@@ -315,9 +315,6 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         cluster = self.spawner.user_options[self.spawner.spark_cluster_field]
         max_mem = self.spawner.user_options[self.spawner.user_memory]
 
-        if cluster == 'none':
-            return
-
         # add basic spark envs
 
         notebook_container.env = self._add_or_replace_by_name(
