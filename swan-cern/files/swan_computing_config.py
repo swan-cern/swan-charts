@@ -137,9 +137,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         Create secret for Spark/Hadoop
         """
 
-        cluster = 'none'
-        if self.spawner.user_options[self.spawner.software_source] == self.spawner.lcg_special_type:
-            cluster = self.spawner.user_options[self.spawner.spark_cluster_field]
+        cluster = self.spawner.user_options.get(self.spawner.spark_cluster_field, 'none')
 
         if cluster == 'none':
             return None
@@ -288,9 +286,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         """
 
         user_roles = self.spawner.user_roles
-        cluster = 'none'
-        if self.spawner.user_options[self.spawner.software_source] == self.spawner.lcg_special_type:
-            cluster = self.spawner.user_options[self.spawner.spark_cluster_field]
+        cluster = self.spawner.user_options.get(self.spawner.spark_cluster_field, 'none')
 
         if cluster == "analytix" and "analytix" not in user_roles:
            raise ValueError(
@@ -316,10 +312,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         notebook_container = self._get_pod_container('notebook')
         username = self.spawner.user.name
 
-        cluster = 'none'
-        if self.spawner.user_options[self.spawner.software_source] == self.spawner.lcg_special_type:
-            cluster = self.spawner.user_options[self.spawner.spark_cluster_field]
-
+        cluster = self.spawner.user_options[self.spawner.spark_cluster_field]
         max_mem = self.spawner.user_options[self.spawner.user_memory]
 
         if cluster == 'none':
@@ -383,9 +376,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         """
         return True if the user has selected an HTCondor pool.
         """
-        condor_pool = 'none'
-        if self.spawner.user_options[self.spawner.software_source] == self.spawner.lcg_special_type:
-            condor_pool = self.spawner.user_options[self.spawner.condor_pool]
+        condor_pool = self.spawner.user_options.get(self.spawner.condor_pool, 'none')
         return condor_pool != 'none'
 
     async def _open_ports(self, num_ports):
