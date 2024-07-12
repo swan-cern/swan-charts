@@ -137,7 +137,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         Create secret for Spark/Hadoop
         """
 
-        cluster = self.spawner.user_options.get(self.spawner.spark_cluster_field, 'none')
+        cluster = self.spawner.user_options[self.spawner.spark_cluster_field]
 
         username = self.spawner.user.name
         hadoop_secret_name = f'hadoop-tokens-{username}'
