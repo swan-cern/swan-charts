@@ -1,0 +1,40 @@
+{{ if .Values.hpc.enabled }}
+{{- range $i, $volume := .Values.hpc.cephVolumes }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: hpc-volume-{{ $i }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: 1Gi
+  csi:
+    driver: cephfs.csi.ceph.com
+    volumeHandle: hpc-volume-{{ $i }}
+    nodeStageSecretRef:
+      name: hpc-volume-{{ $i }}-secret
+      namespace: {{ $.Release.Namespace }}
+    nodePublishSecretRef:
+      name: hpc-volume-{{ $i }}-secret
+      namespace: {{ $.Release.Namespace }}
+    volumeAttributes:
+      monitors: {{ $volume.monitors }}
+      rootPath: {{ $volume.rootPath }}
+      provisionVolume: "false"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hpc-volume-{{ $i }}-pvc
+  namespace: {{ $.Release.Namespace }}
+spec:
+  accessModes:
+   - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: hpc-volume-{{ $i }}
+{{- end }}
+{{- end }}
