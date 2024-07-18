@@ -1,0 +1,36 @@
+name: Update jupyter and jupyterhub images
+on: 
+  workflow_dispatch:
+    inputs:
+      image:
+        description: 'Image Name'     
+        required: true
+        default: ''    
+      version:
+        description: 'Image Version'     
+        required: true
+        default: ''       
+jobs:
+  update-images:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        ref: master
+
+    - name: Update images version
+      run: |
+        echo "Updating information for image = ${{ github.event.inputs.image }} version = ${{ github.event.inputs.version }}"
+        export IMAGE_NAME=${{ github.event.inputs.image }}
+        export IMAGE_VERSION=$(echo ${{ github.event.inputs.version }} | sed -e "s/v//g")
+        sed -i "s/\( gitlab-registry.cern.ch/swan/docker-images/$IMAGE_NAME:*\)[^ ]*/\1$IMAGE_VERSION/" swan/values.yaml
+    - name: Create Pull Request
+      id: cpr
+      uses: peter-evans/create-pull-request@v6
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: "Updated image ${{ github.event.inputs.image }} to version ${{ github.event.inputs.version }}"
+        branch: '${{ github.event.inputs.image }}-${{ github.event.inputs.version }}'
+        delete-branch: true
+        title: "Updated image ${{ github.event.inputs.image }} to version ${{ github.event.inputs.version }}"
