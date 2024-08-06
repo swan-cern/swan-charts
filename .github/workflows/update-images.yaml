@@ -21,10 +21,10 @@ jobs:
 
     - name: Update images version
       run: |
-        echo "Updating information for image = ${{ github.event.inputs.image }} version = ${{ github.event.inputs.version }}"
         export IMAGE_NAME=${{ github.event.inputs.image }}
-        export IMAGE_VERSION=$(echo ${{ github.event.inputs.version }} | sed -e "s/v//g")
-        sed -i "s|\(gitlab-registry.cern.ch/swan/docker-images/$IMAGE_NAME:\)[^ ]*|\1$IMAGE_VERSION|" swan/values.yaml
+        export IMAGE_VERSION=${{ github.event.inputs.version }}
+        echo "Updating information for image = $IMAGE_NAME version = $IMAGE_VERSION"
+        sed -i "\|gitlab-registry.cern.ch/swan/docker-images/$IMAGE_NAME|!b;n;s|tag: .*|tag: $IMAGE_VERSION|" swan/values.yaml
     - name: Create Pull Request
       id: cpr
       uses: peter-evans/create-pull-request@v6
