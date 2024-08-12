@@ -8,11 +8,8 @@ dependencies:
 - name: eosxd
   repository: http://registry.cern.ch/chartrepo/cern
   version: 5.1.27-1
-- name: cvmfs
-  repository: oci://registry.cern.ch/sciencebox/charts
-  version: 0.0.8
 - name: cvmfs-csi
-  repository: http://registry.cern.ch/chartrepo/cern
-  version: 0.1.0
-digest: sha256:3eac4448e52537f505f81f044fdf3e3f0b7b2967fa357a6567c5ae450ec7957e
-generated: "2023-10-17T13:12:20.679327104+02:00"
+  repository: oci://registry.cern.ch/kubernetes/charts
+  version: 2.5.0
+digest: sha256:64cb0681fbd354e11d37ff6ac172cc22a450e5787aee9fd597b2039eec96242a
+generated: "2024-08-12T10:35:27.023897564+02:00"
