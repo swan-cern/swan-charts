@@ -8,7 +8,11 @@ global:
     platform: 
   nxcals:
     lcg: 
-    platform: 
+    platform:
+
+systemuser-image:
+  name:  &systemUserImageName "gitlab-registry.cern.ch/swan/docker-images/jupyter/swan-cern"
+  tag: &systemUserImageTag "v0.0.20"
 
 swan:
   cvmfs-csi:
@@ -25,6 +29,9 @@ swan:
     nodeplugin:
       prefetcher:
         enabled: true
+        image:
+          repository: *systemUserImageName
+          tag: *systemUserImageTag
         # Jobs to warmup ROOT, NXCALS and CUDA stacks respectively
         jobs:
           - name: cron-warmup-lcg-releases
@@ -59,6 +66,9 @@ swan:
     singleuser:
       cpu:
         guarantee: 0.5
+      image:
+        name: *systemUserImageName
+        tag: *systemUserImageTag
     scheduling:
       userPods:
         nodeAffinity:
