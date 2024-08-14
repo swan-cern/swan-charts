@@ -10,10 +10,6 @@ global:
     lcg: 
     platform:
 
-user-image:
-  name:  &userImageName "gitlab-registry.cern.ch/swan/docker-images/jupyter/swan-cern"
-  tag: &userImageTag "v0.0.21"
-
 swan:
   cvmfs-csi:
     extraConfigMaps:
@@ -29,10 +25,9 @@ swan:
     nodeplugin:
       prefetcher:
         enabled: true
-        # Ensure the warmup cronjobs run with the same image as the user
         image:
-          repository: *userImageName
-          tag: *userImageTag
+          repository: gitlab-registry.cern.ch/swan/docker-images/jupyter/prefetcher
+          tag: v0.0.1
         # Jobs to warmup ROOT, NXCALS and CUDA stacks respectively
         jobs:
           - name: cron-warmup-lcg-releases
@@ -68,8 +63,8 @@ swan:
       cpu:
         guarantee: 0.5
       image:
-        name: *userImageName
-        tag: *userImageTag
+        name: gitlab-registry.cern.ch/swan/docker-images/jupyter/swan-cern
+        tag: v0.0.21
     scheduling:
       userPods:
         nodeAffinity:
