@@ -49,8 +49,8 @@ jupyterhub:
     storage:
       type: none
     image:
-      name: "gitlab-registry.cern.ch/swan/docker-images/jupyter/swan-cern"
-      tag: "v0.0.20"
+      name: "gitlab-registry.cern.ch/swan/docker-images/jupyter/swan"
+      tag: "v0.0.14"
       pullPolicy: "Always"
     cloudMetadata:
       # until we configure networkPolicy
