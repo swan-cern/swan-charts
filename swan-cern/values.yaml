@@ -64,7 +64,7 @@ swan:
         guarantee: 0.5
       image:
         name: gitlab-registry.cern.ch/swan/docker-images/jupyter/swan-cern
-        tag: v0.0.21
+        tag: v0.0.22
     scheduling:
       userPods:
         nodeAffinity:
