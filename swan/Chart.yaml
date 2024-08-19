@@ -22,4 +22,4 @@ dependencies:
   - name: cvmfs-csi
     version: 2.5.0
     repository: oci://registry.cern.ch/kubernetes/charts
-    condition: cvmfs-csi.deployCsiDriver
+    condition: cvmfs-csi.enabled

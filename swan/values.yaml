@@ -5,8 +5,8 @@
 #   This solution is based on automounting.
 #
 cvmfs-csi:
+  enabled: true
   automountHostPath: /var/cvmfs-blue
-  deployCsiDriver: true
 
 #
 # EOS access
