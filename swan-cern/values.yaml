@@ -49,6 +49,7 @@ swan:
               source /cvmfs/sft.cern.ch/lcg/views/{{ .Values.global.cuda.lcg }}/{{ .Values.global.cuda.platform }}/setup.sh &&
               (timeout 20s python3 -c 'import tensorflow' || true) &&
               (timeout 20s python3 -c 'import torch' || true)
+  eosxd-csi:
   jupyterhub:
     singleuser:
       cpu:

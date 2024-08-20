@@ -16,7 +16,9 @@ cvmfs-csi:
 #
 eosxd-csi:
   enabled:  &eosEnabled true
-  automountHostPath: &eosAutomountHostPath /var/eos-blue
+  automountHostPath: /var/eos-blue
+  commonStorageClass:
+    enabled: true
 
 #
 # JupyterHub
@@ -180,7 +182,6 @@ jupyterhub:
       checkEosAuth: false
     eos:
       enabled: *eosEnabled
-      automountHostPath: *eosAutomountHostPath
 # placeholders for swan credentials
 swan:
   secrets:
