@@ -50,6 +50,7 @@ swan:
               (timeout 20s python3 -c 'import tensorflow' || true) &&
               (timeout 20s python3 -c 'import torch' || true)
   eosxd-csi:
+    automountDaemonUnmountTimeout: 1800
   jupyterhub:
     singleuser:
       cpu:
