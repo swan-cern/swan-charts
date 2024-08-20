@@ -175,21 +175,20 @@ c.SwanKubeSpawner.volume_mounts.append(
 
 # Manage EOS access
 if get_config("custom.eos.enabled", False):
-    # Access via bind-mount from the host
+    c.SwanKubeSpawner.volumes.append(
+        V1Volume(
+            name='eos',
+            persistent_volume_claim=V1PersistentVolumeClaimVolumeSource(
+                claim_name='eos'
+            )
+        )
+    )
     c.SwanKubeSpawner.volume_mounts.append(
         V1VolumeMount(
             name='eos',
             mount_path='/eos',
             mount_propagation='HostToContainer'
-        ),
-    )
-    c.SwanKubeSpawner.volumes.append(
-        V1Volume(
-            name='eos',
-            host_path=V1HostPathVolumeSource(
-                path=get_config("custom.eos.automountHostPath", "/var/eos")
-            )
-        ),
+        )
     )
 else:
     # No access to EOS provided
