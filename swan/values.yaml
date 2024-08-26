@@ -6,7 +6,7 @@
 #
 cvmfs-csi:
   enabled: true
-  automountHostPath: /var/cvmfs-blue
+  automountHostPath: /var/cvmfs
   automountStorageClass:
     create: true
 
@@ -18,7 +18,7 @@ cvmfs-csi:
 #
 eosxd-csi:
   enabled:  &eosEnabled true
-  automountHostPath: /var/eos-blue
+  automountHostPath: /var/eos
   commonStorageClass:
     enabled: true
 
