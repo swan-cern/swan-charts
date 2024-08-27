@@ -10,7 +10,10 @@ global:
     lcg: 
     platform:
 
+enabled: &swanCernEnabled true
+
 swan:
+  enabled: *swanCernEnabled
   cvmfs-csi:
     extraConfigMaps:
       cvmfs-csi-default-local:
