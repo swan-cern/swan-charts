@@ -1,3 +1,4 @@
+{{- if index .Values "enabled" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -88,3 +89,4 @@ spec:
   ports:
     - protocol: TCP
       port: 80
+{{- end }}

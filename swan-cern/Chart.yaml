@@ -12,6 +12,7 @@ dependencies:
   - name: swan
     version: 2.3.8
     repository: oci://registry.cern.ch/swan/charts
+    condition: swan.enabled
   - name: fluentd
     version: 0.4.3
     repository: https://fluent.github.io/helm-charts
