@@ -1,3 +1,4 @@
+{{- if index .Values "enabled" }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -23,3 +24,4 @@ spec:
     bearerTokenSecret:
       name: hub
       key: hub.services.prometheus-service-monitor.apiToken
+{{- end }}
