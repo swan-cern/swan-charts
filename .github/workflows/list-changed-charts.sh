@@ -6,7 +6,7 @@ script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" || exit; pwd;)"
 
 cd "${script_dir}/../../" # cd to the root of the repo
 
-CHARTS=("swan" "swan-cern")
+CHARTS=("swan" "swan-cern" "swan-cern-system")
 
 for CHART_NAME in "${CHARTS[@]}"; do
 
