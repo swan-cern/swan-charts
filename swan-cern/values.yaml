@@ -192,7 +192,7 @@ swanCern:
       cred:
 
 hadoopTokenGenerator:
-  image: gitlab-registry.cern.ch/swan/docker-images/hadoop-token-generator:v3.0.3
+  image: gitlab-registry.cern.ch/swan/docker-images/hadoop-token-generator:v3.0.4
 
 fluentd:
   caCertPath: &fluentdCaCertPath /etc/ssl/ca-bundle.crt
