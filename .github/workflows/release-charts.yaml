@@ -42,6 +42,16 @@ on:
           - minor
           - patch
 
+      bump_swan_cern_system:
+        description: "Bump version for swan-cern-system/"
+        required: false
+        default: patch
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
 jobs:
   check_branch:
     runs-on: ubuntu-latest
@@ -59,6 +69,7 @@ jobs:
     outputs:
       swan_has_changed: ${{ steps.diff.outputs.swan_has_changed }}
       swan-cern_has_changed: ${{ steps.diff.outputs.swan-cern_has_changed }}
+      swan-cern-system_has_changed: ${{ steps.diff.outputs.swan-cern-system_has_changed }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -131,6 +142,18 @@ jobs:
     with:
       chart: swan-cern
       bump: ${{ inputs.bump_swan_cern }}
+    secrets:
+      WORKFLOW_ACCESS_TOKEN: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
+      HELM_REPO_USERNAME: ${{ secrets.HELM_REPO_USERNAME }}
+      HELM_REPO_PASSWORD: ${{ secrets.HELM_REPO_PASSWORD }}
+
+  tag_swan_cern_system:
+    needs: [check_charts, list_changed_charts]
+    if: needs.list_changed_charts.outputs.swan-cern-system_has_changed == 'true'
+    uses: ./.github/workflows/tag-chart.yaml
+    with:
+      chart: swan-cern-system
+      bump: ${{ inputs.bump_swan_cern_system }}
     secrets:
       WORKFLOW_ACCESS_TOKEN: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
       HELM_REPO_USERNAME: ${{ secrets.HELM_REPO_USERNAME }}

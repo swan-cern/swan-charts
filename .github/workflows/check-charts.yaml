@@ -29,3 +29,5 @@ jobs:
       - run: helm dependency update swan && helm lint swan && helm package swan
 
       - run: helm dependency update swan-cern && helm lint swan-cern && helm package swan-cern
+
+      - run: helm dependency update swan-cern-system && helm lint swan-cern-system && helm package swan-cern-system
