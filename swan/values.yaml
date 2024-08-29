@@ -21,6 +21,25 @@ eosxd-csi:
   automountHostPath: /var/eos-blue
   commonStorageClass:
     enabled: true
+  extraConfigMaps:
+    eos-csi-dir-etc-eos:
+      # Ensure file versions are shown to allow notebook checkpoints (hide-versions option is added)
+      fuse.home-i00.conf: |
+        {"name":"home-i00","hostport":"eoshome-i00.cern.ch","remotemountdir":"/eos/user/","bind":"d l n t z","auth":{"ssskeytab":"/etc/eos.keytab"},"options":{"hide-versions":0}}
+      fuse.home-i01.conf: |
+        {"name":"home-i01","hostport":"eoshome-i01.cern.ch","remotemountdir":"/eos/user/","bind":"a g j k w","auth":{"ssskeytab":"/etc/eos.keytab"},"options":{"hide-versions":0}}
+      fuse.home-i02.conf: |
+        {"name":"home-i02","hostport":"eoshome-i02.cern.ch","remotemountdir":"/eos/user/","bind":"h o r s y","auth":{"ssskeytab":"/etc/eos.keytab"},"options":{"hide-versions":0}}
+      fuse.home-i03.conf: |
+        {"name":"home-i03","hostport":"eoshome-i03.cern.ch","remotemountdir":"/eos/user/","bind":"b e m v x","auth":{"ssskeytab":"/etc/eos.keytab"},"options":{"hide-versions":0}}
+      fuse.home-i04.conf: |
+        {"name":"home-i04","hostport":"eoshome-i04.cern.ch","remotemountdir":"/eos/user/","bind":"c f i p q u","auth":{"ssskeytab":"/etc/eos.keytab"},"options":{"hide-versions":0}}
+      fuse.project-i00.conf: |
+        {"name":"project-i00","hostport":"eosproject-i00.cern.ch","remotemountdir":"/eos/project/","bind":"a e j g v k q y","auth":{"ssskeytab":"/etc/eos.keytab"},{"hide-versions":0}}
+      fuse.project-i01.conf: |
+        {"name":"project-i01","hostport":"eosproject-i01.cern.ch","remotemountdir":"/eos/project/","bind":"l h b p s f w n o","auth":{"ssskeytab":"/etc/eos.keytab"},{"hide-versions":0}}
+      fuse.project-i02.conf: |
+        {"name":"project-i02","hostport":"eosproject-i02.cern.ch","remotemountdir":"/eos/project/","bind":"d c i r m t u x z","auth":{"ssskeytab":"/etc/eos.keytab"},{"hide-versions":0}}
 
 #
 # JupyterHub
