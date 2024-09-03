@@ -1,6 +1,12 @@
 dependencies:
 - name: swan
   repository: oci://registry.cern.ch/swan/charts
-  version: 2.3.11
-digest: sha256:e850deb13c6128cb33b3aa40fecb1b56bc95adf35448b113b0e871dd67fff390
-generated: "2024-12-19T09:55:38.321953329Z"
+  version: 9.9.9
+- name: fluentd
+  repository: https://fluent.github.io/helm-charts
+  version: 0.4.3
+- name: gpu-operator
+  repository: oci://registry.cern.ch/kubernetes/charts
+  version: v22.9.1
+digest: sha256:589b9fdb13e19c7468a2ab1521cd0a65ffbf80af0d4540c609bc68b2cbad688a
+generated: "2024-09-03T10:19:25.143381984+02:00"
