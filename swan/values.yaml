@@ -35,11 +35,11 @@ eosxd-csi:
       fuse.home-i04.conf: |
         {"name":"home-i04","hostport":"eoshome-i04.cern.ch","remotemountdir":"/eos/user/","bind":"c f i p q u","auth":{"ssskeytab":"/etc/eos.keytab"},"options":{"hide-versions":0}}
       fuse.project-i00.conf: |
-        {"name":"project-i00","hostport":"eosproject-i00.cern.ch","remotemountdir":"/eos/project/","bind":"a e j g v k q y","auth":{"ssskeytab":"/etc/eos.keytab"},{"hide-versions":0}}
+        {"name":"project-i00","hostport":"eosproject-i00.cern.ch","remotemountdir":"/eos/project/","bind":"a e j g v k q y","auth":{"ssskeytab":"/etc/eos.keytab"},"options":{"hide-versions":0}}
       fuse.project-i01.conf: |
-        {"name":"project-i01","hostport":"eosproject-i01.cern.ch","remotemountdir":"/eos/project/","bind":"l h b p s f w n o","auth":{"ssskeytab":"/etc/eos.keytab"},{"hide-versions":0}}
+        {"name":"project-i01","hostport":"eosproject-i01.cern.ch","remotemountdir":"/eos/project/","bind":"l h b p s f w n o","auth":{"ssskeytab":"/etc/eos.keytab"},"options":{"hide-versions":0}}
       fuse.project-i02.conf: |
-        {"name":"project-i02","hostport":"eosproject-i02.cern.ch","remotemountdir":"/eos/project/","bind":"d c i r m t u x z","auth":{"ssskeytab":"/etc/eos.keytab"},{"hide-versions":0}}
+        {"name":"project-i02","hostport":"eosproject-i02.cern.ch","remotemountdir":"/eos/project/","bind":"d c i r m t u x z","auth":{"ssskeytab":"/etc/eos.keytab"},"options":{"hide-versions":0}}
 
 #
 # JupyterHub
