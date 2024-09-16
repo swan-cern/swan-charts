@@ -1,0 +1,9 @@
+dependencies:
+- name: fluentd
+  repository: https://fluent.github.io/helm-charts
+  version: 0.4.3
+- name: gpu-operator
+  repository: oci://registry.cern.ch/kubernetes/charts
+  version: v22.9.1
+digest: sha256:915af39533df575e4dfb366889d13000c2719d659af8d9067a0e17f5687da99e
+generated: "2024-08-28T11:51:58.383677074+02:00"
