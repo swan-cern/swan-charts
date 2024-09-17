@@ -154,6 +154,7 @@ jupyterhub:
         # set home directory to EOS
         local_home: False
         centos7_image: "gitlab-registry.cern.ch/swan/docker-images/systemuser:v6.0.0"
+        accpy_image: "gitlab-registry.cern.ch/rhenriqu/test_image_registry/swan-acc:latest"
       SpawnHandlersConfigs:
         # disable some defaults of swanspawner that do now work for kube-spawner
         # FIXME remove this from the spawner once we support only k8s
