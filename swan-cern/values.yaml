@@ -58,6 +58,31 @@ swan:
       image:
         name: gitlab-registry.cern.ch/swan/docker-images/jupyter/swan-cern
         tag: v0.0.27
+      networkPolicy:
+        ingress:
+          # Allow user pods to receive incoming connections on the NodePort service port range.
+          # This supports use cases where servers run inside the user pod and need to receive
+          # connections (e.g. Spark, HTCondor via Dask).
+          - from:
+            - ipBlock:
+                cidr: 0.0.0.0/0
+                # Exclude connections from other pods in our cluster's pod network.
+                except:
+                  - 10.0.0.0/8
+                  - 172.16.0.0/12
+                  - 192.168.0.0/16
+            ports:
+            - protocol: TCP
+              port: 30000
+              endPort: 32767
+        egress:
+          # Allow connection from the user pod to the hadoop token generator to get Hadoop credentials.
+          - to:
+              - podSelector:
+                  matchLabels:
+                    app: hadoop-token-generator
+            ports:
+              - port: 80
     scheduling:
       userPods:
         nodeAffinity:
@@ -174,6 +199,16 @@ swan:
           description: Access to hub Prometheus metrics
           scopes: ['read:metrics']
           services: [prometheus-service-monitor]
+      networkPolicy:
+        ingress:
+          # Allow connection from prometheus to the hub, to scrape the metrics endpoint
+          - ports:
+              - protocol: TCP
+                port: 8081
+            from:
+              - podSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: prometheus
     custom:
       cull:
         # 4 hours

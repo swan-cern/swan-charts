@@ -55,11 +55,12 @@ jupyterhub:
       tag: "v0.0.14"
       pullPolicy: "Always"
     cloudMetadata:
-      # until we configure networkPolicy
-      blockWithIptables: true
       ip: 169.254.169.254
     networkPolicy:
-      enabled: false
+      enabled: true
+      egressAllowRules:
+        dnsPortsCloudMetadataServer: false
+        dnsPortsPrivateIPs: false
     extraAnnotations:
       kubectl.kubernetes.io/default-container: notebook
     extraEnv:
@@ -77,6 +78,13 @@ jupyterhub:
     service:
       type: ClusterIP
     chp:
+      networkPolicy:
+        enabled: true
+        egressAllowRules:
+          cloudMetadataServer: false
+          dnsPortsCloudMetadataServer: false
+          dnsPortsPrivateIPs: false
+          privateIPs: false
       image:
         name: "jupyterhub/configurable-http-proxy"
         tag: "4.5.0"
@@ -174,7 +182,12 @@ jupyterhub:
           raise Exception("Please configure pre_spawn_hook")
         c.KeyCloakAuthenticator.pre_spawn_hook = pre_spawn_hook
     networkPolicy:
-      enabled: false
+      enabled: true
+      egressAllowRules:
+        cloudMetadataServer: false
+        dnsPortsCloudMetadataServer: false
+        dnsPortsPrivateIPs: false
+        privateIPs: false
     # placeholder for hub cookieSecret
     # when empty, it generates a new randomly
     cookieSecret:
@@ -209,4 +222,3 @@ swan:
     ingress:
       cert:
       key:
-
