@@ -145,7 +145,6 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         username = self.spawner.user.name
         hadoop_secret_name = f'hadoop-tokens-{username}'
 
-        webhdfs_token_base64 = ''
         k8suser_config_base64 = ''
 
         if cluster == 'k8s':
@@ -159,24 +158,6 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
                 # if no access, all good for now
                 raise ValueError("Could not setup user on k8s")
 
-            try:
-                # Retrieve hdfs token for user
-                webhdfs_token_base64 = subprocess.check_output(
-                    ['sudo', '--preserve-env=SWAN_DEV', '/srv/jupyterhub/private/webhdfs_token.sh', hdfs_cluster, username], timeout=60
-                ).decode('ascii')
-            except Exception as e:
-                # if no access, all good for now
-                raise ValueError("Could not get webhdfs tokens")
-        else:
-            try:
-                # Retrieve hdfs token for user
-                webhdfs_token_base64 = subprocess.check_output(
-                    ['sudo', '--preserve-env=SWAN_DEV', '/srv/jupyterhub/private/webhdfs_token.sh', cluster, username], timeout=60
-                ).decode('ascii')
-            except Exception as e:
-                # if no access, all good for now
-                raise ValueError("Could not get webhdfs tokens")
-
         # Create V1Secret with webdhfs token and k8s user config
         try:
             secret_data = V1Secret()
@@ -187,7 +168,6 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
             secret_data.metadata = secret_meta
             secret_data.data = {}
             secret_data.data['k8s-user.config'] = k8suser_config_base64
-            secret_data.data['webhdfs.toks'] = webhdfs_token_base64
 
             try:
                 await self.spawner.api.read_namespaced_secret(hadoop_secret_name, swan_container_namespace)
@@ -254,20 +234,6 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
             V1EnvVar(
                 name='KUBECONFIG',
                 value='/srv/notebook/tokens/k8s-user.config'
-            ),
-        )
-
-        # webhdfs token
-        notebook_container.env = self._add_or_replace_by_name(
-            notebook_container.env,
-            V1EnvVar(
-                name='WEBHDFS_TOKEN',
-                value_from=V1EnvVarSource(
-                    secret_key_ref=V1SecretKeySelector(
-                        key='webhdfs.toks',
-                        name=hadoop_secret_name
-                    )
-                )
             ),
         )
 

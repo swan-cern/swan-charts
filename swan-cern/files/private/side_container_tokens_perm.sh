@@ -27,13 +27,6 @@ if [[ ! -f "/srv/side-container/eos/krb5cc" ]]; then
     exit 1
 fi
 
-if [[ -f "/srv/side-container/hadoop/webhdfs.toks" ]]; then
-    echo "add hadoop.toks to user container"
-    copy_token_to_notebook /srv/side-container/hadoop/webhdfs.toks /srv/notebook/tokens/webhdfs.toks
-else
-    echo "webhdfs.toks not required, skipping"
-fi
-
 if [[ -f "/srv/side-container/hadoop/hadoop.toks" ]]; then
     echo "add hadoop.toks to user container"
     copy_token_to_notebook /srv/side-container/hadoop/hadoop.toks /srv/notebook/tokens/hadoop.toks
