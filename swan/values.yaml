@@ -61,6 +61,7 @@ jupyterhub:
       egressAllowRules:
         dnsPortsCloudMetadataServer: false
         dnsPortsPrivateIPs: false
+        nonPrivateIPs: false
     extraAnnotations:
       kubectl.kubernetes.io/default-container: notebook
     extraEnv:
