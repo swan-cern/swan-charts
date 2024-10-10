@@ -351,8 +351,3 @@ gpu-operator:
     config:
       name: nvidia-device-plugin-config
       default: "default"
-  node-feature-discovery:
-    image:
-      repository: registry.cern.ch/kubernetes/node-feature-discovery
-      tag: v0.10.1
-
