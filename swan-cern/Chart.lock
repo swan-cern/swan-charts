@@ -7,6 +7,6 @@ dependencies:
   version: 0.4.3
 - name: gpu-operator
   repository: oci://registry.cern.ch/kubernetes/charts
-  version: v24.6.2
-digest: sha256:02b128aa07fd796252255ac4f09708fef9b99aabd0d01d4f2c29d28a2e1aca55
-generated: "2024-10-09T16:57:02.584172485+02:00"
+  version: v22.9.1
+digest: sha256:4600d0fa64afa906aaa7570a138dd796a87b20edd18cb96829f0d8e08372c4f3
+generated: "2024-10-01T09:39:24.176258854Z"
