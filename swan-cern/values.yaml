@@ -212,6 +212,9 @@ swan:
               - podSelector:
                   matchLabels:
                     app.kubernetes.io/name: prometheus
+                namespaceSelector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: kube-system
     custom:
       cull:
         # 4 hours
