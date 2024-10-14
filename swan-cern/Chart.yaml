@@ -16,6 +16,6 @@ dependencies:
     version: 0.4.3
     repository: https://fluent.github.io/helm-charts
   - name: gpu-operator
-    version: v24.6.2
+    version: v22.9.1
     repository: oci://registry.cern.ch/kubernetes/charts
     condition: gpu-operator.enabled
