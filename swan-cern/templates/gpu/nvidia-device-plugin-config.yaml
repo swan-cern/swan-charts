@@ -2,9 +2,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: nvidia-time-slicing-config
+  name: nvidia-device-plugin-config
   namespace: {{ .Release.Namespace }}
 data:
+  default: |-
+    version: v1
+    flags: {}
   slice-4: |-
     version: v1
     sharing:
@@ -24,4 +27,3 @@ data:
         - name: nvidia.com/gpu
           replicas: 10
 {{- end }}
-

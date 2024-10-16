@@ -274,10 +274,10 @@ gpu-operator:
   enabled: true
   validator:
     repository: registry.cern.ch/kubernetes
-    version: v22.9.1
+    version: v24.6.2
   operator:
     repository: registry.cern.ch/kubernetes
-    version: v22.9.1
+    version: v24.6.2
     defaultRuntime: containerd
     initContainer:
       repository: registry.cern.ch/kubernetes
@@ -285,15 +285,16 @@ gpu-operator:
   driver:
     repository: registry.cern.ch/kubernetes
     image: nvidia-gpu-driver
-    version: "v550.54.15-6.6.13-200.fc39.x86_64"
+    version: "v550.54.15-6.8.4-200.fc39.x86_64"
     imagePullPolicy: Always
     manager:
       repository: registry.cern.ch/kubernetes
       version: v0.6.0
     licensingConfig:
       configMapName: "nvidia-grid-license"
-    kernelModuleConfig:
-      name: kernel-module-params
+      nlsEnabled: false
+    nfd:
+      enabled: false
   vgpuManager:
     repository: registry.cern.ch
     driverManager:
@@ -305,12 +306,15 @@ gpu-operator:
     driverManager:
       repository: registry.cern.ch
       version: v0.5.1
+  gdrcopy:
+    repository: registry.cern.ch/kubernetes
+    version: v2.4.1-1
   vgpuDeviceManager:
     repository: registry.cern.ch
     version: v0.2.0
   toolkit:
     repository: registry.cern.ch/kubernetes
-    version: v1.11.0
+    version: v1.16.2-ubuntu20.04
   devicePlugin:
     repository: registry.cern.ch/kubernetes
     version: v0.13.0
@@ -324,7 +328,7 @@ gpu-operator:
       name: nvidia-dcgm-exporter-metrics
   gfd:
     repository: registry.cern.ch/kubernetes
-    version: v0.7.0
+    version: v0.16.2-ubi8
   mig:
     strategy: mixed
   migManager:
@@ -334,17 +338,19 @@ gpu-operator:
       name: nvidia-mig-config
   nodeStatusExporter:
     repository: registry.cern.ch
-    version: v22.9.1
+    version: v24.6.2
+  kataManager:
+    repository: registry.cern.ch/kubernetes
+    version: v0.2.1
   sandboxDevicePlugin:
     repository: registry.cern.ch/kubernetes
     version: v1.2.1
+  ccManager:
+    repository: registry.cern.ch/kubernetes
+    version: v0.1.1
   devicePlugin:
     repository: registry.cern.ch/kubernetes
     version: v0.12.2-ubi8
     config:
-      name: nvidia-time-slicing-config
-  node-feature-discovery:
-    image:
-      repository: registry.cern.ch/kubernetes/node-feature-discovery
-      tag: v0.10.1
-
+      name: nvidia-device-plugin-config
+      default: "default"
