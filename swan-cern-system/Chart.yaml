@@ -1,0 +1,26 @@
+apiVersion: v2
+#
+name: swan-cern-system
+type: application
+# version set by bump2version search/replace
+version: 0.0.1 # __swan-cern_version__
+appVersion: 0.0.1
+#
+description: The chart to deploy SWAN system components at CERN
+#
+dependencies:
+  - name: fluentd
+    version: 0.4.3
+    repository: https://fluent.github.io/helm-charts
+  - name: gpu-operator
+    version: v24.6.2
+    repository: oci://registry.cern.ch/kubernetes/charts
+    condition: gpu-operator.enabled
+  - name: cern-it-monitoring-kubernetes
+    version: 1.0.0-rc4
+    repository: oci://registry.cern.ch/monit
+    condition: cern-it-monitoring-kubernetes.enabled
+  - name: cern-it-monitoring-kubernetes-crds
+    version: 1.0.0-rc3
+    repository: oci://registry.cern.ch/monit
+    condition: cern-it-monitoring-kubernetes.enabled
