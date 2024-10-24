@@ -117,3 +117,6 @@ gpu-operator:
     config:
       name: nvidia-device-plugin-config
       default: "default"
+
+cern-it-monitoring-kubernetes:
+  enabled: true
