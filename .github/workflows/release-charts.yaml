@@ -81,7 +81,7 @@ jobs:
           set -euxo pipefail
           ./.github/workflows/list-changed-charts.sh >> $GITHUB_OUTPUT
       - name: Fail if no charts have changes
-        if: steps.diff.outputs.swan_has_changed != 'true' && steps.diff.outputs.swan-cern_has_changed != 'true'
+        if: steps.diff.outputs.swan_has_changed != 'true' && steps.diff.outputs.swan-cern_has_changed != 'true' && steps.diff.outputs.swan-cern-system_has_changed != 'true'
         run: exit 1
   
 
