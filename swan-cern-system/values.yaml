@@ -119,4 +119,4 @@ gpu-operator:
       default: "default"
 
 cern-it-monitoring-kubernetes:
-  enabled: true
+  enabled: false
