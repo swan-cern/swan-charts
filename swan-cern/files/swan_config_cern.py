@@ -193,7 +193,7 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
         pod_spec_containers.append(
             V1Container(
                 name='side-container',
-                image='cern/cc7-base:20181210',
+                image='gitlab-registry.cern.ch/linuxsupport/cc7-base:20230801-1.x86_64',
                 command=['/srv/side-container/side_container_tokens_perm.sh'],
                 args=[
                     env['USER_ID'],
