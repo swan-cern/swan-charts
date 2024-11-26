@@ -55,6 +55,7 @@ jupyterhub:
       tag: "v0.0.14"
       pullPolicy: "Always"
     cloudMetadata:
+      blockWithIptables: false
       ip: 169.254.169.254
     networkPolicy:
       enabled: true
