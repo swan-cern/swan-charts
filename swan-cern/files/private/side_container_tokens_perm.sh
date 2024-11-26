@@ -45,6 +45,10 @@ echo "start refreshing EOS kerberos tickets in user container"
 copy_token_to_notebook /srv/side-container/eos/krb5cc /srv/notebook/tokens/krb5cc
 copy_token_to_notebook /srv/side-container/eos/krb5cc /srv/notebook/tokens/writable/krb5cc_nb_term
 klist -c /srv/notebook/tokens/krb5cc
+
+# Install diff to use it below
+dnf install -y diffutils
+
 while true; do
     sleep $CULL_PERIOD
 
