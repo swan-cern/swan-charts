@@ -12,6 +12,7 @@ from kubernetes_asyncio.client.models import (
     V1ObjectMeta,
     V1Secret,
     V1SecretVolumeSource,
+    V1SecurityContext,
     V1Volume,
     V1VolumeMount,
 )
@@ -200,7 +201,8 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
                     env['USER_ID'],
                     str(swan_cull_period)
                 ],
-                volume_mounts=side_container_volume_mounts
+                volume_mounts=side_container_volume_mounts,
+                security_context=V1SecurityContext(run_as_user=0)
             )
         )
 
