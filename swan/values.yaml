@@ -92,7 +92,6 @@ jupyterhub:
           privateIPs: false
       image:
         name: "registry.cern.ch/quay.io/jupyterhub/configurable-http-proxy"
-        tag: "4.5.0"
         pullPolicy: "IfNotPresent"
       resources:
         requests:
