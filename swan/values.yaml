@@ -79,6 +79,9 @@ jupyterhub:
   proxy:
     service:
       type: ClusterIP
+    secretSync:
+      image:
+        name: "registry.cern.ch/quay.io/jupyterhub/k8s-secret-sync"
     chp:
       networkPolicy:
         enabled: true
@@ -88,7 +91,7 @@ jupyterhub:
           dnsPortsPrivateIPs: false
           privateIPs: false
       image:
-        name: "jupyterhub/configurable-http-proxy"
+        name: "registry.cern.ch/quay.io/jupyterhub/configurable-http-proxy"
         tag: "4.5.0"
         pullPolicy: "IfNotPresent"
       resources:
@@ -201,6 +204,8 @@ jupyterhub:
   prePuller:
     hook:
       enabled: true
+      image:
+        name: "registry.cern.ch/quay.io/jupyterhub/k8s-image-awaiter"
     continuous:
       enabled: false
     containerSecurityContext:
