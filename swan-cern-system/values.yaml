@@ -1,4 +1,6 @@
 fluentd:
+  image:
+    repository: registry.cern.ch/docker.io/fluent/fluentd-kubernetes-daemonset
   caCertPath: &fluentdCaCertPath /etc/ssl/ca-bundle.crt
   plugins:
     - fluent-plugin-rewrite-tag-filter
