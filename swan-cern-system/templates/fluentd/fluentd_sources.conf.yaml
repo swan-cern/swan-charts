@@ -12,9 +12,19 @@ data:
 
       {{ if not .Values.fluentd.output.includeInternal }}
       <match kubernetes.var.log.containers.**_kube-system_**>
+        {{ if not .Values.fluentd.output.includeFalco }}
           @type null
+        {{ else }}
+          <filter kubernetes.var.log.containers.**_kube-system_**>
+            @type grep
+            <regexp>
+              key $.kubernetes.pod_name
+              pattern /-falco-/
+            </regexp>
+          </filter>
+        {{ end }}
       </match>
-      {{ end }}  
+      {{ end }}
 
       # Read from container logs
       <source>
