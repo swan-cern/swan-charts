@@ -1,0 +1,37 @@
+customRules:
+  user_pod_rules.yaml: |-
+    - macro: user_pod
+      condition: >
+        container
+        and k8s.pod.name startswith "jupyter-"
+        and k8s.ns.name = swan
+
+    - rule: Log User Commands in Jupyter Pod
+      desc: Logs all commands executed by the user
+      condition: user_pod and spawned_process
+      output: >
+        user: %user.name --- pid: %proc.pid --- exec: %proc.execpath --- args: %proc.args --- cwd: %proc.cwd
+      priority: NOTICE
+      tags: [user_activity, k8s, monitoring]
+
+    - rule: Detect Incoming Connections in Jupyter Pod
+      desc: Detects incoming connections to Jupyter pod
+      condition: >
+        user_pod and evt.type in (accept,listen) and
+        fd.sip exists and fd.cip exists and
+        evt.res = SUCCESS
+      output: >
+        Incoming connection: %fd.sip:%fd.sport -> %fd.cip:%fd.cport
+      priority: NOTICE
+      tags: [user_activity, k8s, monitoring, network]
+
+    - rule: Detect Outgoing Connections in Jupyter Pod
+      desc: Detects outgoing connections from Jupyter pod
+      condition: >
+        user_pod and evt.type = connect and
+        fd.sip exists and fd.cip exists and
+        evt.res = SUCCESS
+      output: >
+        Outgoing connection: %fd.cip:%fd.cport -> %fd.sip:%fd.sport
+      priority: NOTICE
+      tags: [user_activity, k8s, monitoring, network]

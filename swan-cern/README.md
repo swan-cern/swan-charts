@@ -203,6 +203,12 @@ rmmod nouveau
 kubectl create -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/1.0.0-beta4/nvidia-device-plugin.yml
 ```
 
+Provide custom rules for Falco deployment 
+
+```bash
+--labels cern_chart_user_values="$(cat falco-custom-rules.yaml | base64 -w0)" \
+```
+
 ### Demo of upstream JupyterHub (no SWAN, no EOS, no CVMFS)
 This option uses upstream [JupyterHub Helm Chart](https://jupyterhub.github.io/helm-chart/)
 
