@@ -40,7 +40,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
 
         if self._gpu_enabled():
             # Configure GPU allocation
-            self._modify_pod_for_gpu()
+            await self._modify_pod_for_gpu()
 
         if self._spark_enabled():
             # Configure Spark clusters at CERN
@@ -62,7 +62,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
 
         return self.pod
 
-    def _modify_pod_for_gpu(self):
+    async def _modify_pod_for_gpu(self):
         """
         Configure a pod that requested a GPU.
 
@@ -76,7 +76,8 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         scheduled on resources that have been allocated for the event (and
         therefore have been labeled and tainted to host only event pods).
         """
-        if events_role in self.spawner.user_roles:
+        spawner = self.spawner
+        if spawner.SWAN_EVENTS_ROLE in spawner.user_roles:
             # The user is a participant of an event hosted by SWAN.
             # Their pod must be allocated on a node that has been
             # provisioned exclusively for the event
@@ -88,7 +89,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
             # Add affinity to nodes that have been provisioned for the
             # event, i.e. labeled with the events role name
             node_selector_req = V1NodeSelectorRequirement(
-                key = events_role,
+                key = spawner.SWAN_EVENTS_ROLE,
                 operator = 'Exists'
             )
             node_selector_term = V1NodeSelectorTerm(
@@ -105,7 +106,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
             # Add toleration to nodes that have been provisioned for the
             # event, i.e. tainted with the events role name
             toleration = V1Toleration(
-                key = events_role,
+                key = spawner.SWAN_EVENTS_ROLE,
                 operator = 'Exists',
                 effect = 'NoSchedule'
             )
@@ -114,8 +115,54 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         else:
             # Regular user
 
-            # Request generic GPU resource name
-            gpu_resource_name = 'nvidia.com/gpu'
+            # Get all pods that have a GPU
+            try:
+                gpu_pods = await spawner.api.list_namespaced_pod(namespace=swan_container_namespace, label_selector='gpu')
+            except ApiException as e:
+                raise RuntimeError('Could not list pods with a GPU') from e
+
+            # Cross-check pod information with GPU flavour availability
+            gpu_description = spawner.user_options[spawner.gpu]
+            free_flavours = self._get_free_gpu_flavours(gpu_pods.items)
+            if free_flavours:
+                # There are free GPU flavours in the cluster...
+                if not gpu_description in free_flavours:
+                    # ... but not the one requested by the user, inform them
+                    error_message = f'The selected GPU flavour ({gpu_description}) is not available. Please select one of the following:'
+                    error_message += '<ul>'
+                    for flavour in free_flavours:
+                        error_message += f'<li>{flavour}</li>'
+                    error_message += '</ul>'
+                    raise ValueError(error_message)
+            else:
+                # No GPUs available, inform the user
+                raise ValueError('Unfortunately, no GPUs are available at the moment. Please try again later.')
+
+            # The GPU flavour requested by the user is available, proceed with user pod creation
+            gpu_info = spawner.gpus.get_info(gpu_description)
+            gpu_resource_name = gpu_info.resource_name
+
+            # Add affinity to nodes that are labeled with the specific GPU
+            # product name that the user requested
+            gpu_product_name = gpu_info.product_name
+            node_selector_req = V1NodeSelectorRequirement(
+                key = 'nvidia.com/gpu.product',
+                operator = 'In',
+                values = [gpu_product_name]
+            )
+            node_selector_term = V1NodeSelectorTerm(
+                match_expressions = [ node_selector_req ]
+            )
+            node_selector = V1NodeSelector(
+                node_selector_terms = [ node_selector_term ]
+            )
+            node_affinity = V1NodeAffinity(
+                required_during_scheduling_ignored_during_execution = node_selector
+            )
+            self.pod.spec.affinity = V1Affinity(node_affinity = node_affinity)
+
+        # Add gpu label to pod (useful for filtering).
+        self.pod.metadata.labels['gpu'] = gpu_resource_name.strip('nvidia.com/')
 
         # Add to notebook container the requests and limits for the GPU
         notebook_container = self._get_pod_container('notebook')
@@ -131,6 +178,39 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
                 value='libnvidia-opencl.so.1'
             ),
         )
+
+    def _get_free_gpu_flavours(self, gpu_pods):
+        """
+        Returns a list of the k8s resource names of the GPU flavours that are
+        free at the moment (i.e. not fully used by current pods)
+        """
+
+        free_gpu_flavours = []
+        gpus_used_by_pods = {}  # resource name -> count
+
+        gpus = self.spawner.gpus
+
+        # Get GPU information in mutual exclusion
+        with gpus.get_lock():
+            flavours = gpus.get_gpu_flavours()
+            cordoned_nodes = gpus.get_cordoned_gpu_nodes()
+
+        # Get all GPU flavours currently used by pods
+        for pod in gpu_pods:
+            if pod.spec.node_name in cordoned_nodes:
+                # This pod runs in a cordoned node, ignore it
+                continue
+            resource_name = 'nvidia.com/' + pod.metadata.labels['gpu']
+            count = gpus_used_by_pods.get(resource_name, 0)
+            gpus_used_by_pods[resource_name] = count + 1
+
+        # Cross-check pod information with GPU flavour availability
+        for gpu_description,gpu_info in flavours.items():
+            if gpu_info.count > gpus_used_by_pods.get(gpu_info.resource_name, 0):
+                # There are more GPUs of this flavour in the cluster than pods using them
+                free_gpu_flavours.append(gpu_description)
+
+        return free_gpu_flavours
 
     async def _init_hadoop_secret(self):
         """
@@ -241,7 +321,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         """
         return True if the user has requested a GPU
         """
-        return "cu" in self.spawner.user_options[self.spawner.lcg_rel_field]
+        return self.spawner.user_options[self.spawner.gpu] != 'none'
 
     def _spark_enabled(self):
         """
@@ -445,9 +525,7 @@ def computing_modify_pod_hook(spawner, pod):
     return computing_pod_hook_handler.get_swan_user_pod()
 
 
-# Custom configuration options
-# Name of the role that is assigned to participants of events hosted by SWAN
-events_role = get_config('custom.events.role', 'swan-events')
+# Custom configuration
 # Name in k8s of the GPU resource to be assigned to participants of an event in SWAN
 events_gpu_name = get_config('custom.events.gpu_name', 'nvidia.com/gpu')
 
