@@ -10,6 +10,7 @@ fluentd:
   containerRuntime: containerd
   output:
     includeInternal: false
+    includeFalco: false
     cacert: *fluentdCaCertPath
   configMapConfigs:
     - fluentd-prometheus-conf # Preserve prometheus config for probes to work
