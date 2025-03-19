@@ -10,12 +10,6 @@ data:
           @type null
       </match>
 
-      {{ if not .Values.fluentd.output.includeInternal }}
-      <match kubernetes.var.log.containers.**_kube-system_**>
-          @type null
-      </match>
-      {{ end }}  
-
       # Read from container logs
       <source>
           @type tail
