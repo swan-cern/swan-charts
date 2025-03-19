@@ -1,0 +1,49 @@
+customRules:
+    user_pod_rules.yaml: |-
+      - list: ignored_networks
+        items: ['"127.0.0.1/8"']
+
+      - macro: connection_filter
+        condition: >
+          fd.l4proto = tcp and (fd.typechar = 4 or fd.typechar = 6) and
+          (fd.ip != "0.0.0.0" and not fd.snet in (ignored_networks))
+
+      - macro: outbound_connection_tcp
+        condition: evt.type = connect and connection_filter and (evt.rawres >= 0 or evt.res = EINPROGRESS)
+      - macro: inbound_connection_tcp
+        condition: evt.type = accept and connection_filter
+
+      - macro: user_pod
+        condition: >
+          container
+          and k8s.pod.name startswith "jupyter-"
+          and k8s.ns.name = swan
+
+      - rule: Contact K8S API Server From Container
+        enabled: false
+        override:
+          enabled: replace
+
+      - rule: Log User Commands in Jupyter Pod
+        desc: Logs all commands executed by the user
+        condition: user_pod and spawned_process
+        output: >
+          exec_path: %proc.exepath --- args: %proc.args --- pname: %proc.pname (%container.info)
+        priority: NOTICE
+        tags: [user_activity, command_execution]
+
+      - rule: Detect Incoming Connections in Jupyter Pod
+        desc: Detects when a process initiates an inbound network connection
+        condition: user_pod and inbound_connection_tcp
+        output: >
+          Incoming connection [%proc.name - %proc.pname]: %fd.rip:%fd.rport -> %fd.lip:%fd.lport (%container.info)
+        priority: NOTICE
+        tags: [user_activity, network, incoming]
+
+      - rule: Detect Outgoing Connections in Jupyter Pod
+        desc: Detects when a process initiates an outbound network connection
+        condition: user_pod and outbound_connection_tcp
+        output: >
+          Outgoing connection [%proc.name - %proc.pname]: %fd.lip:%fd.lport -> %fd.rip:%fd.rport (%container.info)
+        priority: NOTICE
+        tags: [user_activity, network, outgoing]
