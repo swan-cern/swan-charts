@@ -24,15 +24,37 @@ data:
           </rule>
           <rule>
               key $.kubernetes.pod_name
+              pattern /.*-falco-.*/
+              tag falco
+          </rule>
+          <rule>
+              key $.kubernetes.namespace_name
+              pattern /kube-system/
+              tag system
+          </rule>
+          <rule>
+              key $.kubernetes.pod_name
               pattern /.?/
               tag logs
           </rule>
       </match>
+ 
+      {{ if not .Values.fluentd.output.includeInternal }}
+        <match {system}>
+            @type null
+        </match>
+      {{ end }}
+
+      {{ if not .Values.fluentd.output.includeFalco }}
+        <match {falco}>
+            @type null
+        </match>
+      {{ end }}
 
       # Retag user and hub logs to:
       # - metrics: jupyter and jupyterhub custom log messages, used to emit metrics
       # - logs: rest of log messages
-      <match {user,hub}>
+      <match {user,hub,falco}>
           @type rewrite_tag_filter
           capitalize_regex_backreference true
           <rule>
