@@ -203,16 +203,6 @@ rmmod nouveau
 kubectl create -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/1.0.0-beta4/nvidia-device-plugin.yml
 ```
 
-### Provide custom rules for Falco deployment
-
-Create a custom rules file `falco-custom-rules.yaml` and encode it in **base64**. Then, through Magum, provide the encoded file as a label to the Falco chart. This way, the custom rules will be loaded and used by Falco.
-
-For more information, read the [CERN Kubernetes Documentation](https://kubernetes.docs.cern.ch/docs/security/falco/#writing-your-own-alerts).
-
-```bash
---labels cern_chart_user_values="$(cat falco-custom-rules.yaml | base64 -w0)" \
-```
-
 ### Demo of upstream JupyterHub (no SWAN, no EOS, no CVMFS)
 This option uses upstream [JupyterHub Helm Chart](https://jupyterhub.github.io/helm-chart/)
 
