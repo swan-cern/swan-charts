@@ -148,7 +148,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         k8suser_config_base64 = ''
 
         if cluster == 'k8s':
-            hdfs_cluster = 'analytix'
+            hdfs_cluster = 'hadoop-analytix'
             try:
                 # Setup the user and generate user kube config
                 k8suser_config_base64 = subprocess.check_output(
@@ -254,7 +254,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         user_roles = self.spawner.user_roles
         cluster = self.spawner.user_options[self.spawner.spark_cluster_field]
 
-        if cluster == "analytix" and "analytix" not in user_roles:
+        if cluster == "hadoop-analytix" and "analytix" not in user_roles:
            raise ValueError(
               """
               Access to the Analytix cluster is not granted. 
