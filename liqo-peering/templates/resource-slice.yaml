@@ -1,0 +1,20 @@
+{{- if eq .Values.role "consumer" }}
+apiVersion: authentication.liqo.io/v1beta1
+kind: ResourceSlice
+metadata:
+  annotations:
+    liqo.io/create-virtual-node: "true"
+  creationTimestamp: null
+  labels:
+    liqo.io/remote-cluster-id: {{ .Values.remoteCluster.clusterId }}
+    liqo.io/remoteID: {{ .Values.remoteCluster.clusterId }}
+  name: pool-gpu
+  namespace: {{ include "liqo.tenantNamespace" . }}
+spec:
+  class: default
+  providerClusterID: {{ .Values.remoteCluster.clusterId }}
+  resources:
+    cpu: 4
+    memory: 128Gi
+    nvidia.com/gpu: "1"
+{{- end }}
