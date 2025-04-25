@@ -1,0 +1,10 @@
+apiVersion: networking.liqo.io/v1beta1
+kind: PublicKey
+metadata:
+  name: gw-publickey
+  namespace: {{ include "liqo.tenantNamespace" . }}
+  labels:
+    liqo.io/remote-cluster-id: {{ .Values.remoteCluster.clusterId }}
+    networking.liqo.io/gateway-resource: "true"
+spec:
+  publicKey: {{ .Values.remoteCluster.publicWireguardKey }}
