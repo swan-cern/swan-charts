@@ -173,6 +173,7 @@ swan:
           mem_request_fraction: 0.6
         SpawnHandlersConfigs:
           tn_enabled: false
+          ats_role: "swan-ats"
       extraConfig:
         00-authConf: |
           def pre_spawn_hook(authenticator, spawner, auth_state):
