@@ -8,7 +8,7 @@ data:
   config.yaml: |
     version: v1
     mig-configs:
-      disabled:
+      all-disabled:
       - devices: all
         mig-enabled: false
 
@@ -68,10 +68,10 @@ data:
           "1g.5gb": 1
           "2g.10gb": 1
           "4g.20gb": 1
-      2x3g.20gb:
+      4g.20gb-3g.20gb:
       - devices: all
         mig-enabled: true
         mig-devices:
-          "3g.20gb": 2
+          "4g.20gb": 1
+          "3g.20gb": 1
 {{- end }}
-
