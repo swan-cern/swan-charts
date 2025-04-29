@@ -146,6 +146,7 @@ jupyterhub:
         scope:
           - profile
           - email
+          - offline_access
           - openid
         exchange_tokens: []
         auto_login: True
