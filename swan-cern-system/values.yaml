@@ -39,14 +39,14 @@ gpu-operator:
   enabled: true
   validator:
     repository: registry.cern.ch/kubernetes
-    version: v24.6.2
+    version: v25.3.0
   operator:
     repository: registry.cern.ch/kubernetes
-    version: v24.6.2
+    version: v25.3.0
     defaultRuntime: containerd
     initContainer:
       repository: registry.cern.ch/kubernetes
-      version: 11.4.2-base-ubi8
+      version: 12.8.1-base-ubi9
   driver:
     repository: registry.cern.ch/kubernetes
     image: nvidia-gpu-driver
@@ -54,12 +54,12 @@ gpu-operator:
     imagePullPolicy: Always
     manager:
       repository: registry.cern.ch/kubernetes
-      version: v0.6.0
+      version: v0.8.0
     licensingConfig:
       configMapName: "nvidia-grid-license"
       nlsEnabled: false
-    nfd:
-      enabled: false
+  nfd:
+    enabled: false
   vgpuManager:
     repository: registry.cern.ch
     driverManager:
@@ -67,55 +67,54 @@ gpu-operator:
       version: v0.5.1
   vfioManager:
     repository: registry.cern.ch
-    version: 11.7.1-base-ubi8
+    version: 12.8.1-base-ubi9
     driverManager:
       repository: registry.cern.ch
-      version: v0.5.1
+      version: v0.8.0
   gdrcopy:
     repository: registry.cern.ch/kubernetes
     version: v2.4.1-1
+    enabled: false
   vgpuDeviceManager:
     repository: registry.cern.ch
     version: v0.2.0
   toolkit:
     repository: registry.cern.ch/kubernetes
-    version: v1.16.2-ubuntu20.04
-  devicePlugin:
-    repository: registry.cern.ch/kubernetes
-    version: v0.13.0
+    version: v1.17.5-ubuntu20.04
   dcgm:
     repository: registry.cern.ch
-    version: 3.1.3-1-ubuntu20.04
+    version: 4.1.1-2-ubuntu22.04
   dcgmExporter:
     repository: registry.cern.ch/kubernetes
-    version: 3.1.3-3.1.2-ubuntu20.04
+    version: 4.1.1-4.0.4-ubuntu22.04
     config:
       name: nvidia-dcgm-exporter-metrics
   gfd:
     repository: registry.cern.ch/kubernetes
-    version: v0.16.2-ubi8
+    version: v0.17.1
   mig:
     strategy: mixed
   migManager:
     repository: registry.cern.ch/kubernetes
-    version: v0.5.0
+    version: v0.12.1-ubuntu20.04
     config:
       name: nvidia-mig-config
+      default: "all-disabled"
   nodeStatusExporter:
     repository: registry.cern.ch
-    version: v24.6.2
+    version: v25.3.2
   kataManager:
     repository: registry.cern.ch/kubernetes
-    version: v0.2.1
+    version: v0.2.3
   sandboxDevicePlugin:
     repository: registry.cern.ch/kubernetes
-    version: v1.2.1
+    version: v1.3.1
   ccManager:
     repository: registry.cern.ch/kubernetes
     version: v0.1.1
   devicePlugin:
     repository: registry.cern.ch/kubernetes
-    version: v0.12.2-ubi8
+    version: v0.17.1
     config:
       name: nvidia-device-plugin-config
       default: "default"
