@@ -1,3 +1,4 @@
+{{- if eq .Values.role "consumer" }}
 apiVersion: offloading.liqo.io/v1beta1
 kind: NamespaceOffloading
 metadata:
@@ -8,3 +9,4 @@ spec:
     nodeSelectorTerms: []
   namespaceMappingStrategy: EnforceSameName
   podOffloadingStrategy: LocalAndRemote
+{{- end }}
