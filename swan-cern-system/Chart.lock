@@ -4,12 +4,12 @@ dependencies:
   version: 0.4.3
 - name: gpu-operator
   repository: oci://registry.cern.ch/kubernetes/charts
-  version: v24.6.2
+  version: v25.3.0
 - name: cern-it-monitoring-kubernetes
   repository: oci://registry.cern.ch/monit
   version: 1.0.0-rc4
 - name: cern-it-monitoring-kubernetes-crds
   repository: oci://registry.cern.ch/monit
   version: 1.0.0-rc3
-digest: sha256:35b63dc5472be7adf6b9a0113f030ebe7986df5c09c37db2e8d31818c8252eb4
-generated: "2024-10-24T11:59:20.581052975+02:00"
+digest: sha256:cda15f5328bc5ad024c2fd5e3a9b739a616b52a25a0f19068d074903ebea6ec3
+generated: "2025-05-07T11:29:45.322887321+02:00"
