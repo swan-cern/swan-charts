@@ -34,6 +34,9 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
         # if hasattr(self.spawner, 'local_home') and \
         #     not self.spawner.local_home:
 
+        # Check if the user has access to the Technical Network
+        self._check_tn_access()
+
         # get eos token
         eos_secret_name = await self._init_eos_secret()
 
@@ -41,6 +44,18 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
         self._init_eos_containers(eos_secret_name)
 
         return self.pod
+
+    def _check_tn_access(self):
+        """
+        Helper function to check if this SWAN deployment is exposed to the Technical Network
+        and, if so, validate if the user has access to it.
+        """
+        user_roles = self.spawner.user_roles
+        tn_enabled = get_config('hub.config.SpawnHandlersConfigs.tn_enabled', False)
+        ats_role = get_config('hub.config.SpawnHandlersConfigs.ats_role', '')
+
+        if tn_enabled == True and ats_role not in user_roles:
+           raise ValueError('Access to the Technical Network is not granted.')
 
     async def _init_eos_secret(self):
 

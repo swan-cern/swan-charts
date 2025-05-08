@@ -241,7 +241,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         """
         return True if the user has requested a GPU
         """
-        return "cu" in self.spawner.user_options[self.spawner.lcg_rel_field]
+        return "cu" in self.spawner.user_options.get(self.spawner.lcg_rel_field, '')
 
     def _spark_enabled(self):
         """
@@ -252,7 +252,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         """
 
         user_roles = self.spawner.user_roles
-        cluster = self.spawner.user_options[self.spawner.spark_cluster_field]
+        cluster = self.spawner.user_options.get(self.spawner.spark_cluster_field, 'none')
 
         if cluster == "hadoop-analytix" and "analytix" not in user_roles:
            raise ValueError(
@@ -280,9 +280,6 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
 
         cluster = self.spawner.user_options[self.spawner.spark_cluster_field]
         max_mem = self.spawner.user_options[self.spawner.user_memory]
-
-        if cluster == 'none':
-            return
 
         # add basic spark envs
 
@@ -342,7 +339,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         """
         return True if the user has selected an HTCondor pool.
         """
-        condor_pool = self.spawner.user_options[self.spawner.condor_pool]
+        condor_pool = self.spawner.user_options.get(self.spawner.condor_pool, 'none')
         return condor_pool != 'none'
 
     async def _open_ports(self, num_ports):
@@ -419,7 +416,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
             # Add ports env for computing integrations
             # Keep old SPARK_PORTS variable name for as long as we support the CentOS7 image, since the port
             # allocator version of such image expects a variable with that name
-            ports_var_name = 'COMPUTING_PORTS' if 'swan-cern' in notebook_container.image else 'SPARK_PORTS'
+            ports_var_name = 'COMPUTING_PORTS' if 'swan-' in notebook_container.image else 'SPARK_PORTS'
             notebook_container.env = self._add_or_replace_by_name(
                 notebook_container.env,
                 V1EnvVar(
