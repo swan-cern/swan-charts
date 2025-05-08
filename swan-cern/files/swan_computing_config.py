@@ -139,6 +139,9 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
 
         cluster = self.spawner.user_options[self.spawner.spark_cluster_field]
 
+        if cluster == 'none':
+            return None
+
         username = self.spawner.user.name
         hadoop_secret_name = f'hadoop-tokens-{username}'
 
