@@ -1,0 +1,12 @@
+apiVersion: networking.liqo.io/v1beta1
+kind: Configuration
+metadata:
+  name: network-configuration
+  namespace: {{ include "liqo.tenantNamespace" . }}
+  labels:
+    liqo.io/remote-cluster-id: {{ .Values.remoteCluster.clusterId }}
+spec:
+  remote:
+    cidr:
+      external: 10.70.0.0/16
+      pod: {{ .Values.remoteCluster.podCidr }}

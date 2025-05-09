@@ -1,0 +1,25 @@
+{{- if eq .Values.role "consumer" }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: add-taint-label-to-virtualnode
+  namespace: {{ include "liqo.tenantNamespace" . }}
+  labels:
+    liqo.io/remote-cluster-id: {{ .Values.remoteCluster.clusterId }}
+spec:
+  template:
+    spec:
+      containers:
+        - name: patch-virtualnode
+          image: bitnami/kubectl:latest  # or any image with kubectl installed
+          command:
+            - /bin/sh
+            - -c
+            - |
+              kubectl patch virtualnode pool-gpu \
+                -n {{ include "liqo.tenantNamespace" . }} \
+                --type=merge \
+                -p '{"spec":{"taints":[{"key":"swan-events","value":"","effect":"NoSchedule"}],"labels":{"swan-events":""}}}'
+      restartPolicy: OnFailure
+  backoffLimit: 4
+{{- end }}

@@ -1,0 +1,10 @@
+apiVersion: offloading.liqo.io/v1beta1
+kind: NamespaceOffloading
+metadata:
+  name: offloading
+  namespace: swan
+spec:
+  clusterSelector:
+    nodeSelectorTerms: []
+  namespaceMappingStrategy: EnforceSameName
+  podOffloadingStrategy: LocalAndRemote

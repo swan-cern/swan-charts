@@ -4,6 +4,8 @@ kind: ConfigMap
 metadata:
   name: swan-scripts-cern
   namespace: {{ .Release.Namespace }}
+  annotations:
+    liqo.io/allow-reflection: "true"
 data:
   options_form_config.json: {{ .Values.optionsform | toJson | quote }}
 {{ (.Files.Glob "files/swan_config_cern.py").AsConfig | indent 2 }}
