@@ -3,6 +3,8 @@ kind: ConfigMap
 metadata:
   name: swan-scripts
   namespace: {{ .Release.Namespace }}
+  annotations:
+    liqo.io/allow-reflection: "true"
 data:
 {{ (.Files.Glob "files/options_form_config.json").AsConfig | indent 2 }}
 {{ (.Files.Glob "files/swan_config.py").AsConfig | indent 2 }}
