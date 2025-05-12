@@ -1,0 +1,24 @@
+# GatewayServer resource to expose a WireGuard-based network gateway,
+# used by the provider cluster to accept incoming peering connections.
+{{- if eq .Values.role "provider" }}
+apiVersion: networking.liqo.io/v1beta1
+kind: GatewayServer
+metadata:
+  name: server
+  namespace: {{ include "liqo.tenantNamespace" . }}
+  labels:
+    liqo.io/remote-cluster-id: {{ .Values.remoteCluster.clusterId }}
+spec:
+  endpoint:
+    loadBalancerIP: {{ .Values.gateway.loadBalancerIp }}
+    port: 51840
+    serviceType: {{ .Values.gateway.serviceType }}
+  mtu: 1340
+  secretRef:
+    name: gw-keys
+  serverTemplateRef:
+    apiVersion: networking.liqo.io/v1beta1
+    kind: WgGatewayServerTemplate
+    name: wireguard-server
+    namespace: liqo
+{{- end }}

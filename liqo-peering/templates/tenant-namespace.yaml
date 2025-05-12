@@ -1,0 +1,9 @@
+# Namespace to represent the remote cluster's tenant namespace.
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    liqo.io/remote-cluster-id: {{ .Values.remoteCluster.clusterId }}
+    liqo.io/tenant-namespace: "true"
+  name: {{ include "liqo.tenantNamespace" . }}
+spec: {}

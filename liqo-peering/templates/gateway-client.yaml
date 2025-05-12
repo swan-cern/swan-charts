@@ -1,0 +1,25 @@
+# GatewayClient resource for establishing a WireGuard tunnel to the remote cluster's gateway,
+# used on the consumer side for network peering.
+{{- if eq .Values.role "consumer" }}
+apiVersion: networking.liqo.io/v1beta1
+kind: GatewayClient
+metadata:
+  name: client
+  namespace: {{ include "liqo.tenantNamespace" . }}
+  labels:
+    liqo.io/remote-cluster-id: {{ .Values.remoteCluster.clusterId }}
+spec:
+  clientTemplateRef:
+    apiVersion: networking.liqo.io/v1beta1
+    kind: WgGatewayClientTemplate
+    name: wireguard-client
+    namespace: liqo
+  secretRef:
+    name: gw-keys
+  endpoint:
+    addresses: 
+      - {{ .Values.gateway.loadBalancerIp }}
+    port: 51840
+    protocol: UDP
+  mtu: 1340
+{{- end }}

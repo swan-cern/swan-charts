@@ -1,0 +1,15 @@
+# Tenant resource representing the provider cluster's tenant configuration,
+# with authorization and status settings for cluster peering.
+{{- if eq .Values.role "provider" }}
+apiVersion: authentication.liqo.io/v1beta1
+kind: Tenant
+metadata:
+  name: my-tenant
+  namespace: {{ include "liqo.tenantNamespace" . }}
+  labels:
+    liqo.io/remote-cluster-id: {{ .Values.remoteCluster.clusterId }}
+spec:
+  clusterID: {{ .Values.remoteCluster.clusterId }}
+  authzPolicy: TolerateNoHandshake
+  tenantCondition: Active
+{{- end }}
