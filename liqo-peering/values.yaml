@@ -1,0 +1,16 @@
+role: consumer  # or provider
+
+clusterId: # ID of the local cluster
+privateWireguardKey: # placeholder for private wireguard key
+publicWireguardKey: # placeholder for public wireguard key
+
+remoteCluster: 
+  clusterId: # ID of the remote cluster 
+  userCommonName: # The CN of the user in the certificate
+  podCidr: # placeholder for pod CIDR
+  publicWireguardKey: # placeholder for public wireguard key
+  kubeconfig: # kubeconfig YAML, base64 encoded
+
+gateway:
+  serviceType: LoadBalancer
+  loadBalancerIp: # placeholder for IP of the load balancer

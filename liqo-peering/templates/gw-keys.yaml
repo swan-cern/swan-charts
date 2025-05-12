@@ -1,0 +1,12 @@
+# Secret containing the WireGuard public and private keys used for secure network peering.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gw-keys
+  namespace: {{ include "liqo.tenantNamespace" . }}  
+  labels:
+    liqo.io/remote-cluster-id: {{ .Values.remoteCluster.clusterId }}
+type: Opaque
+data:
+  privateKey: {{ .Values.privateWireguardKey }}
+  publicKey: {{ .Values.publicWireguardKey }}
