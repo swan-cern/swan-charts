@@ -30,7 +30,7 @@ swan:
         enabled: true
         image:
           repository: gitlab-registry.cern.ch/swan/docker-images/jupyter/prefetcher
-          tag: v0.0.2
+          tag: v0.0.3
         # Jobs to warmup ROOT, NXCALS and CUDA stacks respectively
         jobs:
           - name: cron-warmup-lcg-releases
