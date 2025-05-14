@@ -171,7 +171,7 @@ swan:
         SwanKubeSpawner:
           # memory request for user pod (fraction of the limit)
           mem_request_fraction: 0.6
-          accpy_image: "gitlab-registry.cern.ch/swan/docker-images/jupyter/swan-accpy:v0.0.1"
+          accpy_image: "gitlab-registry.cern.ch/swan/docker-images/jupyter/swan-accpy:v0.0.2"
         SpawnHandlersConfigs:
           tn_enabled: false
           ats_role: "swan-ats"
