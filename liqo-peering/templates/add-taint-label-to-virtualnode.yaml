@@ -9,7 +9,13 @@ metadata:
   labels:
     liqo.io/remote-cluster-id: {{ .Values.remoteCluster.clusterId }}
 spec:
+  selector:
+    matchLabels:
+      job-name: add-taint-label-to-virtualnode
   template:
+    metadata:
+      labels:
+        job-name: add-taint-label-to-virtualnode
     spec:
       containers:
         - name: patch-virtualnode
