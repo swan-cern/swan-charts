@@ -26,6 +26,9 @@ swan:
       sft.cern.ch.conf: |
         CVMFS_HTTP_PROXY='http://ca-proxy-sft.cern.ch:3128;http://ca-proxy.cern.ch:3128'
     nodeplugin:
+      registrar:
+        image:
+          repository: registry.cern.ch/registry.k8s.io/sig-storage/csi-node-driver-registrar
       prefetcher:
         enabled: true
         image:
@@ -52,6 +55,10 @@ swan:
               source /cvmfs/sft.cern.ch/lcg/views/{{ .Values.global.cuda.lcg }}/{{ .Values.global.cuda.platform }}/setup.sh &&
               (timeout 20s python3 -c 'import tensorflow' || true) &&
               (timeout 20s python3 -c 'import torch' || true)
+      controllerplugin:
+        provisioner:
+          image:
+            repository: registry.cern.ch/registry.k8s.io/sig-storage/csi-provisioner
   eosxd-csi:
     automountDaemonUnmountTimeout: 1800
     nodeplugin:
