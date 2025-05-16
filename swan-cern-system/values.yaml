@@ -1,12 +1,8 @@
 fluentd:
   image:
-    repository: registry.cern.ch/docker.io/fluent/fluentd-kubernetes-daemonset
+    repository: gitlab-registry.cern.ch/swan/docker-images/fluentd
+    tag: v1.17.1-debian-elasticsearch7-1.2
   caCertPath: &fluentdCaCertPath /etc/ssl/ca-bundle.crt
-  plugins:
-    - fluent-plugin-rewrite-tag-filter
-    - fluent-plugin-out-http
-    - fluent-plugin-grok-parser
-    - fluent-plugin-route
   containerRuntime: containerd
   output:
     includeInternal: false
