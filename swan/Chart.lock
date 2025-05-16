@@ -7,6 +7,6 @@ dependencies:
   version: 1.4.2
 - name: cvmfs-csi
   repository: oci://registry.cern.ch/kubernetes/charts
-  version: 2.5.0
-digest: sha256:7096a31df9a5654ed7f0b4a69d9084030d45c146e857616b2e75a386a0bbde44
-generated: "2024-08-19T17:12:40.411064376+02:00"
+  version: 2.5.2
+digest: sha256:2403fa1044e0a332086da3ce223a381cec52ffff8b93adc17aaaee03046cde79
+generated: "2025-05-16T16:16:43.276526215+02:00"
