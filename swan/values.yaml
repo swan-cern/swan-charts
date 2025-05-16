@@ -63,6 +63,9 @@ jupyterhub:
         dnsPortsCloudMetadataServer: false
         dnsPortsPrivateIPs: false
         nonPrivateIPs: false
+    networkTools:
+      image:
+        name: "registry.cern.ch/quay.io/jupyterhub/k8s-network-tools"
     extraAnnotations:
       kubectl.kubernetes.io/default-container: notebook
     extraEnv:
