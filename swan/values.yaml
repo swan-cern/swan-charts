@@ -208,6 +208,9 @@ jupyterhub:
       enabled: true
       image:
         name: "registry.cern.ch/quay.io/jupyterhub/k8s-image-awaiter"
+    pause:
+      image:
+        name: "registry.cern.ch/registry.k8s.io/pause"
     continuous:
       enabled: false
     containerSecurityContext:
