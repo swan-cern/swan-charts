@@ -20,6 +20,6 @@ dependencies:
     repository: oci://registry.cern.ch/kubernetes/charts
     condition: eosxd-csi.enabled
   - name: cvmfs-csi
-    version: 2.5.0
+    version: 2.5.2
     repository: oci://registry.cern.ch/kubernetes/charts
     condition: cvmfs-csi.enabled
