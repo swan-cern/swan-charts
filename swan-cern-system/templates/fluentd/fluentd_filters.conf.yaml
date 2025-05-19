@@ -147,6 +147,7 @@ data:
           <record>
               timestamp ${(time.to_f * 1000).to_i}
               producer {{ .Values.fluentd.output.producer }}
+              community {{ .Values.community }}
               raw ${record["log"]} # field named raw is indexed by MONIT/OpenSearch
           </record>
           remove_keys ["log"]
