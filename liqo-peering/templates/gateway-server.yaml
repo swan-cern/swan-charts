@@ -8,6 +8,8 @@ metadata:
   namespace: {{ include "liqo.tenantNamespace" . }}
   labels:
     liqo.io/remote-cluster-id: {{ .Values.remoteCluster.clusterId }}
+  annotations:
+    oci.oraclecloud.com/load-balancer-type: "nlb"
 spec:
   endpoint:
     loadBalancerIP: {{ .Values.gateway.loadBalancerIp }}
