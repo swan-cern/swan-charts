@@ -8,8 +8,5 @@ dependencies:
 - name: cern-it-monitoring-kubernetes
   repository: oci://registry.cern.ch/monit
   version: 3.0.0
-- name: cern-it-monitoring-kubernetes-crds
-  repository: oci://registry.cern.ch/monit
-  version: 1.0.0-rc3
-digest: sha256:8f695dd9521215681631d876a8df4f9b362951f068de1714feb16510ab6cfffc
-generated: "2025-05-22T14:30:11.795477347+02:00"
+digest: sha256:eaeddb4711083a7548e586b2399a6dc6bbe2c9aae7271966c4efe1a3fbd8ecfc
+generated: "2025-05-22T14:30:46.029203155+02:00"
