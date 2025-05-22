@@ -17,7 +17,7 @@ dependencies:
     repository: oci://registry.cern.ch/kubernetes/charts
     condition: gpu-operator.enabled
   - name: cern-it-monitoring-kubernetes
-    version: 1.0.0-rc4
+    version: 3.0.0
     repository: oci://registry.cern.ch/monit
     condition: cern-it-monitoring-kubernetes.enabled
   - name: cern-it-monitoring-kubernetes-crds
