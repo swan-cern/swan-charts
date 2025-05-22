@@ -367,7 +367,10 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
                 spec=V1ServiceSpec(
                     selector=self.pod.metadata.labels,  # attach this service to the user pod
                     ports=service_template_ports,
-                    type="NodePort"
+                    type="NodePort",
+                    # To preserve the source IP of the incoming connection,
+                    # so that it is possible to connect to the Spark WebUI
+                    external_traffic_policy="Local"
                 )
             )
 
