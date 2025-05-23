@@ -9,6 +9,7 @@ metadata:
   labels:
     liqo.io/remote-cluster-id: {{ .Values.remoteCluster.clusterId }}
     liqo.io/remoteID: {{ .Values.remoteCluster.clusterId }}
+    liqo.io/replication: "true"
   name: pool-gpu
   namespace: {{ include "liqo.tenantNamespace" . }}
 spec:

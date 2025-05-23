@@ -2,10 +2,11 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: gw-keys
+  name: gw-{{ .Values.remoteCluster.clusterId }}
   namespace: {{ include "liqo.tenantNamespace" . }}  
   labels:
     liqo.io/remote-cluster-id: {{ .Values.remoteCluster.clusterId }}
+    networking.liqo.io/gateway-resource: "true"
 type: Opaque
 data:
   privateKey: {{ .Values.privateWireguardKey }}

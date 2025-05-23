@@ -4,7 +4,7 @@
 apiVersion: networking.liqo.io/v1beta1
 kind: GatewayServer
 metadata:
-  name: server
+  name: {{ .Values.remoteCluster.clusterId }}
   namespace: {{ include "liqo.tenantNamespace" . }}
   labels:
     liqo.io/remote-cluster-id: {{ .Values.remoteCluster.clusterId }}
@@ -17,7 +17,7 @@ spec:
     serviceType: {{ .Values.gateway.serviceType }}
   mtu: 1340
   secretRef:
-    name: gw-keys
+    name: gw-{{ .Values.remoteCluster.clusterId }}
   serverTemplateRef:
     apiVersion: networking.liqo.io/v1beta1
     kind: WgGatewayServerTemplate

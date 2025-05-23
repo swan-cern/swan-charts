@@ -1,6 +1,12 @@
 # RoleBinding to grant the remote cluster's control plane the necessary permissions 
 # to interact with resources in the provider cluster.
 {{- if eq .Values.role "provider" }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.remoteCluster.clusterId }}
+  namespace: {{ include "liqo.tenantNamespace" . }}
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -13,7 +19,7 @@ roleRef:
   kind: ClusterRole
   name: liqo-remote-controlplane
 subjects:
-- apiGroup: rbac.authorization.k8s.io
-  kind: User
-  name: {{ .Values.remoteCluster.userCommonName }}
+- kind: ServiceAccount
+  name: {{ .Values.remoteCluster.clusterId }}
+  namespace: {{ include "liqo.tenantNamespace" . }}
 {{- end }}

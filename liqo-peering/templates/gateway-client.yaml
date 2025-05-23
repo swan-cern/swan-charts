@@ -4,7 +4,7 @@
 apiVersion: networking.liqo.io/v1beta1
 kind: GatewayClient
 metadata:
-  name: client
+  name: {{ .Values.remoteCluster.clusterId }}
   namespace: {{ include "liqo.tenantNamespace" . }}
   labels:
     liqo.io/remote-cluster-id: {{ .Values.remoteCluster.clusterId }}
@@ -15,7 +15,7 @@ spec:
     name: wireguard-client
     namespace: liqo
   secretRef:
-    name: gw-keys
+    name: gw-{{ .Values.remoteCluster.clusterId }}
   endpoint:
     addresses: 
       - {{ .Values.gateway.loadBalancerIp }}
