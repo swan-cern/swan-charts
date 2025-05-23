@@ -4,7 +4,7 @@
 apiVersion: authentication.liqo.io/v1beta1
 kind: Tenant
 metadata:
-  name: my-tenant
+  name: {{ .Values.remoteCluster.clusterId }}
   namespace: {{ include "liqo.tenantNamespace" . }}
   labels:
     liqo.io/remote-cluster-id: {{ .Values.remoteCluster.clusterId }}

@@ -3,7 +3,7 @@
 apiVersion: networking.liqo.io/v1beta1
 kind: PublicKey
 metadata:
-  name: gw-publickey
+  name: {{ .Values.remoteCluster.clusterId }}
   namespace: {{ include "liqo.tenantNamespace" . }}
   labels:
     liqo.io/remote-cluster-id: {{ .Values.remoteCluster.clusterId }}
