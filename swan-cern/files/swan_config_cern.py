@@ -51,8 +51,8 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
         and, if so, validate if the user has access to it.
         """
         user_roles = self.spawner.user_roles
+        ats_role = self.spawner.ats_role
         tn_enabled = get_config('hub.config.SpawnHandlersConfigs.tn_enabled', False)
-        ats_role = get_config('hub.config.SpawnHandlersConfigs.ats_role', '')
 
         if tn_enabled == True and ats_role not in user_roles:
            raise ValueError('Access to the Technical Network is not granted.')
