@@ -116,6 +116,19 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
 
             # Request generic GPU resource name
             gpu_resource_name = 'nvidia.com/gpu'
+            
+            # Only allow scheduling on Oracle if user is in swan-gpu group
+            if 'swan-gpu' in self.spawner.user_roles:
+                tolerations = self.pod.spec.tolerations or []
+                tolerations.append(
+                    V1Toleration(
+                        key="oracle/gpu",
+                        operator="Equal",
+                        value="true",
+                        effect="NoSchedule"
+                    )
+                )
+                self.pod.spec.tolerations = tolerations
 
         # Add to notebook container the requests and limits for the GPU
         notebook_container = self._get_pod_container('notebook')
