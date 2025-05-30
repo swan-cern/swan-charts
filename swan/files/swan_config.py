@@ -149,12 +149,32 @@ if get_config("custom.cull.enabled", False):
     if hooks_dir:
         cull_cmd.append(f"--hooks-dir={hooks_dir}")
 
+    audience = get_config('custom.cull.audience')
+    if audience:
+        cull_cmd.append(f"--audience={audience}")
+    
+    auth_url = get_config('custom.cull.auth_url')
+    if auth_url:
+        cull_cmd.append(f"--auth_url={auth_url}")
+    
+    authz_api_url = get_config('custom.cull.authz_api_url')
+    if authz_api_url:
+        cull_cmd.append(f"--authz_api_url={authz_api_url}")
+    
+    auth_check_interval = get_config('custom.cull.auth_check_interval')
+    if auth_check_interval:
+        cull_cmd.append("--auth_check_interval=%s" % auth_check_interval)
+
     c.JupyterHub.services.append(
         {
             "name": "swan-idle-culler",
             "admin": True,
             "command": cull_cmd,
-            "environment": {'SWAN_DEV': os.environ.get('SWAN_DEV', 'false')}
+            "environment": {
+                'SWAN_DEV': os.environ.get('SWAN_DEV', 'false'),
+                'AUTH_CLIENT_ID': c.KeyCloakAuthenticator.client_id,
+                'AUTH_CLIENT_SECRET': c.KeyCloakAuthenticator.client_secret,
+            }
         }
     )
     c.JupyterHub.load_roles.append(swan_idle_culler_role)
