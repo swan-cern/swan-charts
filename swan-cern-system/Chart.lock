@@ -1,12 +1,9 @@
 dependencies:
-- name: fluentd
-  repository: https://fluent.github.io/helm-charts
-  version: 0.5.3
 - name: gpu-operator
   repository: oci://registry.cern.ch/kubernetes/charts
   version: v25.3.0
 - name: cern-it-monitoring-kubernetes
   repository: oci://registry.cern.ch/monit
   version: 3.0.0
-digest: sha256:eaeddb4711083a7548e586b2399a6dc6bbe2c9aae7271966c4efe1a3fbd8ecfc
-generated: "2025-05-22T14:30:46.029203155+02:00"
+digest: sha256:c516bac080b00365074c364781bd4f7f96886600b1067c73af4f8a90f51bd768
+generated: "2025-06-03T09:52:07.36053248+02:00"

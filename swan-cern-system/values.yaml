@@ -1,37 +1,3 @@
-fluentd:
-  image:
-    repository: gitlab-registry.cern.ch/swan/docker-images/fluentd
-    tag: v1.17.1-debian-elasticsearch7-1.2
-  caCertPath: &fluentdCaCertPath /etc/ssl/ca-bundle.crt
-  containerRuntime: containerd
-  output:
-    includeInternal: false
-    includeFalco: false
-    cacert: *fluentdCaCertPath
-  configMapConfigs:
-    - fluentd-prometheus-conf # Preserve prometheus config for probes to work
-    - fluentd-sources-conf
-    - fluentd-filters-conf
-    - fluentd-outputs-conf
-  fileConfigs:
-    # This is to disable the configuration that comes from upstream
-    01_sources.conf: "" 
-    02_filters.conf: ""
-    03_dispatch.conf: ""
-    04_outputs.conf: ""
-  volumeMounts:
-  - name: ca-certificate
-    mountPath: *fluentdCaCertPath
-    subPath: ca-bundle.crt
-    readOnly: true
-  volumes:
-  - name: ca-certificate
-    configMap:
-      name: fluentd-ca
-      items:
-        - key: ca-bundle.crt
-          path: ca-bundle.crt
-
 gpu-operator:
   enabled: true
   validator:
