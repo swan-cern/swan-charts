@@ -84,3 +84,175 @@ gpu-operator:
 
 cern-it-monitoring-kubernetes:
   enabled: false
+  output:
+    includeFalco: false
+    includeInternal: false
+  logs:
+    enabled: true
+    collectedNamespaces: []
+    fluentbit:
+      enabled: true
+      inputs: |
+        [INPUT]
+            Name              tail
+            Tag               kube.*
+            Path              /var/log/containers/*.log
+            multiline.parser  cri
+            DB                /var/log/fluentbit-containers.log.pos
+            Read_from_Head    True
+      # Overwrite filters value to be able to toggle falco and system logs
+      # Reference: https://gitlab.cern.ch/monitoring/helm-charts/kubernetes-monitoring/-/blob/master/values.yaml?ref_type=heads#L401
+      filters: |
+        [FILTER]
+            Name                kubernetes
+            Match               kube.*
+            Kube_URL            https://kubernetes.default.svc:443
+            Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
+            Kube_Tag_Prefix     kube.var.log.containers.
+            Merge_Log           On
+            Merge_Log_Trim      On
+            Keep_Log            On
+            K8S-Logging.Parser  On
+            K8S-Logging.Exclude On
+            Annotations         Off
+            Labels              Off
+
+        [FILTER]
+            Name          nest
+            Match         kube.*
+            Operation     lift
+            Nested_under  kubernetes
+            Add_prefix    kubernetes_
+
+        [FILTER]
+            Name modify
+            Match kube.*
+            Add kubernetes_cluster_name {{ required "kubernetes.clusterName is missing" (.Values.kubernetes).clusterName }}
+            Add monit_type kubernetes
+            Remove kubernetes_container_hash
+            Remove kubernetes_docker_id
+            Remove kubernetes_pod_id
+
+        [FILTER]
+            Name            grep
+            Match           kube.*
+            Exclude         kubernetes_namespace_name swan-cern-system
+            Exclude         kubernetes_container_name it-monit-logs-collector-fluentbit
+
+        [FILTER]
+            Name    rewrite_tag
+            Match   kube.*
+            Rule    $kubernetes_container_name ^notebook$ swan.app false
+
+        [FILTER]
+            Name    rewrite_tag
+            Match   kube.*
+            Rule    $kubernetes_container_name ^hub$ swan.app false
+
+        {{ if .Values.output.includeFalco }}
+        [FILTER]
+            Name    rewrite_tag
+            Match   kube.*
+            Rule    $kubernetes_container_name ^falco$ swan.falco false
+        {{ end }}
+
+        {{ if .Values.output.includeInternal }}
+        [FILTER]
+            Name    rewrite_tag
+            Match   kube.*
+            Rule    $kubernetes_namespace_name ^kube-system$ swan.system false
+        {{ end }}
+
+        [FILTER]
+            Name    rewrite_tag
+            Match   swan.app
+            Rule    $log  "^.*?user: .*?, host: .*?, metric: .*?, value: .*"  swan.metrics  false
+
+        [FILTER]
+            Name            parser
+            Match           swan.metrics
+            Key_Name        log
+            Preserve_Key    true
+            Reserve_Data    On
+            Parser          metrics_parser
+
+        [FILTER]
+            Name            lua
+            Match           swan.metrics
+            Script          /fluent-bit/etc/scripts/records_transformer.lua
+            Call            transform_metrics
+
+        [FILTER]
+            Name            modify
+            Match           swan.*
+            Set             type logs
+            Set             community {{ .Values.community }}
+
+        [FILTER]
+            Name            modify
+            Match           swan.metrics
+            Set             type metrics
+
+        [FILTER]
+            Name lua
+            Match swan.*
+            script /fluent-bit/etc/scripts/time_to_ts.lua
+            call add_timestamp_to_record_from_timestamp
+      outputs: |
+        [OUTPUT]
+            name opentelemetry
+            match swan.*
+            host {{ .Values.otlp.endpoint }}
+            port {{ .Values.otlp.port }}
+            metrics_uri /v1/metrics
+            logs_uri /v1/logs
+            traces_uri /v1/traces
+            tls on
+            tls.verify off
+            http_user {{ required "Tenant name is required" (.Values.tenant).name }}
+            http_passwd {{ required "Tenant password is required" (.Values.tenant).password }}
+            header tag monit
+            header log_type kubernetes
+            header User-Agent {{ .Chart.Name }}/{{ .Chart.Version }}
+            logs_body_key imaginary_non_existing_field
+
+      customParsers: |
+        [PARSER]
+            Name   metrics_parser
+            Format regex
+            Regex  user: (?<_metric_user_>.*?), host: .*?, metric: (?<_metric_key_>[\w_]+)(?:\.(?<_metric_context_>[^,]+))?, value: (?<_metric_value_>.*)
+      luaScripts:
+        records_transformer.lua: |
+          function transform_metrics(tag, timestamp, record)
+            local key = record["_metric_key_"]
+            local user = record["_metric_user_"]
+            local context = record["_metric_context_"]
+            local value = record["_metric_value_"]
+
+            if key and user and value then
+                local base = "metrics." .. key
+
+                record[base .. ".user"] = user
+                record[base .. ".value"] = value
+
+                if context and context ~= "" then
+                    record[base .. ".context"] = context
+
+                    -- Last segment logic for flat field
+                    local cleaned_context = context:gsub("-", "_")
+                    local last_segment = cleaned_context:match("([^.]+)$")
+                    if last_segment then
+                        record["metrics." .. key .. "_" .. last_segment] = value
+                    end
+                end
+            end
+
+            -- Clean up
+            record["_metric_user_"] = nil
+            record["_metric_key_"] = nil
+            record["_metric_context_"] = nil
+            record["_metric_value_"] = nil
+
+            return 1, timestamp, record
+          end
