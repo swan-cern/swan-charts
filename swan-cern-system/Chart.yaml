@@ -9,9 +9,6 @@ appVersion: 0.0.1
 description: The chart to deploy SWAN system components at CERN
 #
 dependencies:
-  - name: fluentd
-    version: 0.5.3
-    repository: https://fluent.github.io/helm-charts
   - name: gpu-operator
     version: v25.3.0
     repository: oci://registry.cern.ch/kubernetes/charts
