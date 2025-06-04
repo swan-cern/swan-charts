@@ -240,10 +240,18 @@ swan:
                     kubernetes.io/metadata.name: kube-system
     custom:
       cull:
+        enabled: true
+        every: 600
         # 4 hours
         timeout: 14400
+        users: true
         checkEosAuth: true
         hooksDir: /srv/jupyterhub/culler
+        audience: 'authorization-service-api'
+        auth_url: https://auth.cern.ch/auth/realms/cern/api-access/token
+        authz_api_url: https://authorization-service-api.web.cern.ch/api/v1.0/Identity
+        # 12 hours
+        auth_check_interval: 43200 
       spark:
         configurationPath: /cvmfs/sft.cern.ch/lcg/etc/hadoop-confext
 swanCern:
