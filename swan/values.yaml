@@ -219,13 +219,6 @@ jupyterhub:
   cull:
     enabled: false
   custom:
-    cull:
-      enabled: true
-      every: 600
-      # 2 hours
-      timeout: 7200
-      users: true
-      checkEosAuth: false
     eos:
       enabled: *eosEnabled
 # placeholders for swan credentials

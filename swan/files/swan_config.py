@@ -70,7 +70,7 @@ class SwanPodHookHandler:
         return list
 
 # https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html
-# This is defined in the configuration to allow overring iindependently 
+# This is defined in the configuration to allow overring independently 
 # of which config file is loaded first
 # c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook
 def swan_pod_hook(spawner, pod):
@@ -102,63 +102,6 @@ c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook
 #             'url': 'http://hub:8989'
 #         }
 #     )
-
-# Culling of users and ticket refresh
-if get_config("custom.cull.enabled", False):
-    swan_idle_culler_role = {
-        "name": "swan-idle-culler",
-        "scopes": [
-            "list:users",
-            "read:users:activity",
-            "read:servers",
-            "delete:servers",
-            # "admin:users", # dynamically added if --cull-users is passed
-        ],
-        # assign the role to a jupyterhub service, so it gains these permissions
-        "services": ["swan-idle-culler"],
-    }
-
-    cull_cmd = ["swanculler"]
-    base_url = c.JupyterHub.get("base_url", "/")
-    cull_cmd.append("--url=http://localhost:8081" + url_path_join(base_url, "hub/api"))
-
-    cull_timeout = get_config("custom.cull.timeout")
-    if cull_timeout:
-        cull_cmd.append("--timeout=%s" % cull_timeout)
-
-    cull_every = get_config("custom.cull.every")
-    if cull_every:
-        cull_cmd.append("--cull-every=%s" % cull_every)
-
-    if get_config("custom.cull.users"):
-        cull_cmd.append("--cull-users=True")
-        swan_idle_culler_role["scopes"].append("admin:users")
-
-    if get_config("custom.cull.removeNamedServers"):
-        cull_cmd.append("--remove-named-servers")
-
-    cull_max_age = get_config("custom.cull.maxAge")
-    if cull_max_age:
-        cull_cmd.append("--max-age=%s" % cull_max_age)
-    
-    check_eos = get_config('custom.cull.checkEosAuth', False)
-    if not check_eos:
-        cull_cmd.append("--disable-hooks=True")
-    
-    hooks_dir = get_config('custom.cull.hooksDir')
-    if hooks_dir:
-        cull_cmd.append(f"--hooks-dir={hooks_dir}")
-
-    c.JupyterHub.services.append(
-        {
-            "name": "swan-idle-culler",
-            "admin": True,
-            "command": cull_cmd,
-            "environment": {'SWAN_DEV': os.environ.get('SWAN_DEV', 'false')}
-        }
-    )
-    c.JupyterHub.load_roles.append(swan_idle_culler_role)
-
 
 # Init lists for volumes and volume_mounts
 c.SwanKubeSpawner.volumes = []
