@@ -237,7 +237,7 @@ swan:
                     app.kubernetes.io/name: prometheus
                 namespaceSelector:
                   matchLabels:
-                    kubernetes.io/metadata.name: kube-system
+                    kubernetes.io/metadata.name: swan-cern-system
     custom:
       cull:
         enabled: true
