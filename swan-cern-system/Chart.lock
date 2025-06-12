@@ -4,6 +4,6 @@ dependencies:
   version: v25.3.0
 - name: cern-it-monitoring-kubernetes
   repository: oci://registry.cern.ch/monit
-  version: 3.0.0
-digest: sha256:c516bac080b00365074c364781bd4f7f96886600b1067c73af4f8a90f51bd768
-generated: "2025-06-03T09:52:07.36053248+02:00"
+  version: 3.1.0
+digest: sha256:64c28a46094cd9279de0264efcd365bf8c4887b459675d7f16f0b0dfc369bd32
+generated: "2025-06-12T15:48:27.772610288+02:00"
