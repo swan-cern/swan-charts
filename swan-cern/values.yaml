@@ -251,7 +251,7 @@ swan:
         auth_url: https://auth.cern.ch/auth/realms/cern/api-access/token
         authz_api_url: https://authorization-service-api.web.cern.ch/api/v1.0/Identity
         # 12 hours
-        auth_check_interval: 600 # TEST: 10 MIN 
+        auth_check_interval: 43200
       spark:
         configurationPath: /cvmfs/sft.cern.ch/lcg/etc/hadoop-confext
 swanCern:
