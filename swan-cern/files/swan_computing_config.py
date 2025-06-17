@@ -114,6 +114,8 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
 
         else:
             # Regular user
+
+            # Avoid race condition in case 2 users request a GPU at the same time
             # Get all pods that have a GPU
             try:
                 gpu_pods = await spawner.api.list_namespaced_pod(namespace=swan_container_namespace, label_selector='gpu')
@@ -171,6 +173,17 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
                 )
             )
             self.pod.spec.tolerations = tolerations
+
+            # decrease currently free GPU count
+            try:
+                with spawner.gpus.get_lock():
+                    if gpu_info and gpu_info.free > 0:
+                        gpu_info.free -= 1
+                        spawner.log.info(f'Decreased currently free count for {gpu_description}: {gpu_info.free}/{gpu_info.count} available')
+                    else:
+                        spawner.log.warning(f'Could not decrease currently free count for {gpu_description}: already at 0 or GPU info not found')
+            except Exception as e:
+                spawner.log.error(f'Error updating free GPU count for {gpu_description}: {e}') # Don't fail pod creation if tracking fails
 
         # Add gpu label to pod (useful for filtering).
         self.pod.metadata.labels['gpu'] = gpu_resource_name.strip('nvidia.com/')
@@ -329,7 +342,8 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         """
         return True if the user has requested a GPU
         """
-        return self.spawner.user_options[self.spawner.gpu] != 'none'
+        lcg_stack = self.spawner.user_options.get('lcg', '')
+        return 'cuda' in lcg_stack.lower()
 
     def _spark_enabled(self):
         """
