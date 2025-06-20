@@ -256,3 +256,7 @@ cern-it-monitoring-kubernetes:
 
             return 1, timestamp, record
           end
+
+kafka-streams-apps:
+  affiliation:
+    enabled: true
