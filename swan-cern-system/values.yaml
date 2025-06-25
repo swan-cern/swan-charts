@@ -259,4 +259,4 @@ cern-it-monitoring-kubernetes:
 
 kafka-streams-apps:
   affiliation:
-    enabled: true
+    enabled: false
