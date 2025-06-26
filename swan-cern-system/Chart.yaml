@@ -18,6 +18,6 @@ dependencies:
     repository: oci://registry.cern.ch/monit
     condition: cern-it-monitoring-kubernetes.enabled
   - name: kafka-streams-apps
-    version: 0.0.2
+    version: 0.0.3
     repository: oci://registry.cern.ch/swan/charts
     condition: kafka-streams-apps.affiliation.enabled
