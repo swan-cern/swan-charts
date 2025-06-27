@@ -7,6 +7,6 @@ dependencies:
   version: 3.1.0
 - name: kafka-streams-apps
   repository: oci://registry.cern.ch/swan/charts
-  version: 0.0.3
-digest: sha256:2c54de05d405f99f8b22582c680ff15075e0daa9c261315b13f566b70c69bbf9
-generated: "2025-06-26T16:55:21.021351777+02:00"
+  version: 0.0.4
+digest: sha256:663ea8c54d27847031b4e6b59186429900670231c775b246b6c0a82827a0dda2
+generated: "2025-06-27T14:47:56.701548111+02:00"
