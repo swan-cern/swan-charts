@@ -127,8 +127,10 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
                         spawner.log.info(f'Decreased currently free count for {gpu_description}: {gpu_info.free}/{gpu_info.count} available')
                     else:
                         # Check what GPU flavours are currently available using the built-in method
-                        free_flavours = list(spawner.gpus.get_free_gpu_flavours().keys())
-                        
+                        if spawner.LHCB_SWAN_ROLE in spawner.user_roles:
+                            free_flavours = list(spawner.gpus.get_free_lhcb_gpu_flavours().keys())
+                        else:
+                            free_flavours = list(spawner.gpus.get_free_gpu_flavours().keys())
                         if free_flavours:
                             # There are free GPU flavours available, but not the one requested
                             error_message = f'The selected GPU flavour ({gpu_description}) is not available. Please select one of the following:'
