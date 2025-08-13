@@ -128,7 +128,6 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
                     else:
                         # Check what GPU flavours are currently available using the built-in method
                         free_flavours = list(spawner.gpus.get_free_gpu_flavours().keys())
-                        
                         if free_flavours:
                             # There are free GPU flavours available, but not the one requested
                             error_message = f'The selected GPU flavour ({gpu_description}) is not available. Please select one of the following:'
@@ -175,6 +174,14 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
                     key="oracle/gpu",
                     operator="Equal",
                     value="true",
+                    effect="NoSchedule"
+                )
+            )
+            # Tolerate all GPU nodes with nvidia.com/gpu taint
+            tolerations.append(
+                V1Toleration(
+                    key="nvidia.com/gpu",
+                    operator="Exists",
                     effect="NoSchedule"
                 )
             )
