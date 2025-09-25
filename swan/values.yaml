@@ -53,7 +53,7 @@ jupyterhub:
     image:
       name: "gitlab-registry.cern.ch/swan/docker-images/jupyter/swan"
       tag: "v0.0.14"
-      pullPolicy: "Always"
+      pullPolicy: "IfNotPresent"
     cloudMetadata:
       blockWithIptables: false
       ip: 169.254.169.254
@@ -125,7 +125,7 @@ jupyterhub:
     image:
       name: "gitlab-registry.cern.ch/swan/docker-images/jupyterhub"
       tag: v3.43
-      pullPolicy: "Always"
+      pullPolicy: "IfNotPresent"
     extraVolumeMounts:
       - name: swan-jh
         mountPath: /srv/jupyterhub/options_form_config.json
