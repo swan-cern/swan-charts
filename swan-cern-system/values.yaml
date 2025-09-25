@@ -7,6 +7,9 @@ cern-it-monitoring-kubernetes:
   output:
     includeFalco: false
     includeInternal: false
+  metrics:
+    lts:
+      enabled: true
   logs:
     enabled: true
     collectedNamespaces: []
