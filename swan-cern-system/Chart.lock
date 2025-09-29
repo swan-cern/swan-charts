@@ -4,9 +4,9 @@ dependencies:
   version: 0.0.2
 - name: cern-it-monitoring-kubernetes
   repository: oci://registry.cern.ch/monit
-  version: 3.1.0
+  version: 3.5.0
 - name: kafka-streams-apps
   repository: oci://registry.cern.ch/swan/charts
   version: 0.0.5
-digest: sha256:811f0a48fcb87878a8bddfc18aa24d021374c3ee6e0dbc601c1df2adada0d436
-generated: "2025-08-12T14:46:14.473126359+02:00"
+digest: sha256:f2d3996d66aa5eb65314a934eac92f2df8a85e8a4f4c70d1ce1019cc657566b2
+generated: "2025-09-25T14:40:52.027687669+02:00"
