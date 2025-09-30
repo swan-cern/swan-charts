@@ -1,5 +1,6 @@
 gpu-operator-cern:
   enabled: true
+  taintGpuNodes: false
 
 cern-it-monitoring-kubernetes:
   enabled: false
