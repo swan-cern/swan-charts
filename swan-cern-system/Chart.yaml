@@ -10,7 +10,7 @@ description: The chart to deploy SWAN system components at CERN
 #
 dependencies:
   - name: gpu-operator-cern
-    version: 0.0.2
+    version: 0.0.3
     repository: oci://registry.cern.ch/kubernetes/charts
     condition: gpu-operator-cern.enabled
   - name: cern-it-monitoring-kubernetes
