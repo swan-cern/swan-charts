@@ -82,10 +82,6 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
             # Their pod must be allocated on a node that has been
             # provisioned exclusively for the event
 
-            # Get the GPU resource name in k8s that the user should be
-            # mapped to
-            gpu_resource_name = events_gpu_name
-
             # Add affinity to nodes that have been provisioned for the
             # event, i.e. labeled with the events role name
             node_selector_req = V1NodeSelectorRequirement(
@@ -145,9 +141,6 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
                 raise
             except Exception as e:
                 spawner.log.error(f'Error updating free GPU count for {gpu_description}: {e}') # Don't fail pod creation if tracking fails
-            
-            # The GPU flavour requested by the user is available, proceed with user pod creation
-            gpu_resource_name = gpu_info.resource_name
 
             # Add affinity to nodes that are labeled with the specific GPU
             # product name that the user requested
@@ -179,6 +172,9 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
                 )
             )
             self.pod.spec.tolerations = tolerations
+
+        # The GPU flavour requested by the user is available, proceed with user pod creation
+        gpu_resource_name = gpu_info.resource_name
 
         # Add gpu label to pod (useful for filtering).
         self.pod.metadata.labels['gpu'] = gpu_resource_name.strip('nvidia.com/')
@@ -506,11 +502,5 @@ def computing_modify_pod_hook(spawner, pod):
     """
     computing_pod_hook_handler = SwanComputingPodHookHandler(spawner, pod)
     return computing_pod_hook_handler.get_swan_user_pod()
-
-
-# Custom configuration
-# Name in k8s of the GPU resource to be assigned to participants of an event in SWAN
-events_gpu_name = get_config('custom.events.gpu_name', 'nvidia.com/gpu')
-
 
 c.SwanKubeSpawner.modify_pod_hook = computing_modify_pod_hook
