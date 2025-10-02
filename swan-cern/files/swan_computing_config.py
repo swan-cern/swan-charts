@@ -79,6 +79,66 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         spawner = self.spawner
         gpu_description = spawner.user_options[spawner.gpu]
         gpu_info = spawner.gpus.get_info(gpu_description)
+
+        # Avoid race condition in case 2 users request a GPU at the same time
+        # decrease currently free GPU count
+        try:
+            with spawner.gpus.get_lock():
+                if gpu_info and gpu_info.free > 0:
+                    gpu_info.free -= 1
+                    spawner.log.info(f'Decreased currently free count for {gpu_description}: {gpu_info.free}/{gpu_info.count} available')
+                else:
+                    # Check what GPU flavours are currently available using the built-in method
+                    free_flavours = list(spawner.gpus.get_free_gpu_flavours().keys())
+
+                    if free_flavours:
+                        # There are free GPU flavours available, but not the one requested
+                        error_message = f'The selected GPU flavour ({gpu_description}) is not available. Please select one of the following:'
+                        error_message += '<ul>'
+                        for flavour in free_flavours:
+                            error_message += f'<li>{flavour}</li>'
+                        error_message += '</ul>'
+                        raise ValueError(error_message)
+                    else:
+                        # No GPUs available at all
+                        error_message = f'The selected GPU flavour ({gpu_description}) is not available. Unfortunately, no GPUs are available at the moment. Please try again later.'
+                        raise ValueError(error_message)
+        except ValueError:
+            raise
+        except Exception as e:
+            spawner.log.error(f'Error updating free GPU count for {gpu_description}: {e}') # Don't fail pod creation if tracking fails
+
+        # Add affinity to nodes that are labeled with the specific GPU
+        # product name that the user requested
+        gpu_product_name = gpu_info.product_name
+        node_selector_req = V1NodeSelectorRequirement(
+            key = 'nvidia.com/gpu.product',
+            operator = 'In',
+            values = [gpu_product_name]
+        )
+        node_selector_term = V1NodeSelectorTerm(
+            match_expressions = [ node_selector_req ]
+        )
+        node_selector = V1NodeSelector(
+            node_selector_terms = [ node_selector_term ]
+        )
+        node_affinity = V1NodeAffinity(
+            required_during_scheduling_ignored_during_execution = node_selector
+        )
+        self.pod.spec.affinity = V1Affinity(node_affinity = node_affinity)
+
+        # Allow scheduling on Oracle for any user requesting a GPU
+        tolerations = self.pod.spec.tolerations or []
+        tolerations.append(
+            V1Toleration(
+                key="oracle/gpu",
+                operator="Equal",
+                value="true",
+                effect="NoSchedule"
+            )
+        )
+        self.pod.spec.tolerations = tolerations
+
         if spawner.SWAN_EVENTS_ROLE in spawner.user_roles:
             # The user is a participant of an event hosted by SWAN.
             # Their pod must be allocated on a node that has been
@@ -90,16 +150,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
                 key = spawner.SWAN_EVENTS_ROLE,
                 operator = 'Exists'
             )
-            node_selector_term = V1NodeSelectorTerm(
-                match_expressions = [ node_selector_req ]
-            )
-            node_selector = V1NodeSelector(
-                node_selector_terms = [ node_selector_term ]
-            )
-            node_affinity = V1NodeAffinity(
-                required_during_scheduling_ignored_during_execution = node_selector
-            )
-            self.pod.spec.affinity = V1Affinity(node_affinity = node_affinity)
+            node_selector_term.match_expressions.append(node_selector_req)
 
             # Add toleration to nodes that have been provisioned for the
             # event, i.e. tainted with the events role name
@@ -108,69 +159,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
                 operator = 'Exists',
                 effect = 'NoSchedule'
             )
-            self.pod.spec.tolerations = [ toleration ]
-
-        else:
-            # Regular user
-
-            # Avoid race condition in case 2 users request a GPU at the same time
-            # decrease currently free GPU count
-            try:
-                with spawner.gpus.get_lock():
-                    if gpu_info and gpu_info.free > 0:
-                        gpu_info.free -= 1
-                        spawner.log.info(f'Decreased currently free count for {gpu_description}: {gpu_info.free}/{gpu_info.count} available')
-                    else:
-                        # Check what GPU flavours are currently available using the built-in method
-                        free_flavours = list(spawner.gpus.get_free_gpu_flavours().keys())
-                        
-                        if free_flavours:
-                            # There are free GPU flavours available, but not the one requested
-                            error_message = f'The selected GPU flavour ({gpu_description}) is not available. Please select one of the following:'
-                            error_message += '<ul>'
-                            for flavour in free_flavours:
-                                error_message += f'<li>{flavour}</li>'
-                            error_message += '</ul>'
-                            raise ValueError(error_message)
-                        else:
-                            # No GPUs available at all
-                            error_message = f'The selected GPU flavour ({gpu_description}) is not available. Unfortunately, no GPUs are available at the moment. Please try again later.'
-                            raise ValueError(error_message)
-            except ValueError:
-                raise
-            except Exception as e:
-                spawner.log.error(f'Error updating free GPU count for {gpu_description}: {e}') # Don't fail pod creation if tracking fails
-
-            # Add affinity to nodes that are labeled with the specific GPU
-            # product name that the user requested
-            gpu_product_name = gpu_info.product_name
-            node_selector_req = V1NodeSelectorRequirement(
-                key = 'nvidia.com/gpu.product',
-                operator = 'In',
-                values = [gpu_product_name]
-            )
-            node_selector_term = V1NodeSelectorTerm(
-                match_expressions = [ node_selector_req ]
-            )
-            node_selector = V1NodeSelector(
-                node_selector_terms = [ node_selector_term ]
-            )
-            node_affinity = V1NodeAffinity(
-                required_during_scheduling_ignored_during_execution = node_selector
-            )
-            self.pod.spec.affinity = V1Affinity(node_affinity = node_affinity)
-
-            # Allow scheduling on Oracle for any user requesting a GPU
-            tolerations = self.pod.spec.tolerations or []
-            tolerations.append(
-                V1Toleration(
-                    key="oracle/gpu",
-                    operator="Equal",
-                    value="true",
-                    effect="NoSchedule"
-                )
-            )
-            self.pod.spec.tolerations = tolerations
+            tolerations.append(toleration)
 
         # The GPU flavour requested by the user is available, proceed with user pod creation
         gpu_resource_name = gpu_info.resource_name
