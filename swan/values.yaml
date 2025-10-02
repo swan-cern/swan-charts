@@ -124,7 +124,7 @@ jupyterhub:
       enabled: false
     image:
       name: "gitlab-registry.cern.ch/swan/docker-images/jupyterhub"
-      tag: v3.43
+      tag: v3.44
       pullPolicy: "IfNotPresent"
     extraVolumeMounts:
       - name: swan-jh
