@@ -77,6 +77,8 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         therefore have been labeled and tainted to host only event pods).
         """
         spawner = self.spawner
+        gpu_description = spawner.user_options[spawner.gpu]
+        gpu_info = spawner.gpus.get_info(gpu_description)
         if spawner.SWAN_EVENTS_ROLE in spawner.user_roles:
             # The user is a participant of an event hosted by SWAN.
             # Their pod must be allocated on a node that has been
@@ -113,9 +115,6 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
 
             # Avoid race condition in case 2 users request a GPU at the same time
             # decrease currently free GPU count
-            gpu_description = spawner.user_options[spawner.gpu]
-            gpu_info = spawner.gpus.get_info(gpu_description)
-
             try:
                 with spawner.gpus.get_lock():
                     if gpu_info and gpu_info.free > 0:
