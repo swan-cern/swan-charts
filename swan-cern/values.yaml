@@ -75,7 +75,7 @@ swan:
         guarantee: 0.5
       image:
         name: gitlab-registry.cern.ch/swan/docker-images/jupyter/swan-cern
-        tag: v0.0.55
+        tag: v0.0.56
       networkPolicy:
         ingress:
           # Allow user pods to receive incoming connections on the NodePort service port range.
