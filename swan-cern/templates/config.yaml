@@ -6,6 +6,9 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     liqo.io/allow-reflection: "true"
+    # This ArgoCD annotation is set to prevent kubectl.kubernetes.io/last-applied-configuration
+    # annotation from being set at deployment time, as the ConfigMap content is too large for it
+    argocd.argoproj.io/sync-options: Replace=true
 data:
   options_form_config.json: {{ .Values.optionsform | toJson | quote }}
 {{ (.Files.Glob "files/swan_config_cern.py").AsConfig | indent 2 }}
