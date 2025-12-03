@@ -10,6 +10,6 @@ description: The chart to deploy SWAN at CERN
 #
 dependencies:
   - name: swan
-    version: 2.3.41
+    version: 2.3.42
     repository: oci://registry.cern.ch/swan/charts
     condition: swan.enabled
