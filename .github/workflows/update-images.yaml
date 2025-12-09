@@ -24,7 +24,7 @@ jobs:
         export IMAGE_NAME=${{ github.event.inputs.image }}
         export IMAGE_VERSION=${{ github.event.inputs.version }}
         echo "Updating information for image = $IMAGE_NAME version = $IMAGE_VERSION"
-        sed -i -E "\|gitlab-registry\.cern\.ch/swan/docker-images/$(echo "$IMAGE_NAME" | sed 's#/#\\/#g')\$| { n; s#^([[:space:]]*)tag: .*#\1tag: $IMAGE_VERSION# }" swan/values.yaml swan-cern/values.yaml
+        sed -i -E "/^[[:space:]]*name:[[:space:]]*\"?gitlab-registry\.cern\.ch\/swan\/docker-images\/${IMAGE_NAME//\//\\/}\"?[[:space:]]*$/ { n; s/^([[:space:]]*)tag:[[:space:]]*\"?[^\"]*\"?/\1tag: ${IMAGE_VERSION}/ }" swan/values.yaml swan-cern/values.yaml
     - name: Create Pull Request
       id: cpr
       uses: peter-evans/create-pull-request@v6
