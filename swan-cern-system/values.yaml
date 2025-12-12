@@ -17,7 +17,7 @@ cern-it-monitoring-kubernetes:
           - __name__
           action: replace
           # Only relabel DCGM metrics from GPUs, to share them with the Kubernetes tenant
-          regex: DCGM*
+          regex: DCGM.*
           targetLabel: monit_shared
           replacement: kops-gpu-lts
             
