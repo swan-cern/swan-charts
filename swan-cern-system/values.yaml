@@ -10,6 +10,17 @@ cern-it-monitoring-kubernetes:
   metrics:
     lts:
       enabled: true
+    prometheus:
+      server:
+        relabelings:
+        - sourceLabels:
+          - __name__
+          action: replace
+          # Only relabel GCGM metrics from GPUs, to share them with the Kubernetes tenant
+          regex: DCGM*
+          targetLabel: monit_shared
+          replacement: kops-gpu-lts
+            
   logs:
     enabled: true
     collectedNamespaces: []
