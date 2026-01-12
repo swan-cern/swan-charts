@@ -104,6 +104,8 @@ swan:
                 except:
                 - 10.100.0.0/16
                 - 169.254.169.254/32
+      extraEnv:
+        CODE_DISABLE_PASSWORD: "true"
     scheduling:
       userPods:
         nodeAffinity:
