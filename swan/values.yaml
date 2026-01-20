@@ -159,9 +159,9 @@ jupyterhub:
         oauth_callback_url: # placeholder, check secrets
       SwanSpawner:
         options_form_config: /srv/jupyterhub/options_form_config.json
-        # Give notebook 45s to start a webserver and max 60s for whole spawn process
-        http_timeout: 45
-        start_timeout: 60
+        # Give notebook and spawn process a total of 120s to start
+        http_timeout: 120
+        start_timeout: 120
         consecutive_failure_limit: 0
       KubeSpawner:
         delete_pvc: False
