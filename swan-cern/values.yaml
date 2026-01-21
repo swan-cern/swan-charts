@@ -111,6 +111,11 @@ swan:
         nodeAffinity:
           matchNodePurpose: ignore
     hub:
+      # We already set template_paths directly in the swanhub Python package,
+      # however, the upstream JupyterHub Helm chart sets it to '[]' which would
+      # override our setting through the generated hub config (via `set_config_if_not_none`)
+      # For this reason we need to explicitly set it to null here to avoid the override.
+      templatePaths: null
       image:
         name: "gitlab-registry.cern.ch/troun/jupyterhub-image/jupyterhub"
         tag: latest
