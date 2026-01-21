@@ -74,8 +74,8 @@ swan:
       cpu:
         guarantee: 0.5
       image:
-        name: gitlab-registry.cern.ch/swan/docker-images/jupyter/swan-cern
-        tag: v0.0.61
+        name: gitlab-registry.cern.ch/troun/jupyter-user-images/swan-cern
+        tag: jh5-0.0.1
       networkPolicy:
         ingress:
           # Allow user pods to receive incoming connections on the NodePort service port range.
@@ -111,6 +111,10 @@ swan:
         nodeAffinity:
           matchNodePurpose: ignore
     hub:
+      image:
+        name: "gitlab-registry.cern.ch/troun/jupyterhub-image/jupyterhub"
+        tag: latest
+        pullPolicy: "Always"
       extraVolumeMounts:
         - name: swan-jh-cern
           mountPath: /srv/jupyterhub/options_form_config.json
