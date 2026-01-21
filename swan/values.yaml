@@ -170,6 +170,9 @@ jupyterhub:
         local_home: False
         centos7_image: "gitlab-registry.cern.ch/swan/docker-images/systemuser:v6.0.0"
       SpawnHandlersConfigs:
+        # disable some defaults of swanspawner that do now work for kube-spawner
+        # FIXME remove this from the spawner once we support only k8s
+        metrics_on: False
         local_home: True
       JupyterHub:
         authenticator_class: keycloakauthenticator.KeyCloakAuthenticator
