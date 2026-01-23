@@ -1,6 +1,6 @@
 dependencies:
 - name: swan
   repository: oci://registry.cern.ch/swan/charts
-  version: 2.3.46
-digest: sha256:90d9595b4fd6149854ea662b66e26a37c3b702c4612deafc610acdafdfac7080
-generated: "2026-01-21T07:53:48.171789749Z"
+  version: 2.3.47
+digest: sha256:8140e003f5ad6d649057506d012dc6c632dce451b2487edc60193e7cf22e72be
+generated: "2026-01-23T10:32:54.221450643Z"
