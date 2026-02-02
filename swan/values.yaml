@@ -105,13 +105,9 @@ jupyterhub:
   hub:
     podSecurityContext:
       fsGroup: 0
-      seccompProfile: {}
     containerSecurityContext:
-      runAsNonRoot: false
       runAsUser: 0
       runAsGroup: 0
-      allowPrivilegeEscalation: true
-      capabilities: {}
     deploymentStrategy:
       type: RollingUpdate
     resources:
