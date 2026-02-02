@@ -194,6 +194,8 @@ swan:
           refresh_pre_spawn: False
         JupyterHub:
           allow_named_servers: False
+          # Redirect to the home page after login insted of the spawn page.
+          redirect_to_server: False
         SwanKubeSpawner:
           # memory request for user pod (fraction of the limit)
           mem_request_fraction: 0.6
