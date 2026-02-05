@@ -4,10 +4,6 @@ kind: ServiceMonitor
 metadata:
   name: hub-metrics-servicemonitor
   namespace: {{ .Release.Namespace }}
-  labels:
-    # This label only works for kubernetes version >= 1.22,
-    # prometheus operator uses this label selector to list servicemonitors
-    release: cern-magnum
 spec:
   namespaceSelector:
     matchNames:
