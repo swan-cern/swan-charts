@@ -88,6 +88,17 @@ swan:
             - protocol: TCP
               port: 30000
               endPort: 32767
+          # Allow the Prometheus pod to scrape metrics from the singleuser pod
+          - from:
+            - podSelector:
+                matchLabels:
+                  app.kubernetes.io/name: prometheus
+              namespaceSelector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: swan-cern-system
+            ports:
+            - protocol: TCP
+              port: notebook-port
         egress:
           # Allow connection from the user pod to the hadoop token generator to get Hadoop credentials.
           - to:

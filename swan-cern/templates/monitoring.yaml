@@ -20,4 +20,29 @@ spec:
     bearerTokenSecret:
       name: hub
       key: hub.services.prometheus-service-monitor.apiToken
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: user-metrics-podmonitor
+  namespace: {{ .Release.Namespace }}
+spec:
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      app: jupyterhub
+      component: singleuser-server
+      release: {{ .Release.Name }}
+  podMetricsEndpoints:
+  - port: notebook-port
+    interval: 30s
+    path: /metrics
+    metricRelabelings:
+      - sourceLabels: [__name__]
+        # The only metrics that are needed to keep are the ones that start with swan_
+        # (always produced by the swanmetrics python extension). The remaining ones are discarded.
+        regex: "swan_.*"
+        action: keep
 {{- end }}
