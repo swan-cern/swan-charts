@@ -84,6 +84,11 @@ cern-it-monitoring-kubernetes:
             Match   kube.*
             Rule    $kubernetes_container_name ^hub$ swan.app false
 
+        [FILTER]
+            Name    rewrite_tag
+            Match   kube.*
+            Rule    $kubernetes_container_name ^chp$ swan.app false
+
         {{ if .Values.output.includeFalco }}
         [FILTER]
             Name    rewrite_tag
