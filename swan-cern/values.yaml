@@ -42,14 +42,13 @@ swan:
               #!/bin/bash
 
               source /cvmfs/sft.cern.ch/lcg/views/{{ .Values.global.generic.lcg }}/{{ .Values.global.generic.platform }}/setup.sh &&
-              (timeout 20s python3 -m ipykernel > /dev/null 2>&1 || true)
-
-              source /cvmfs/sft.cern.ch/lcg/views/{{ .Values.global.generic.lcg }}/{{ .Values.global.generic.platform }}/setup.sh &&
-              (timeout 20s python3 -m JupyROOT.kernel.rootkernel > /dev/null 2>&1 || true)
+              (timeout 20s python3 -m ipykernel > /dev/null 2>&1 || true) &&
+              (timeout 20s python3 -m JupyROOT.kernel.rootkernel > /dev/null 2>&1 || true) &&
+              (timeout 120s python3 -c 'import pyspark' || true)
 
               source /cvmfs/sft.cern.ch/lcg/views/{{ .Values.global.nxcals.lcg }}/{{ .Values.global.nxcals.platform }}/setup.sh &&
               (timeout 20s python3 -m ipykernel > /dev/null 2>&1 || true) &&
-              (timeout 20s python3 -c 'import pyspark' || true)
+              (timeout 120s python3 -c 'import pyspark' || true)
 
               (lsmod | grep nvidia) &&
               source /cvmfs/sft.cern.ch/lcg/views/{{ .Values.global.cuda.lcg }}/{{ .Values.global.cuda.platform }}/setup.sh &&
