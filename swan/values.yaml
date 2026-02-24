@@ -52,7 +52,7 @@ jupyterhub:
       type: none
     image:
       name: "gitlab-registry.cern.ch/swan/docker-images/jupyter/swan"
-      tag: v0.0.39
+      tag: v0.0.40
       pullPolicy: "IfNotPresent"
     cloudMetadata:
       blockWithIptables: false
