@@ -202,7 +202,7 @@ swan:
           accpy:
             image:
               name: gitlab-registry.cern.ch/swan/docker-images/jupyter/swan-accpy
-              tag: v0.0.12
+              tag: v0.0.13
         SwanSpawner:
           ats_role: "swan-ats"
         SpawnHandlersConfigs:
