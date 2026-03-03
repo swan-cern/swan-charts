@@ -37,11 +37,11 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
         # Check if the user has access to the Technical Network
         self._check_tn_access()
 
-        # get eos token
-        eos_secret_name = await self._init_eos_secret()
+        # # get eos token
+        # eos_secret_name = await self._init_eos_secret()
 
-        # init user containers (notebook and side-container)
-        self._init_eos_containers(eos_secret_name)
+        # # init user containers (notebook and side-container)
+        # self._init_eos_containers(eos_secret_name)
 
         return self.pod
 
