@@ -4,7 +4,7 @@ name: swan
 type: application
 
 # version set by bump2version search/replace
-version: 2.3.56 # __swan_version__
+version: 2.3.57 # __swan_version__
 
 appVersion: 0.1.2 # Using swanhub version
 #
