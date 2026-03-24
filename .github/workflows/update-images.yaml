@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         ref: master
 
@@ -27,7 +27,7 @@ jobs:
         sed -i -E "/^[[:space:]]*name:[[:space:]]*\"?gitlab-registry\.cern\.ch\/swan\/docker-images\/${IMAGE_NAME//\//\\/}\"?[[:space:]]*$/ { n; s/^([[:space:]]*)tag:[[:space:]]*\"?[^\"]*\"?/\1tag: ${IMAGE_VERSION}/ }" swan/values.yaml swan-cern/values.yaml
     - name: Create Pull Request
       id: cpr
-      uses: peter-evans/create-pull-request@v6
+      uses: peter-evans/create-pull-request@v8
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         commit-message: "Updated image ${{ github.event.inputs.image }} to version ${{ github.event.inputs.version }}"

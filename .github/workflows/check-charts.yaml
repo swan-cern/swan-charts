@@ -19,10 +19,10 @@ jobs:
   check_charts:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
       - name: Temporarily change swan-cern to use local file://../swan
-        uses: mikefarah/yq@1f0881fb5faf371694bfa108753cda0b824f5037 # v4.28.2
+        uses: mikefarah/yq@5a7e72a743649b1b3a47d1a1d8214f3453173c51 # v4.52.4
         with:
           cmd: yq -i '(.dependencies[] | select(.name == "swan")).repository = "file://../swan"' swan-cern/Chart.yaml
 
