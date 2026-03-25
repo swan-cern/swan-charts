@@ -59,6 +59,7 @@ jobs:
       - name: Fail if not on master branch
         if: github.ref != 'refs/heads/master'
         run: exit 1
+
   check_charts:
     needs: [check_branch]
     uses: ./.github/workflows/check-charts.yaml
@@ -71,8 +72,7 @@ jobs:
       swan-cern_has_changed: ${{ steps.diff.outputs.swan-cern_has_changed }}
       swan-cern-system_has_changed: ${{ steps.diff.outputs.swan-cern-system_has_changed }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0 # Fetch all tags and history to check for changes
       - name: List charts with changes since last tag
@@ -102,32 +102,28 @@ jobs:
     needs: [tag_swan]
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false # To use WORKFLOW_ACCESS_TOKEN instead of GITHUB_TOKEN in later steps
           ref: ${{ github.ref_name }} # Checkout latest commit on branch including new commits created in earlier steps
 
       - name: Update version of swan on swan-cern/Chart.yaml
-        uses: mikefarah/yq@1f0881fb5faf371694bfa108753cda0b824f5037 # v4.28.2
-        with:
-          cmd: yq -i '(.dependencies[] | select(.name == "swan")).version = "${{ needs.tag_swan.outputs.new_version }}"' 'swan-cern/Chart.yaml'
-
-      - name: Commit changes
         run: |
-          set -x
+          yq -i '(.dependencies[] | select(.name == "swan")).version = "${{ needs.tag_swan.outputs.new_version }}"' 'swan-cern/Chart.yaml'
+
+      - name: Commit and push changes
+        env:
+          WORKFLOW_ACCESS_TOKEN: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
+        run: |
           helm dependency update swan-cern
           cd swan-cern
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .
           git commit -m "Update swan-cern to use swan@${{ needs.tag_swan.outputs.new_version }} by @${{ github.actor }}"
-
-      - name: Push commit
-        uses: ad-m/github-push-action@4dcce6dea3e3c8187237fc86b7dfdc93e5aaae58
-        with:
-          github_token: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
-          branch: ${{ github.ref_name }}
+          cd ..
+          git remote set-url origin "https://x-access-token:${WORKFLOW_ACCESS_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push origin "${{ github.ref_name }}"
 
   tag_swan_cern:
     needs: [check_charts, list_changed_charts, tag_swan, update_dependency]
