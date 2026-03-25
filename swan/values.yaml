@@ -22,6 +22,18 @@ eosxd-csi:
   commonStorageClass:
     enabled: true
   extraConfigMaps:
+    eos-csi-dir-etc-auto-master-d:
+      # /etc/auto.master.d/eos.autofs
+      eos.autofs: |
+        /eos /etc/eos/auto.eos
+      # /etc/auto.master.d/eos.squashfs.autofs
+      eos.squashfs.autofs: |
+        /eos/squashfs program:/sbin/auto.eos.squashfs
+      # per-letter views under /eos/user and /eos/project
+      eos.user.autofs: |
+        /eos/user /etc/eos/auto.user
+      eos.project.autofs: |
+        /eos/project /etc/eos/auto.project
     eos-csi-dir-etc-eos:
       # Ensure file versions are shown to allow notebook checkpoints (hide-versions option is added)
       fuse.home-i00.conf: |
@@ -40,7 +52,143 @@ eosxd-csi:
         {"name":"project-i01","hostport":"eosproject-i01.cern.ch","remotemountdir":"/eos/project/","bind":"l h b p s f w n o","auth":{"ssskeytab":"/etc/eos.keytab"},"options":{"hide-versions":0}}
       fuse.project-i02.conf: |
         {"name":"project-i02","hostport":"eosproject-i02.cern.ch","remotemountdir":"/eos/project/","bind":"d c i r m t u x z","auth":{"ssskeytab":"/etc/eos.keytab"},"options":{"hide-versions":0}}
+      auto.eos: |
+        ams -fstype=eosx,fsname=ams  :eosxd
+        atlas -fstype=eosx,fsname=atlas  :eosxd
+        cms -fstype=eosx,fsname=cms  :eosxd
+        experiment -fstype=eosx,fsname=experiment  :eosxd
+        geant4 -fstype=eosx,fsname=geant4  :eosxd
+        lhcb -fstype=eosx,fsname=lhcb  :eosxd
+        theory -fstype=eosx,fsname=theory  :eosxd
+        web -fstype=eosx,fsname=web  :eosxd
+        workspace -fstype=eosx,fsname=workspace  :eosxd
 
+        # EOS instance-letter mappings are defined in their respective
+        # client configs in /etc/eos.
+
+        home-i00 -fstype=eosx,fsname=home-i00  :eosxd
+        home-i01 -fstype=eosx,fsname=home-i01  :eosxd
+        home-i02 -fstype=eosx,fsname=home-i02  :eosxd
+        home-i03 -fstype=eosx,fsname=home-i03  :eosxd
+        home-i04 -fstype=eosx,fsname=home-i04  :eosxd
+
+        home-d -symlink :/eos/home-i00/d
+        home-l -symlink :/eos/home-i00/l
+        home-n -symlink :/eos/home-i00/n
+        home-t -symlink :/eos/home-i00/t
+        home-z -symlink :/eos/home-i00/z
+
+        home-a -symlink :/eos/home-i01/a
+        home-g -symlink :/eos/home-i01/g
+        home-j -symlink :/eos/home-i01/j
+        home-k -symlink :/eos/home-i01/k
+        home-w -symlink :/eos/home-i01/w
+
+        home-h -symlink :/eos/home-i02/h
+        home-o -symlink :/eos/home-i02/o
+        home-r -symlink :/eos/home-i02/r
+        home-s -symlink :/eos/home-i02/s
+        home-y -symlink :/eos/home-i02/y
+
+        home-b -symlink :/eos/home-i03/b
+        home-e -symlink :/eos/home-i03/e
+        home-m -symlink :/eos/home-i03/m
+        home-v -symlink :/eos/home-i03/v
+        home-x -symlink :/eos/home-i03/x
+
+        home-c -symlink :/eos/home-i04/c
+        home-f -symlink :/eos/home-i04/f
+        home-i -symlink :/eos/home-i04/i
+        home-p -symlink :/eos/home-i04/p
+        home-q -symlink :/eos/home-i04/q
+        home-u -symlink :/eos/home-i04/u
+
+        project-i00 -fstype=eosx,fsname=project-i00  :eosxd
+        project-i01 -fstype=eosx,fsname=project-i01  :eosxd
+        project-i02 -fstype=eosx,fsname=project-i02  :eosxd
+
+        project-a -symlink :/eos/project-i00/a
+        project-e -symlink :/eos/project-i00/e
+        project-j -symlink :/eos/project-i00/j
+        project-g -symlink :/eos/project-i00/g
+        project-v -symlink :/eos/project-i00/v
+        project-k -symlink :/eos/project-i00/k
+        project-q -symlink :/eos/project-i00/q
+        project-y -symlink :/eos/project-i00/y
+
+        project-l -symlink :/eos/project-i01/l
+        project-h -symlink :/eos/project-i01/h
+        project-b -symlink :/eos/project-i01/b
+        project-p -symlink :/eos/project-i01/p
+        project-s -symlink :/eos/project-i01/s
+        project-f -symlink :/eos/project-i01/f
+        project-w -symlink :/eos/project-i01/w
+        project-n -symlink :/eos/project-i01/n
+        project-o -symlink :/eos/project-i01/o
+
+        project-d -symlink :/eos/project-i02/d
+        project-c -symlink :/eos/project-i02/c
+        project-i -symlink :/eos/project-i02/i
+        project-r -symlink :/eos/project-i02/r
+        project-m -symlink :/eos/project-i02/m
+        project-t -symlink :/eos/project-i02/t
+        project-u -symlink :/eos/project-i02/u
+        project-x -symlink :/eos/project-i02/x
+        project-z -symlink :/eos/project-i02/z
+      auto.user: |
+        a -symlink :/eos/home-a
+        b -symlink :/eos/home-b
+        c -symlink :/eos/home-c
+        d -symlink :/eos/home-d
+        e -symlink :/eos/home-e
+        f -symlink :/eos/home-f
+        g -symlink :/eos/home-g
+        h -symlink :/eos/home-h
+        i -symlink :/eos/home-i
+        j -symlink :/eos/home-j
+        k -symlink :/eos/home-k
+        l -symlink :/eos/home-l
+        m -symlink :/eos/home-m
+        n -symlink :/eos/home-n
+        o -symlink :/eos/home-o
+        p -symlink :/eos/home-p
+        q -symlink :/eos/home-q
+        r -symlink :/eos/home-r
+        s -symlink :/eos/home-s
+        t -symlink :/eos/home-t
+        u -symlink :/eos/home-u
+        v -symlink :/eos/home-v
+        w -symlink :/eos/home-w
+        x -symlink :/eos/home-x
+        y -symlink :/eos/home-y
+        z -symlink :/eos/home-z
+      auto.project: |
+        a -symlink :/eos/project-a
+        b -symlink :/eos/project-b
+        c -symlink :/eos/project-c
+        d -symlink :/eos/project-d
+        e -symlink :/eos/project-e
+        f -symlink :/eos/project-f
+        g -symlink :/eos/project-g
+        h -symlink :/eos/project-h
+        i -symlink :/eos/project-i
+        j -symlink :/eos/project-j
+        k -symlink :/eos/project-k
+        l -symlink :/eos/project-l
+        m -symlink :/eos/project-m
+        n -symlink :/eos/project-n
+        o -symlink :/eos/project-o
+        p -symlink :/eos/project-p
+        q -symlink :/eos/project-q
+        r -symlink :/eos/project-r
+        s -symlink :/eos/project-s
+        t -symlink :/eos/project-t
+        u -symlink :/eos/project-u
+        v -symlink :/eos/project-v
+        w -symlink :/eos/project-w
+        x -symlink :/eos/project-x
+        y -symlink :/eos/project-y
+        z -symlink :/eos/project-z
 #
 # JupyterHub
 #
