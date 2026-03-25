@@ -42,7 +42,7 @@ jobs:
       last_tag: ${{ steps.version.outputs.last_tag }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           persist-credentials: false # To use a different token with admin privileges instead of GITHUB_TOKEN in later steps
           ref: ${{ github.ref_name }} # Checkout latest commit on branch including new commits created in earlier steps
@@ -77,7 +77,7 @@ jobs:
           bump2version ${{ inputs.bump }} --verbose --message '${{ inputs.chart }} {new_version} by @${{ github.actor }}'
 
       - name: Push commit + tag to origin
-        uses: ad-m/github-push-action@4dcce6dea3e3c8187237fc86b7dfdc93e5aaae58
+        uses: ad-m/github-push-action@4cc74773234f74829a8c21bc4d69dd4be9cfa599
         with:
           github_token: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
           branch: ${{ github.ref_name }}
@@ -102,7 +102,7 @@ jobs:
       LAST_TAG: ${{ needs.publish_chart.outputs.last_tag }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0 # Fetch all tags and history to check for changes
           ref: ${{ github.ref_name }}
