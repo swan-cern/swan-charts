@@ -1,36 +1,46 @@
 name: Update jupyter and jupyterhub images
-on: 
+
+on:
   workflow_dispatch:
     inputs:
       image:
-        description: 'Image Name'     
+        description: 'Image Name'
         required: true
-        default: ''    
       version:
-        description: 'Image Version'     
+        description: 'Image Version'
         required: true
-        default: ''       
+
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   update-images:
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         ref: master
 
     - name: Update images version
       run: |
-        export IMAGE_NAME=${{ github.event.inputs.image }}
-        export IMAGE_VERSION=${{ github.event.inputs.version }}
+        IMAGE_NAME="${{ inputs.image }}"
+        IMAGE_VERSION="${{ inputs.version }}"
         echo "Updating information for image = $IMAGE_NAME version = $IMAGE_VERSION"
         sed -i -E "/^[[:space:]]*name:[[:space:]]*\"?gitlab-registry\.cern\.ch\/swan\/docker-images\/${IMAGE_NAME//\//\\/}\"?[[:space:]]*$/ { n; s/^([[:space:]]*)tag:[[:space:]]*\"?[^\"]*\"?/\1tag: ${IMAGE_VERSION}/ }" swan/values.yaml swan-cern/values.yaml
+
     - name: Create Pull Request
-      id: cpr
-      uses: peter-evans/create-pull-request@v6
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        commit-message: "Updated image ${{ github.event.inputs.image }} to version ${{ github.event.inputs.version }}"
-        branch: '${{ github.event.inputs.image }}-${{ github.event.inputs.version }}'
-        delete-branch: true
-        title: "Updated image ${{ github.event.inputs.image }} to version ${{ github.event.inputs.version }}"
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        BRANCH="${{ inputs.image }}-${{ inputs.version }}"
+        MESSAGE="Updated image ${{ inputs.image }} to version ${{ inputs.version }}"
+
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git checkout -b "$BRANCH"
+        git add swan/values.yaml swan-cern/values.yaml
+        git commit -m "$MESSAGE"
+        git push origin "$BRANCH"
+        gh pr create --title "$MESSAGE" --body "" --head "$BRANCH" --base master
