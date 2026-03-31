@@ -121,6 +121,12 @@ swan:
         nodeAffinity:
           matchNodePurpose: ignore
     hub:
+      extraEnv:
+        SENTRY_DSN:
+          valueFrom:
+            secretKeyRef:
+              name: swan-cern
+              key: sentry.dsn
       extraVolumeMounts:
         - name: swan-jh-cern
           mountPath: /srv/jupyterhub/options_form_config.json
@@ -280,6 +286,8 @@ swanCern:
       cred:
     sparkk8s:
       cred:
+    sentry:
+      dsn:
 
 hadoopTokenGenerator:
   image: gitlab-registry.cern.ch/swan/docker-images/hadoop-token-generator:v3.0.5
