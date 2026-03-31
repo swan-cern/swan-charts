@@ -49,6 +49,7 @@ jobs:
       - uses: astral-sh/setup-uv@v7
         with:
           python-version: 3.14
+          enable-cache: false # Silence a warning about missing requirements.txt/pyproject.toml files in the repository
 
       - name: Fetch chart dependencies
         run: helm dependency update ${{ inputs.chart }}
