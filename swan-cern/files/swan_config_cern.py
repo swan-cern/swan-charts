@@ -29,19 +29,15 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
     async def get_swan_user_pod(self):
         super().get_swan_user_pod()
 
-        # ATTENTION Spark requires this side container, so we need to create it!!
-        # Check if we should add the EOS path in the firstplace
-        # if hasattr(self.spawner, 'local_home') and \
-        #     not self.spawner.local_home:
-
         # Check if the user has access to the Technical Network
         self._check_tn_access()
 
-        # get eos token
-        eos_secret_name = await self._init_eos_secret()
-
-        # init user containers (notebook and side-container)
-        self._init_eos_containers(eos_secret_name)
+        # When eos is enabled, create eos token and side-container for token refresh
+        # Note: Spark also requires the side container so Spark is disabled when EOS is disabled.
+        eos_enabled = get_config("custom.eos.enabled", False)
+        if eos_enabled:
+            eos_secret_name = await self._init_eos_secret()
+            self._init_eos_containers(eos_secret_name)
 
         return self.pod
 
