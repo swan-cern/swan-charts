@@ -123,8 +123,13 @@ c.SwanKubeSpawner.volume_mounts.append(
     )
 )
 
+eos_enabled = get_config("custom.eos.enabled", False)
+
+# Propagate EOS availability to user pods
+c.SwanKubeSpawner.environment.update({'EOS_ENABLED': str(eos_enabled).lower()})
+
 # Manage EOS access
-if get_config("custom.eos.enabled", False):
+if eos_enabled:
     c.SwanKubeSpawner.volumes.append(
         V1Volume(
             name='eos',
@@ -141,9 +146,9 @@ if get_config("custom.eos.enabled", False):
         )
     )
 else:
-    # No access to EOS provided
-    logging.warn("EOS access not provided. Make sure you use a scratch space as home directory (local_home: true)")
-    pass
+    # No access to EOS provided, congfigure HOME to point to /home/<user> instead of EOS HOME.
+    c.SwanKubeSpawner.local_home = True
+    c.SpawnHandlersConfigs.local_home = True
 
 # Manage CVMFS access
 c.SwanKubeSpawner.volumes.append(
