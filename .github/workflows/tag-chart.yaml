@@ -46,7 +46,7 @@ jobs:
           persist-credentials: false # To use a different token with admin privileges instead of GITHUB_TOKEN in later steps
           ref: ${{ github.ref_name }} # Checkout latest commit on branch including new commits created in earlier steps
 
-      - uses: astral-sh/setup-uv@v8.0.0
+      - uses: astral-sh/setup-uv@v8.1.0
         with:
           python-version: 3.14
           enable-cache: false # Silence a warning about missing requirements.txt/pyproject.toml files in the repository
