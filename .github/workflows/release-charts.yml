@@ -62,7 +62,7 @@ jobs:
 
   check_charts:
     needs: [check_branch]
-    uses: ./.github/workflows/check-charts.yaml
+    uses: ./.github/workflows/check-charts.yml
 
   list_changed_charts:
     needs: [check_branch]
@@ -88,7 +88,7 @@ jobs:
   tag_swan:
     needs: [check_charts, list_changed_charts]
     if: needs.list_changed_charts.outputs.swan_has_changed == 'true'
-    uses: ./.github/workflows/tag-chart.yaml
+    uses: ./.github/workflows/tag-chart.yml
     with:
       chart: swan
       bump: ${{ inputs.bump_swan }}
@@ -134,7 +134,7 @@ jobs:
       needs.tag_swan.result != 'failure' && 
       needs.update_dependency.result != 'failure' && 
       (needs.list_changed_charts.outputs.swan_has_changed == 'true' || needs.list_changed_charts.outputs.swan-cern_has_changed == 'true')
-    uses: ./.github/workflows/tag-chart.yaml
+    uses: ./.github/workflows/tag-chart.yml
     with:
       chart: swan-cern
       bump: ${{ inputs.bump_swan_cern }}
@@ -146,7 +146,7 @@ jobs:
   tag_swan_cern_system:
     needs: [check_charts, list_changed_charts]
     if: needs.list_changed_charts.outputs.swan-cern-system_has_changed == 'true'
-    uses: ./.github/workflows/tag-chart.yaml
+    uses: ./.github/workflows/tag-chart.yml
     with:
       chart: swan-cern-system
       bump: ${{ inputs.bump_swan_cern_system }}
