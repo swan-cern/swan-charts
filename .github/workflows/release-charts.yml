@@ -108,6 +108,7 @@ jobs:
     # Update 'swan-cern' chart to use as dependency the new tagged version of 'swan' chart
     needs: [tag_swan]
     runs-on: ubuntu-latest
+    environment: bump-dependency
     permissions:
       contents: write  # Needs to commit and push the dependency bump
     steps:
