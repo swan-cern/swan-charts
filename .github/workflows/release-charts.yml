@@ -16,9 +16,6 @@ name: Release Charts
 run-name: "Release swan: ${{ inputs.bump_swan }}, swan-cern: ${{ inputs.bump_swan_cern }}"
 concurrency: release # Only run one 'release' workflow at a time
 
-permissions:
-  contents: write
-
 on:
   workflow_dispatch:
     inputs:
@@ -52,6 +49,8 @@ on:
           - minor
           - patch
 
+permissions: {}  # Deny all permissions by default at workflow level
+
 jobs:
   check_branch:
     runs-on: ubuntu-latest
@@ -71,6 +70,8 @@ jobs:
       swan_has_changed: ${{ steps.diff.outputs.swan_has_changed }}
       swan-cern_has_changed: ${{ steps.diff.outputs.swan-cern_has_changed }}
       swan-cern-system_has_changed: ${{ steps.diff.outputs.swan-cern-system_has_changed }}
+    permissions:
+      contents: read  # Only needs to checkout + read git history
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -92,6 +93,8 @@ jobs:
     with:
       chart: swan
       bump: ${{ inputs.bump_swan }}
+    permissions:
+      contents: write  # Needs to create tags, commits, and GitHub releases
     secrets:
       WORKFLOW_ACCESS_TOKEN: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
       HELM_REPO_USERNAME: ${{ secrets.HELM_REPO_USERNAME }}
@@ -101,6 +104,8 @@ jobs:
     # Update 'swan-cern' chart to use as dependency the new tagged version of 'swan' chart
     needs: [tag_swan]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Needs to commit and push the dependency bump
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -140,6 +145,8 @@ jobs:
     with:
       chart: swan-cern
       bump: ${{ inputs.bump_swan_cern }}
+    permissions:
+      contents: write  # Needs to create tags, commits, and GitHub releases
     secrets:
       WORKFLOW_ACCESS_TOKEN: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
       HELM_REPO_USERNAME: ${{ secrets.HELM_REPO_USERNAME }}
@@ -152,6 +159,8 @@ jobs:
     with:
       chart: swan-cern-system
       bump: ${{ inputs.bump_swan_cern_system }}
+    permissions:
+      contents: write # Needs to create tags, commits, and GitHub releases
     secrets:
       WORKFLOW_ACCESS_TOKEN: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
       HELM_REPO_USERNAME: ${{ secrets.HELM_REPO_USERNAME }}

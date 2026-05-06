@@ -2,9 +2,6 @@
 name: Tag Chart
 run-name: Tag ${{ inputs.bump }} version of ${{ inputs.chart }} by @${{ github.actor }}
 
-permissions:
-  contents: write
-
 on:
   workflow_call:
     inputs:
@@ -33,6 +30,8 @@ on:
       new_version:
         value: ${{ jobs.publish_chart.outputs.new_version }}
 
+permissions: {}  # Deny all permissions by default at workflow level
+
 jobs:
   publish_chart:
     runs-on: ubuntu-latest
@@ -44,6 +43,8 @@ jobs:
       new_version: ${{ steps.version.outputs.new_version }}
       new_tag: ${{ steps.version.outputs.new_tag }}
       last_tag: ${{ steps.version.outputs.last_tag }}
+    permissions:
+      contents: write # Required to push commits and tags to master branch
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:

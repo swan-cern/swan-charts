@@ -10,9 +10,7 @@ on:
         description: 'Image Version'
         required: true
 
-permissions:
-  contents: write
-  pull-requests: write
+permissions: {}  # Deny all permissions by default at workflow level
 
 jobs:
   update-images:
@@ -20,6 +18,9 @@ jobs:
     env:
       IMAGE: ${{ inputs.image }}
       VERSION: ${{ inputs.version }}
+    permissions:
+      contents: write # Required to push commits to master branch
+      pull-requests: write # Required to create pull requests
 
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
