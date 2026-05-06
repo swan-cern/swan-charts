@@ -72,7 +72,7 @@ jobs:
       swan-cern_has_changed: ${{ steps.diff.outputs.swan-cern_has_changed }}
       swan-cern-system_has_changed: ${{ steps.diff.outputs.swan-cern-system_has_changed }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0 # Fetch all tags and history to check for changes
       - name: List charts with changes since last tag
@@ -102,7 +102,7 @@ jobs:
     needs: [tag_swan]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false # To use WORKFLOW_ACCESS_TOKEN instead of GITHUB_TOKEN in later steps
           ref: ${{ github.ref_name }} # Checkout latest commit on branch including new commits created in earlier steps

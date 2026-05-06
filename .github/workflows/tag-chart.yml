@@ -41,12 +41,12 @@ jobs:
       new_tag: ${{ steps.version.outputs.new_tag }}
       last_tag: ${{ steps.version.outputs.last_tag }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false # To use a different token with admin privileges instead of GITHUB_TOKEN in later steps
           ref: ${{ github.ref_name }} # Checkout latest commit on branch including new commits created in earlier steps
 
-      - uses: astral-sh/setup-uv@v8.1.0
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
           python-version: 3.14
           enable-cache: false # Silence a warning about missing requirements.txt/pyproject.toml files in the repository
@@ -97,7 +97,7 @@ jobs:
       NEW_TAG: ${{ needs.publish_chart.outputs.new_tag }}
       LAST_TAG: ${{ needs.publish_chart.outputs.last_tag }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0 # Fetch all tags and history to check for changes
           ref: ${{ github.ref_name }}
