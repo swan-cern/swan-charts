@@ -111,6 +111,7 @@ jobs:
           REF_NAME: ${{ github.ref_name }}
         with:
           fetch-depth: 0 # Fetch all tags and history to check for changes
+          persist-credentials: false
       - name: Create GitHub Release
         run: |
           NOTES=$(git log "${LAST_TAG}..${NEW_TAG}" --pretty='- %h %s' -- ${CHART})
