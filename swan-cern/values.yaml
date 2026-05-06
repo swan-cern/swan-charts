@@ -189,6 +189,7 @@ swan:
           exchange_tokens:
             - eos-service
             - cernbox-service
+            - kubeflow-ml
           logout_redirect_url: https://cern.ch/swan
           auto_login: False
           username_claim: preferred_username
