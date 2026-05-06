@@ -14,7 +14,6 @@
 
 name: Release Charts
 run-name: "Release swan: ${{ inputs.bump_swan }}, swan-cern: ${{ inputs.bump_swan_cern }}"
-concurrency: release # Only run one 'release' workflow at a time
 
 on:
   workflow_dispatch:
@@ -48,6 +47,10 @@ on:
           - major
           - minor
           - patch
+
+concurrency:
+  group: release # Only run one 'release' workflow at a time
+  cancel-in-progress: false  # Never cancel an in-progress release mid-flight
 
 permissions: {}  # Deny all permissions by default at workflow level
 

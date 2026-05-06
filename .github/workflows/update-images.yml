@@ -10,6 +10,10 @@ on:
         description: 'Image Version'
         required: true
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions: {}  # Deny all permissions by default at workflow level
 
 jobs:
