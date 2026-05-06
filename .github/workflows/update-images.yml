@@ -17,6 +17,9 @@ permissions:
 jobs:
   update-images:
     runs-on: ubuntu-latest
+    env:
+      IMAGE: ${{ inputs.image }}
+      VERSION: ${{ inputs.version }}
 
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -25,8 +28,8 @@ jobs:
 
     - name: Update images version
       run: |
-        IMAGE_NAME="${{ inputs.image }}"
-        IMAGE_VERSION="${{ inputs.version }}"
+        IMAGE_NAME="${IMAGE}"
+        IMAGE_VERSION="${VERSION}"
         echo "Updating information for image = $IMAGE_NAME version = $IMAGE_VERSION"
         sed -i -E "/^[[:space:]]*name:[[:space:]]*\"?gitlab-registry\.cern\.ch\/swan\/docker-images\/${IMAGE_NAME//\//\\/}\"?[[:space:]]*$/ { n; s/^([[:space:]]*)tag:[[:space:]]*\"?[^\"]*\"?/\1tag: ${IMAGE_VERSION}/ }" swan/values.yaml swan-cern/values.yaml
 
@@ -34,8 +37,8 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        BRANCH="${{ inputs.image }}-${{ inputs.version }}"
-        MESSAGE="Updated image ${{ inputs.image }} to version ${{ inputs.version }}"
+        BRANCH="${IMAGE}-${VERSION}"
+        MESSAGE="Updated image ${IMAGE} to version ${VERSION}"
 
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
