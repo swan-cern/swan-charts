@@ -115,4 +115,5 @@ jobs:
       - name: Create GitHub Release
         run: |
           NOTES=$(git log "${LAST_TAG}..${NEW_TAG}" --pretty='- %h %s' -- ${CHART})
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           gh release create "$NEW_TAG" --notes "$NOTES"

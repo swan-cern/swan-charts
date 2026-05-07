@@ -51,5 +51,6 @@ jobs:
         git checkout -b "$BRANCH"
         git add swan/values.yaml swan-cern/values.yaml
         git commit -m "$MESSAGE"
+        git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
         git push origin "$BRANCH"
         gh pr create --title "$MESSAGE" --body "" --head "$BRANCH" --base master
