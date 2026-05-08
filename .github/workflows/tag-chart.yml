@@ -78,7 +78,7 @@ jobs:
           ACTOR: ${{ github.actor }}
         run: |
           cd ${CHART}
-          uvx bump2version ${BUMP} --verbose --message '${CHART} {new_version} by @${ACTOR}'
+          uvx bump2version ${BUMP} --verbose --message "${CHART} {new_version} by @${ACTOR}"
 
       - name: Push commit + tag to origin
         env:
