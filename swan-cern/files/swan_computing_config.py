@@ -80,34 +80,21 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         gpu_description = spawner.user_options[spawner.gpu]
         gpu_info = spawner.gpus.get_info(gpu_description)
 
-        # Avoid race condition in case 2 users request a GPU at the same time
-        # decrease currently free GPU count
+        # Avoid race condition in case 2 users request a GPU at the same time.
+        # Keep the lock scope minimal and avoid awaiting while holding it.
+        allocated_gpu = False
         try:
             with spawner.gpus.get_lock():
                 if gpu_info and gpu_info.free > 0:
                     gpu_info.free -= 1
+                    allocated_gpu = True
                     spawner.log.info(f'Decreased currently free count for {gpu_description}: {gpu_info.free}/{gpu_info.count} available')
-                else:
-                    user_roles = await spawner._get_user_roles(spawner)
-                    # Check what GPU flavours are currently available using the built-in method
-                    free_flavours = list(spawner.gpus.get_free_gpu_flavours(user_roles).keys())
-
-                    if free_flavours:
-                        # There are free GPU flavours available, but not the one requested
-                        error_message = f'The selected GPU flavour ({gpu_description}) is not available. Please select one of the following:'
-                        error_message += '<ul>'
-                        for flavour in free_flavours:
-                            error_message += f'<li>{flavour}</li>'
-                        error_message += '</ul>'
-                        raise ValueError(error_message)
-                    else:
-                        # No GPUs available at all
-                        error_message = f'The selected GPU flavour ({gpu_description}) is not available. Unfortunately, no GPUs are available at the moment. Please try again later.'
-                        raise ValueError(error_message)
-        except ValueError:
-            raise
         except Exception as e:
-            spawner.log.error(f'Error updating free GPU count for {gpu_description}: {e}') # Don't fail pod creation if tracking fails
+            spawner.log.error(f'Error updating free GPU count for {gpu_description}: {e}')
+
+        if not allocated_gpu:
+            error_message = f'The selected GPU flavour ({gpu_description}) is not available. Please try again later.'
+            raise ValueError(error_message)
 
         # Add affinity to nodes that are labeled with the specific GPU
         # product name that the user requested
