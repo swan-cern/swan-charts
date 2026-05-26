@@ -83,14 +83,11 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         # Avoid race condition in case 2 users request a GPU at the same time.
         # Keep the lock scope minimal and avoid awaiting while holding it.
         allocated_gpu = False
-        try:
-            with spawner.gpus.get_lock():
-                if gpu_info and gpu_info.free > 0:
-                    gpu_info.free -= 1
-                    allocated_gpu = True
-                    spawner.log.info(f'Decreased currently free count for {gpu_description}: {gpu_info.free}/{gpu_info.count} available')
-        except Exception as e:
-            spawner.log.error(f'Error updating free GPU count for {gpu_description}: {e}')
+        with spawner.gpus.get_lock():
+            if gpu_info and gpu_info.free > 0:
+                gpu_info.free -= 1
+                allocated_gpu = True
+                spawner.log.info(f'Decreased currently free count for {gpu_description}: {gpu_info.free}/{gpu_info.count} available')
 
         if not allocated_gpu:
             error_message = f'The selected GPU flavour ({gpu_description}) is not available. Please try again later.'
