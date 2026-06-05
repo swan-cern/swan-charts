@@ -22,3 +22,11 @@ spec:
         it_monit_downsampled_metric: "true"  # Required to send to SWAN LTS tenant
     - expr: max_over_time(count(count(kube_pod_container_resource_requests{resource=~"nvidia_com_(gpu|mig.+)"}) by(exported_pod))[24h:5m])
       record: swan:users:gpu:peak:daily
+    - expr: sum(kube_pod_status_phase{exported_namespace="swan", phase=~"Failed|Unknown"}, exported_pod=~"jupyter-[a-z]+"})
+      record: swan:sessions:errors:current
+      labels:
+        public_visibility: "true" # Required to filter when configuring dashboard data source permissions
+    - expr: sum(kube_pod_status_phase{exported_namespace="swan", phase="Running", exported_pod=~"jupyter-[a-z]+"})
+      record: swan:sessions:success:current
+      labels:
+        public_visibility: "true" # Required to filter when configuring dashboard data source permissions
