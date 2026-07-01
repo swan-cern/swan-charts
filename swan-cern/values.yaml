@@ -54,6 +54,10 @@ swan:
               source /cvmfs/sft.cern.ch/lcg/views/{{ .Values.global.cuda.lcg }}/{{ .Values.global.cuda.platform }}/setup.sh &&
               (timeout 20s python3 -c 'import tensorflow' || true) &&
               (timeout 20s python3 -c 'import torch' || true)
+
+              source /cvmfs/sft.cern.ch/lcg/views/LCG_110_swan/x86_64-el9-gcc13-opt/setup.sh &&
+              (timeout 20s python3 -m ipykernel > /dev/null 2>&1 || true) &&
+              (timeout 20s python3 -m JupyROOT.kernel.rootkernel > /dev/null 2>&1 || true)
     controllerplugin:
       provisioner:
         image:
