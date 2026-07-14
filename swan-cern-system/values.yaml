@@ -1,6 +1,16 @@
 gpu-operator-cern:
   enabled: true
   taintGpuNodes: false
+  gpu-operator:
+    driver:
+      # Disable automatic driver upgrades.
+      # Driver upgrades drain GPU nodes, which we don't want to happen automatically.
+      # Coupled with the updateStrategy being OnDelete, this lets us bump the gpu operator
+      # version without affecting existing GPU nodes.
+      # See the nvidia docs for more info:
+      # https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/gpu-driver-upgrades.html#gpu-driver-upgrades
+      upgradePolicy:
+        autoUpgrade: false
 
 cern-it-monitoring-kubernetes:
   enabled: false
