@@ -1,12 +1,12 @@
 dependencies:
 - name: gpu-operator-cern
   repository: oci://registry.cern.ch/kubernetes/charts
-  version: 0.0.7
+  version: 0.0.3
 - name: cern-it-monitoring-kubernetes
   repository: oci://registry.cern.ch/monit
   version: 3.5.0
 - name: kafka-streams-apps
   repository: oci://registry.cern.ch/swan/charts
   version: 0.0.5
-digest: sha256:1469c0ae81928ca48b1b2abbcf592b1caa09b21fa693e9f8aa1075026df2c9d9
-generated: "2026-08-01T22:16:15.27864077+02:00"
+digest: sha256:2778f51968302cc01484409c0e7912e0868f99a13e5712153f2f4a3dee0838c9
+generated: "2025-10-20T14:56:52.295566797+02:00"
