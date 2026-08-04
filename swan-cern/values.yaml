@@ -196,7 +196,7 @@ swan:
             - kubeflow-ml
           logout_redirect_url: https://cern.ch/swan
           auto_login: False
-          username_claim: preferred_username
+          username_claim: cern_upn
           client_id: # placeholder, check secrets
           client_secret: # placeholder, check secrets
           oauth_callback_url: # placeholder, check secrets
