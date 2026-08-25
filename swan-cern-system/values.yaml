@@ -1,6 +1,11 @@
 gpu-operator-cern:
   enabled: true
   taintGpuNodes: false
+  # Never run the containerd-version-upgrade DaemonSet.
+  # It sets /etc/containerd/config.toml version=4 which our version
+  # of containerd that ships with Fedora 41 cannot parse.
+  containerdConfigVersionUpgrade:
+    enabled: false
   gpu-operator:
     driver:
       # Disable automatic driver upgrades.
