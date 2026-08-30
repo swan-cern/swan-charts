@@ -152,6 +152,9 @@ swan:
         - name: cvmfs
           mountPath: /cvmfs
           mountPropagation: HostToContainer
+        - name: hub-announcement
+          # Assumes the jupyterhub image venv is in /opt
+          mountPath: /opt/venv/share/jupyterhub/static/announcement
       extraVolumes:
         - name: cvmfs
           persistentVolumeClaim:
@@ -182,6 +185,9 @@ swan:
               path: hadoop.cred
             - key: sparkk8s.cred
               path: sparkk8s.cred
+        - name: hub-announcement
+          configMap:
+            name: hub-announcement
       config:
         KeyCloakAuthenticator:
           oidc_issuer: https://auth.cern.ch/auth/realms/cern
