@@ -1,0 +1,9 @@
+{{- if index .Values "enabled" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hub-announcement
+  namespace: {{ .Release.Namespace }}
+data:
+  announcement.json: {{ .Values.swan.jupyterhub.custom.announcement | default dict | toJson | quote }}
+{{- end }}
