@@ -1,6 +1,6 @@
 [dependency-groups]
 dev = [
-    "ruff==0.15.20",
+    "ruff==0.16.6",
 ]
 
 [tool.ruff]
@@ -42,10 +42,7 @@ select = [
 ]
 ignore = [
     # Too many violations, disable repo-wide
-    "E501",  # line-too-long
-    "G002",  # logging-percent-format
-    "G004",  # logging-f-string
-    "G201",  # logging-exc-info
+    "E501",  # line-too-long, 33 violations
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -74,4 +71,5 @@ ignore = [
     "I001",      # unsorted-imports
     "RUF010",    # explicit-f-string-type-conversion
     "W291",      # trailing-whitespace
+    "G004",      # logging-f-string
 ]
