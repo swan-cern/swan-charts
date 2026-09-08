@@ -1,0 +1,75 @@
+[dependency-groups]
+dev = [
+    "ruff==0.16.6",
+]
+
+[tool.ruff]
+target-version = "py312"
+
+# Provided by JupyterHub’s configuration environment
+builtins = [
+    "c",
+    "get_config",
+    "url_path_join",
+    "SwanPodHookHandler",
+    "SwanPodHookHandlerProd",
+    "swan_container_namespace",
+]
+
+[tool.ruff.lint]
+select = [
+    "ASYNC",   # flake8-async
+    "B",       # flake8-bugbear
+    "DTZ",     # flake8-datetimez
+    "E",       # pycodestyle errors
+    "F",       # Pyflakes
+    "G",       # flake8-logging-format
+    "I",       # isort
+    "LOG",     # flake8-logging
+    "PIE",     # flake8-pie
+    "PLE",     # Pylint errors
+    "PLR0402", # manual-from-import
+    "PLW",     # Pylint warnings
+    "RET502",  # implicit-return-value
+    "RUF",     # Ruff-specific
+    "SIM118",  # in-dict-keys
+    "UP007",   # PEP 604 union
+    "UP015",   # redundant-open-modes
+    "UP017",   # datetime.UTC
+    "UP032",   # f-string
+    "W",       # pycodestyle warnings
+    "YTT",     # flake8-2020
+]
+ignore = [
+    # Too many violations, disable repo-wide
+    "E501",  # line-too-long, 33 violations
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Temporary for the CI setup PR. Remove these in the Python cleanup PR
+"swan/files/swan_config.py" = [
+    "F401",    # unused-import
+    "PIE808",  # unnecessary-range-start
+    "W291",    # trailing-whitespace
+]
+"swan-cern/files/swan_config_cern.py" = [
+    "ASYNC221",  # run-process-in-async-function
+    "B904",      # raise-without-from-inside-except
+    "E401",      # multiple-imports-on-one-line
+    "E712",      # true-false-comparison
+    "F841",      # unused-variable
+    "I001",      # unsorted-imports
+    "W291",      # trailing-whitespace
+    "W293",      # blank-line-with-whitespace
+]
+"swan-cern/files/swan_computing_config.py" = [
+    "ASYNC221",  # run-process-in-async-function
+    "B005",      # strip-with-multi-characters
+    "B904",      # raise-without-from-inside-except
+    "F401",      # unused-import
+    "F841",      # unused-variable
+    "I001",      # unsorted-imports
+    "RUF010",    # explicit-f-string-type-conversion
+    "W291",      # trailing-whitespace
+    "G004",      # logging-f-string
+]
