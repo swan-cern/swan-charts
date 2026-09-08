@@ -289,13 +289,13 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         if cluster == "hadoop-analytix" and "analytix" not in user_roles:
            raise ValueError(
               """
-              Access to the Analytix cluster is not granted. 
+              Access to the Analytix cluster is not granted.
               Please <a href="https://cern.service-now.com/service-portal?id=sc_cat_item&name=access-cluster-hadoop&se=Hadoop-Service" target="_blank">request access</a>
               """)
         elif cluster == "hadoop-nxcals" and "hadoop-nxcals" not in user_roles:
            raise ValueError(
               """
-              Access to the NXCALS cluster is not granted. 
+              Access to the NXCALS cluster is not granted.
               Please <a href="http://nxcals-docs.web.cern.ch/current/user-guide/data-access/nxcals-access-request/" target="_blank">request access</a>
               """)
         elif cluster != "none":

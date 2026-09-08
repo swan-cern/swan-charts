@@ -68,7 +68,7 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
         except Exception as e:
             raise ValueError("Could not create required user credential")
 
-        # ITHADOOP-819 - Ports need to be opened using service creation, and later assigning allocated service nodeport to a pod 
+        # ITHADOOP-819 - Ports need to be opened using service creation, and later assigning allocated service nodeport to a pod
         # Create V1Secret with eos token
         secret_data = V1Secret()
 
@@ -225,7 +225,7 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
         self.pod.spec.containers = pod_spec_containers
 
 # https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html
-# This is defined in the configuration to allow overring iindependently 
+# This is defined in the configuration to allow overring iindependently
 # of which config file is loaded first
 # c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook
 async def swan_pod_hook_prod(spawner, pod):
@@ -282,11 +282,11 @@ if get_config("custom.cull.enabled", False):
     cull_max_age = get_config("custom.cull.maxAge")
     if cull_max_age:
         cull_cmd.append("--max-age=%s" % cull_max_age)
-    
+
     check_eos = get_config('custom.cull.checkEosAuth', False)
     if not check_eos:
         cull_cmd.append("--disable-hooks=True")
-    
+
     hooks_dir = get_config('custom.cull.hooksDir')
     if hooks_dir:
         cull_cmd.append(f"--hooks-dir={hooks_dir}")
@@ -294,15 +294,15 @@ if get_config("custom.cull.enabled", False):
     audience = get_config('custom.cull.audience')
     if audience:
         cull_cmd.append(f"--audience={audience}")
-    
+
     auth_url = get_config('custom.cull.auth_url')
     if auth_url:
         cull_cmd.append(f"--auth_url={auth_url}")
-    
+
     authz_api_url = get_config('custom.cull.authz_api_url')
     if authz_api_url:
         cull_cmd.append(f"--authz_api_url={authz_api_url}")
-    
+
     auth_check_interval = get_config('custom.cull.auth_check_interval')
     if auth_check_interval:
         cull_cmd.append("--auth_check_interval=%s" % auth_check_interval)

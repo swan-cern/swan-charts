@@ -70,7 +70,7 @@ class SwanPodHookHandler:
         return list
 
 # https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html
-# This is defined in the configuration to allow overring independently 
+# This is defined in the configuration to allow overring independently
 # of which config file is loaded first
 # c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook
 def swan_pod_hook(spawner, pod):
