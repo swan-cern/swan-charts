@@ -147,7 +147,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         gpu_resource_name = gpu_info.resource_name
 
         # Add gpu label to pod (useful for filtering).
-        self.pod.metadata.labels['gpu'] = gpu_resource_name.strip('nvidia.com/')
+        self.pod.metadata.labels['gpu'] = gpu_resource_name.removeprefix('nvidia.com/')
 
         # Add to notebook container the requests and limits for the GPU
         notebook_container = self._get_pod_container('notebook')
