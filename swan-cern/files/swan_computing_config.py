@@ -177,7 +177,6 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         k8suser_config_base64 = ''
 
         if cluster == 'k8s':
-            #hdfs_cluster = 'hadoop-analytix'
             try:
                 # Setup the user and generate user kube config
                 k8suser_config_base64 = subprocess.check_output(
@@ -386,7 +385,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
             for port_id in range(1, num_ports + 1):
                 service_template_ports.append(
                     V1ServicePort(
-                        name=f'comp-port-{port_id!s}',
+                        name=f'comp-port-{port_id}',
                         port=port_id
                     )
                 )
