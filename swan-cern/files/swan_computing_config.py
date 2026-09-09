@@ -2,16 +2,14 @@ import subprocess
 
 from kubernetes_asyncio.client.models import (
     V1Affinity,
-    V1EnvVar,
-    V1EnvVarSource,
     V1ContainerPort,
+    V1EnvVar,
     V1NodeAffinity,
     V1NodeSelector,
     V1NodeSelectorRequirement,
     V1NodeSelectorTerm,
     V1ObjectMeta,
     V1Secret,
-    V1SecretKeySelector,
     V1SecretVolumeSource,
     V1Service,
     V1ServicePort,
@@ -20,7 +18,6 @@ from kubernetes_asyncio.client.models import (
     V1Volume,
     V1VolumeMount,
 )
-
 from kubernetes_asyncio.client.rest import ApiException
 
 """

@@ -1,8 +1,5 @@
-import logging
-
 from kubernetes_asyncio.client.models import (
     V1EmptyDirVolumeSource,
-    V1HostPathVolumeSource,
     V1PersistentVolumeClaimVolumeSource,
     V1Volume,
     V1VolumeMount,
