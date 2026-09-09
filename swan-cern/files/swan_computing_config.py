@@ -338,17 +338,11 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         )
 
         # add spark auth required env
-
-        if cluster == 'hadoop-nxcals':
-            auth_required = 'true'
-        else:
-            auth_required = 'false'
-
         notebook_container.env = self._add_or_replace_by_name(
             notebook_container.env,
             V1EnvVar(
                 name='SPARK_AUTH_REQUIRED',
-                value=auth_required
+                value='true',
             )
         )
 
