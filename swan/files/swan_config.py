@@ -1,8 +1,5 @@
-import logging
-
 from kubernetes_asyncio.client.models import (
     V1EmptyDirVolumeSource,
-    V1HostPathVolumeSource,
     V1PersistentVolumeClaimVolumeSource,
     V1Volume,
     V1VolumeMount,
@@ -58,7 +55,7 @@ class SwanPodHookHandler:
 
     def _add_or_replace_by_name(self, list, element):
         found = False
-        for list_index in range(0, len(list)):
+        for list_index in range(len(list)):
             if list[list_index].to_dict().get("name") == element.to_dict().get("name"):
                 list[list_index] = element
                 found = True
@@ -70,7 +67,7 @@ class SwanPodHookHandler:
         return list
 
 # https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html
-# This is defined in the configuration to allow overring independently 
+# This is defined in the configuration to allow overring independently
 # of which config file is loaded first
 # c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook
 def swan_pod_hook(spawner, pod):

@@ -46,30 +46,15 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-# Temporary for the CI setup PR. Remove these in the Python cleanup PR
-"swan/files/swan_config.py" = [
-    "F401",    # unused-import
-    "PIE808",  # unnecessary-range-start
-    "W291",    # trailing-whitespace
-]
+
 "swan-cern/files/swan_config_cern.py" = [
     "ASYNC221",  # run-process-in-async-function
     "B904",      # raise-without-from-inside-except
-    "E401",      # multiple-imports-on-one-line
     "E712",      # true-false-comparison
-    "F841",      # unused-variable
-    "I001",      # unsorted-imports
-    "W291",      # trailing-whitespace
-    "W293",      # blank-line-with-whitespace
 ]
 "swan-cern/files/swan_computing_config.py" = [
     "ASYNC221",  # run-process-in-async-function
     "B005",      # strip-with-multi-characters
     "B904",      # raise-without-from-inside-except
-    "F401",      # unused-import
-    "F841",      # unused-variable
-    "I001",      # unsorted-imports
-    "RUF010",    # explicit-f-string-type-conversion
-    "W291",      # trailing-whitespace
     "G004",      # logging-f-string
 ]

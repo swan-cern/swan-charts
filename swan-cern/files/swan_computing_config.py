@@ -2,16 +2,14 @@ import subprocess
 
 from kubernetes_asyncio.client.models import (
     V1Affinity,
-    V1EnvVar,
-    V1EnvVarSource,
     V1ContainerPort,
+    V1EnvVar,
     V1NodeAffinity,
     V1NodeSelector,
     V1NodeSelectorRequirement,
     V1NodeSelectorTerm,
     V1ObjectMeta,
     V1Secret,
-    V1SecretKeySelector,
     V1SecretVolumeSource,
     V1Service,
     V1ServicePort,
@@ -20,7 +18,6 @@ from kubernetes_asyncio.client.models import (
     V1Volume,
     V1VolumeMount,
 )
-
 from kubernetes_asyncio.client.rest import ApiException
 
 """
@@ -180,13 +177,12 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         k8suser_config_base64 = ''
 
         if cluster == 'k8s':
-            hdfs_cluster = 'hadoop-analytix'
             try:
                 # Setup the user and generate user kube config
                 k8suser_config_base64 = subprocess.check_output(
                     ['sudo', '--preserve-env=SWAN_DEV', '/srv/jupyterhub/private/sparkk8s_token.sh', username], timeout=60
                 ).decode('ascii')
-            except Exception as e:
+            except Exception:
                 # if no access, all good for now
                 raise ValueError("Could not setup user on k8s")
 
@@ -289,13 +285,13 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         if cluster == "hadoop-analytix" and "analytix" not in user_roles:
            raise ValueError(
               """
-              Access to the Analytix cluster is not granted. 
+              Access to the Analytix cluster is not granted.
               Please <a href="https://cern.service-now.com/service-portal?id=sc_cat_item&name=access-cluster-hadoop&se=Hadoop-Service" target="_blank">request access</a>
               """)
         elif cluster == "hadoop-nxcals" and "hadoop-nxcals" not in user_roles:
            raise ValueError(
               """
-              Access to the NXCALS cluster is not granted. 
+              Access to the NXCALS cluster is not granted.
               Please <a href="http://nxcals-docs.web.cern.ch/current/user-guide/data-access/nxcals-access-request/" target="_blank">request access</a>
               """)
         elif cluster != "none":
@@ -383,7 +379,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
             for port_id in range(1, num_ports + 1):
                 service_template_ports.append(
                     V1ServicePort(
-                        name=f'comp-port-{str(port_id)}',
+                        name=f'comp-port-{port_id}',
                         port=port_id
                     )
                 )
