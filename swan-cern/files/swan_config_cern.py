@@ -65,7 +65,7 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
             eos_token_base64 = subprocess.check_output(
                 ['sudo', '--preserve-env=SWAN_DEV', '/srv/jupyterhub/private/eos_token.sh', username], timeout=60
             ).decode('ascii')
-        except Exception as e:
+        except Exception:
             raise ValueError("Could not create required user credential")
 
         # ITHADOOP-819 - Ports need to be opened using service creation, and later assigning allocated service nodeport to a pod

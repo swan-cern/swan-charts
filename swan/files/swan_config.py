@@ -55,7 +55,7 @@ class SwanPodHookHandler:
 
     def _add_or_replace_by_name(self, list, element):
         found = False
-        for list_index in range(0, len(list)):
+        for list_index in range(len(list)):
             if list[list_index].to_dict().get("name") == element.to_dict().get("name"):
                 list[list_index] = element
                 found = True

@@ -177,13 +177,13 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
         k8suser_config_base64 = ''
 
         if cluster == 'k8s':
-            hdfs_cluster = 'hadoop-analytix'
+            #hdfs_cluster = 'hadoop-analytix'
             try:
                 # Setup the user and generate user kube config
                 k8suser_config_base64 = subprocess.check_output(
                     ['sudo', '--preserve-env=SWAN_DEV', '/srv/jupyterhub/private/sparkk8s_token.sh', username], timeout=60
                 ).decode('ascii')
-            except Exception as e:
+            except Exception:
                 # if no access, all good for now
                 raise ValueError("Could not setup user on k8s")
 
@@ -386,7 +386,7 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
             for port_id in range(1, num_ports + 1):
                 service_template_ports.append(
                     V1ServicePort(
-                        name=f'comp-port-{str(port_id)}',
+                        name=f'comp-port-{port_id!s}',
                         port=port_id
                     )
                 )
