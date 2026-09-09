@@ -41,11 +41,13 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
 
         if self._spark_enabled():
             # Configure Spark clusters at CERN
-            hadoop_secret_name = await self._init_hadoop_secret()
             await self._init_spark()
 
-            # Modify user containers (notebook and side-container)
-            self._modify_containers_for_spark(hadoop_secret_name)
+            cluster = self.spawner.user_options[self.spawner.spark_cluster_field]
+            if cluster == 'k8s':
+                secret_name = await self._init_sparkk8s_config()
+                # Modify user containers (notebook and side-container)
+                self._modify_containers_for_spark(secret_name)
 
             # Add required Spark ports
             required_ports += self._SPARK_REQUIRED_PORTS
@@ -164,32 +166,26 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
             ),
         )
 
-    async def _init_hadoop_secret(self):
+    async def _init_sparkk8s_config(self):
         """
-        Create secret for Spark/Hadoop
+        Create config for Spark on k8s
         """
-
-        cluster = self.spawner.user_options[self.spawner.spark_cluster_field]
 
         username = self.spawner.user.name
         hadoop_secret_name = f'hadoop-tokens-{username}'
 
-        k8suser_config_base64 = ''
+        try:
+            # Setup the user and generate user kube config
+            k8suser_config_base64 = subprocess.check_output(
+                ['sudo', '--preserve-env=SWAN_DEV', '/srv/jupyterhub/private/sparkk8s_token.sh', username], timeout=60
+            ).decode('ascii')
+        except Exception:
+            # if no access, all good for now
+            raise ValueError("Could not setup user on k8s")
 
-        if cluster == 'k8s':
-            try:
-                # Setup the user and generate user kube config
-                k8suser_config_base64 = subprocess.check_output(
-                    ['sudo', '--preserve-env=SWAN_DEV', '/srv/jupyterhub/private/sparkk8s_token.sh', username], timeout=60
-                ).decode('ascii')
-            except Exception:
-                # if no access, all good for now
-                raise ValueError("Could not setup user on k8s")
-
-        # Create V1Secret with webdhfs token and k8s user config
+        # Create V1Secret with the k8s user config
         try:
             secret_data = V1Secret()
-
             secret_meta = V1ObjectMeta()
             secret_meta.name = hadoop_secret_name
             secret_meta.namespace = swan_container_namespace
@@ -236,24 +232,6 @@ class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
                 name=hadoop_secret_name,
                 mount_path='/srv/side-container/hadoop'
             )
-        )
-
-        # instruct sparkconnector to fetch delegation tokens from service
-        notebook_container.env = self._add_or_replace_by_name(
-            notebook_container.env,
-            V1EnvVar(
-                name='SWAN_FETCH_HADOOP_TOKENS',
-                value='true'
-            ),
-        )
-
-        # hadoop token generator url
-        notebook_container.env = self._add_or_replace_by_name(
-            notebook_container.env,
-            V1EnvVar(
-                name='SWAN_HADOOP_TOKEN_GENERATOR_URL',
-                value='http://hadoop-token-generator:80'
-            ),
         )
 
         # configuration to access Spark k8s cluster

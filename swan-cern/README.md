@@ -9,7 +9,7 @@ User session image developed by CERN IT (https://gitlab.cern.ch/swan/docker-imag
 Integrations  
 
 - SSO (Keycloak) 
-- Authentication Tokens for CERNBox, Hadoop and Spark k8s and refresh mechanism  
+- Authentication Tokens for CERNBox and Spark k8s and refresh mechanism  
 - Podspec customization to run Spark with IT Hadoop clusters and user home being CERNBox and software  
   
 This repository serves as equivalent of `https://gitlab.cern.ch/ai/it-puppet-hostgroup-swan` in magnum k8s
@@ -154,7 +154,7 @@ eosxd ./swan-eosxd-config-chart
 $ helm upgrade --install --namespace kube-system  \
 cvmfs ./swan-cvmfs-config-chart
  
-# authenticate to provide eos token (you can also provide generated k8s and hadoop base64 tokens if needed)
+# authenticate to provide eos token (you can also provide a generated k8s base64 token if needed)
 $ kinit -c krb5cc
  
 # install swan (linux example)
@@ -167,7 +167,6 @@ $ helm upgrade --install --namespace swan  \
 --set jupyterhub.hub.extraEnv.OAUTH_CLIENT_ID="redacted" \
 --set jupyterhub.hub.extraEnv.OAUTH_CLIENT_SECRET="redacted" \
 --set swan.secrets.eos.cred="$(base64 -w0 krb5cc)" \
---set swan.secrets.hadoop.cred="$(base64 -w0 hadoop.toks)" \
 --set swan.secrets.sparkk8s.cred="$(base64 -w0 k8s-user.config)" \
 swan ./swan-upstream-chart
 ```
