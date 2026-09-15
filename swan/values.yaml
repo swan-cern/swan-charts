@@ -174,7 +174,7 @@ jupyterhub:
         local_home: True
       JupyterHub:
         authenticator_class: keycloakauthenticator.KeyCloakAuthenticator
-        spawner_class: swanspawner.SwanKubeSpawner
+        spawner_class: swanspawner.swankubespawner.SwanKubeSpawner
         cleanup_servers: False
         tornado_settings:
           # currently we customize spawnhandler to stay in form before redirecting the user, as upstream does
