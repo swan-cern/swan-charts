@@ -231,7 +231,7 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
 async def swan_pod_hook_prod(spawner, pod):
     """
     :param spawner: Swan Kubernetes Spawner
-    :type spawner: swanspawner.SwanKubeSpawner
+    :type spawner: swanspawner.swankubespawner.SwanKubeSpawner
     :param pod: default pod definition set by jupyterhub
     :type pod: V1Pod
 

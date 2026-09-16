@@ -12,7 +12,7 @@ Class handling KubeSpawner.modify_pod_hook(spawner,pod) call
 class SwanPodHookHandler:
     def __init__(self, spawner, pod):
         """
-        :type spawner: swanspawner.SwanKubeSpawner
+        :type spawner: swanspawner.swankubespawner.SwanKubeSpawner
         :type pod: V1Pod
         """
         self.spawner = spawner
@@ -73,7 +73,7 @@ class SwanPodHookHandler:
 def swan_pod_hook(spawner, pod):
     """
     :param spawner: Swan Kubernetes Spawner
-    :type spawner: swanspawner.SwanKubeSpawner
+    :type spawner: swanspawner.swankubespawner.SwanKubeSpawner
     :param pod: default pod definition set by jupyterhub
     :type pod: V1Pod
 
