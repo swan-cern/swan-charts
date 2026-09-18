@@ -68,6 +68,7 @@ c.SwanKubeSpawner.environment.update({'EOS_ENABLED': str(eos_enabled).lower()})
 
 # Manage EOS access
 if eos_enabled:
+    c.SwanKubeSpawner.eos_enabled = True
     c.SwanKubeSpawner.volumes.append(
         V1Volume(
             name='eos',
