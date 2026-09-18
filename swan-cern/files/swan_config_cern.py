@@ -18,6 +18,7 @@ from kubernetes_asyncio.client.models import (
     V1VolumeMount,
 )
 from kubernetes_asyncio.client.rest import ApiException
+from swanspawner.podhookhandler.swanpodhookhandler import SwanPodHookHandler
 
 """
 Class handling KubeSpawner.modify_pod_hook(spawner,pod) call
@@ -225,7 +226,7 @@ class SwanPodHookHandlerProd(SwanPodHookHandler):
         self.pod.spec.containers = pod_spec_containers
 
 # https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html
-# This is defined in the configuration to allow overring iindependently
+# This is defined in the configuration to allow overring independently
 # of which config file is loaded first
 # c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook
 async def swan_pod_hook_prod(spawner, pod):
