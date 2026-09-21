@@ -1,4 +1,6 @@
-from swanspawner.podhookhandler.swancomputingpodhookhandler import SwanComputingPodHookHandler
+from swanspawner.podhookhandler.swancomputingpodhookhandler import (
+    SwanComputingPodHookHandler,
+)
 
 
 def computing_modify_pod_hook(spawner, pod):
