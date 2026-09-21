@@ -1,6 +1,6 @@
 import os
 
-from swanspawner.podhookhandler.swanpodhookprod import SwanPodHookHandlerProd
+from swanspawner.podhookhandler.swanprodpodhookhandler import SwanProdPodHookHandler
 
 
 # https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html
@@ -17,7 +17,7 @@ async def swan_pod_hook_prod(spawner, pod):
     :returns: dynamically customized pod specification for user session
     :rtype: V1Pod
     """
-    pod_hook_handler = SwanPodHookHandlerProd(spawner, pod)
+    pod_hook_handler = SwanProdPodHookHandler(spawner, pod)
     return await pod_hook_handler.get_swan_user_pod()
 
 
@@ -100,8 +100,9 @@ if get_config("custom.cull.enabled", False):
     )
     c.JupyterHub.load_roles.append(swan_idle_culler_role)
 
-c.SwanKubeSpawner.swan_cull_period = get_config('custom.cull.every', 600)
+c.SwanKubeSpawner.cull_period = get_config('custom.cull.every', 600)
 c.SwanKubeSpawner.tn_enabled = get_config('hub.config.SpawnHandlersConfigs.tn_enabled', False)
+c.SwanKubeSpawner.swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
 
 c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook_prod
 
