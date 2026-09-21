@@ -1,13 +1,13 @@
 import os
 
-from swanspawner.podhookhandler.swanprodpodhookhandler import SwanProdPodHookHandler
+from swanspawner.podhookhandler import SwanSparkCondorPodHookHandler
 
 
 # https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html
 # This is defined in the configuration to allow overring independently
 # of which config file is loaded first
 # c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook
-async def swan_pod_hook_prod(spawner, pod):
+async def swan_pod_hook_cern(spawner, pod):
     """
     :param spawner: Swan Kubernetes Spawner
     :type spawner: swanspawner.swankubespawner.SwanKubeSpawner
@@ -17,7 +17,7 @@ async def swan_pod_hook_prod(spawner, pod):
     :returns: dynamically customized pod specification for user session
     :rtype: V1Pod
     """
-    pod_hook_handler = SwanProdPodHookHandler(spawner, pod)
+    pod_hook_handler = SwanSparkCondorPodHookHandler(spawner, pod)
     return await pod_hook_handler.get_swan_user_pod()
 
 
@@ -103,8 +103,9 @@ if get_config("custom.cull.enabled", False):
 c.SwanKubeSpawner.cull_period = get_config('custom.cull.every', 600)
 c.SwanKubeSpawner.tn_enabled = get_config('hub.config.SpawnHandlersConfigs.tn_enabled', False)
 c.SwanKubeSpawner.swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
+c.SwanKubeSpawner.spark_configuration_path = get_config('custom.spark.configurationPath')
 
-c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook_prod
+c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook_cern
 
 # Required for swan systemuser.sh
 c.SwanKubeSpawner.cmd = None

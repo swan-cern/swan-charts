@@ -4,7 +4,7 @@ from kubernetes_asyncio.client.models import (
     V1Volume,
     V1VolumeMount,
 )
-from swanspawner.podhookhandler.swanpodhookhandler import SwanPodHookHandler
+from swanspawner.podhookhandler import SwanLabelPodHookHandler
 
 
 # https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html
@@ -21,7 +21,7 @@ def swan_pod_hook(spawner, pod):
     :returns: dynamically customized pod specification for user session
     :rtype: V1Pod
     """
-    pod_hook_handler = SwanPodHookHandler(spawner, pod)
+    pod_hook_handler = SwanLabelPodHookHandler(spawner, pod)
     return pod_hook_handler.get_swan_user_pod()
 
 """

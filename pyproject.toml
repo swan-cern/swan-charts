@@ -52,8 +52,3 @@ ignore = [
     "B904",      # raise-without-from-inside-except
     "E712",      # true-false-comparison
 ]
-"swan-cern/files/swan_computing_config.py" = [
-    "ASYNC221",  # run-process-in-async-function
-    "B904",      # raise-without-from-inside-except
-    "G004",      # logging-f-string
-]
