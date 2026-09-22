@@ -44,16 +44,3 @@ ignore = [
     # Too many violations, disable repo-wide
     "E501",  # line-too-long, 33 violations
 ]
-
-[tool.ruff.lint.per-file-ignores]
-
-"swan-cern/files/swan_config_cern.py" = [
-    "ASYNC221",  # run-process-in-async-function
-    "B904",      # raise-without-from-inside-except
-    "E712",      # true-false-comparison
-]
-"swan-cern/files/swan_computing_config.py" = [
-    "ASYNC221",  # run-process-in-async-function
-    "B904",      # raise-without-from-inside-except
-    "G004",      # logging-f-string
-]
