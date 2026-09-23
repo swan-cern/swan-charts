@@ -100,9 +100,10 @@ if get_config("custom.cull.enabled", False):
     c.JupyterHub.load_roles.append(swan_idle_culler_role)
 
 c.SwanKubeSpawner.cull_period = get_config('custom.cull.every', 600)
+c.SwanKubeSpawner.tn_enabled = get_config('hub.config.SpawnHandlersConfigs.tn_enabled', False)
+c.SwanKubeSpawner.spark_configuration_path = get_config('custom.spark.configurationPath')
 # Get configuration parameters from environment variables
 c.SwanKubeSpawner.swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
-c.SwanKubeSpawner.tn_enabled = get_config('hub.config.SpawnHandlersConfigs.tn_enabled', False)
 
 c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook_prod
 
