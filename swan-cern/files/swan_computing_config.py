@@ -19,13 +19,14 @@ from kubernetes_asyncio.client.models import (
     V1VolumeMount,
 )
 from kubernetes_asyncio.client.rest import ApiException
+from swanspawner.podhookhandler import SwanEosPodHookHandler
 
 """
 Class handling KubeSpawner.modify_pod_hook(spawner,pod) call
 """
 
 
-class SwanComputingPodHookHandler(SwanPodHookHandlerProd):
+class SwanComputingPodHookHandler(SwanEosPodHookHandler):
 
     _SPARK_REQUIRED_PORTS  = 18
     _CONDOR_REQUIRED_PORTS = 5
