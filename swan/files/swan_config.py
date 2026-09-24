@@ -29,18 +29,6 @@ Configuration for JupyterHub
 """
 c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook
 
-
-# Hub services
-# FIXME port is not exposed so it cannot be accessed. Maybe we should run this separately?
-# if get_config("custom.notificationsService", True):
-#     c.JupyterHub.services.append(
-#         {
-#             'name': 'notifications',
-#             'command': 'swannotificationsservice --port 8989'.split(),
-#             'url': 'http://hub:8989'
-#         }
-#     )
-
 # Init lists for volumes and volume_mounts
 c.SwanKubeSpawner.volumes = []
 c.SwanKubeSpawner.volume_mounts = []
