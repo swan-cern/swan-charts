@@ -39,52 +39,33 @@ if get_config("custom.cull.enabled", False):
         "services": ["swan-idle-culler"],
     }
 
-    cull_cmd = ["swanculler"]
     base_url = c.JupyterHub.get("base_url", "/")
-    cull_cmd.append("--url=http://localhost:8081" + url_path_join(base_url, "hub/api"))
+    cull_cmd = [
+        "swanculler",
+        f"--url=http://localhost:8081{url_path_join(base_url, "hub/api")}"
+    ]
 
-    cull_timeout = get_config("custom.cull.timeout")
-    if cull_timeout:
-        cull_cmd.append("--timeout=%s" % cull_timeout)
-
-    cull_every = get_config("custom.cull.every")
-    if cull_every:
-        cull_cmd.append("--cull-every=%s" % cull_every)
+    cull_value_flags = {
+        "--timeout": "custom.cull.timeout",
+        "--cull-every": "custom.cull.every",
+        "--max-age": "custom.cull.maxAge",
+        "--hooks-dir": "custom.cull.hooksDir",
+        "--audience": "custom.cull.audience",
+        "--auth-url": "custom.cull.auth_url",
+        "--authz-api-url": "custom.cull.authz_api_url",
+        "--auth-check-interval": "custom.cull.auth_check_interval",
+    }
+    for flag, config_key in cull_value_flags.items():
+        value = get_config(config_key)
+        if value:
+            cull_cmd.append(f"{flag}={value}")
 
     if get_config("custom.cull.users"):
         cull_cmd.append("--cull-users=True")
         swan_idle_culler_role["scopes"].append("admin:users")
 
-    if get_config("custom.cull.removeNamedServers"):
-        cull_cmd.append("--remove-named-servers")
-
-    cull_max_age = get_config("custom.cull.maxAge")
-    if cull_max_age:
-        cull_cmd.append("--max-age=%s" % cull_max_age)
-
-    check_eos = get_config('custom.cull.checkEosAuth', False)
-    if not check_eos:
+    if not get_config("custom.cull.checkEosAuth", False):
         cull_cmd.append("--disable-hooks=True")
-
-    hooks_dir = get_config('custom.cull.hooksDir')
-    if hooks_dir:
-        cull_cmd.append(f"--hooks-dir={hooks_dir}")
-
-    audience = get_config('custom.cull.audience')
-    if audience:
-        cull_cmd.append(f"--audience={audience}")
-
-    auth_url = get_config('custom.cull.auth_url')
-    if auth_url:
-        cull_cmd.append(f"--auth_url={auth_url}")
-
-    authz_api_url = get_config('custom.cull.authz_api_url')
-    if authz_api_url:
-        cull_cmd.append(f"--authz_api_url={authz_api_url}")
-
-    auth_check_interval = get_config('custom.cull.auth_check_interval')
-    if auth_check_interval:
-        cull_cmd.append("--auth_check_interval=%s" % auth_check_interval)
 
     c.JupyterHub.services.append(
         {
@@ -107,6 +88,3 @@ c.SwanKubeSpawner.spark_configuration_path = get_config('custom.spark.configurat
 c.SwanKubeSpawner.swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
 
 c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook_prod
-
-# Required for swan systemuser.sh
-c.SwanKubeSpawner.cmd = None
