@@ -2,7 +2,7 @@
 
 USER_ID=$1
 USER_GID=$2
-CULL_PERIOD=$3
+TOKEN_REFRESH_PERIOD=$3
 
 # Create a directory to store the tokens. Those intended to be read-only for the
 # user are stored in tokens, those that can be overwritten by the user are stored
@@ -40,7 +40,7 @@ copy_token_to_notebook /srv/side-container/eos/krb5cc /srv/notebook/tokens/writa
 klist -c /srv/notebook/tokens/krb5cc
 
 while true; do
-    sleep $CULL_PERIOD
+    sleep $TOKEN_REFRESH_PERIOD
 
     # Check whether the kerberos ticket for the Jupyter server (krb5cc) and the one for
     # notebooks and terminals (krb5cc_nb_term) differ. If they do, it means the user ran
