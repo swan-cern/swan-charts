@@ -53,8 +53,7 @@ if get_config("custom.cull.enabled", False):
         "--auth-check-interval": "custom.cull.auth_check_interval",
     }
     for flag, config_key in cull_value_flags.items():
-        value = get_config(config_key)
-        if value:
+        if value := get_config(config_key):
             cull_cmd.append(f"{flag}={value}")
 
     if get_config("custom.cull.users"):
