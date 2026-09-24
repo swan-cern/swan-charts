@@ -40,10 +40,7 @@ if get_config("custom.cull.enabled", False):
     }
 
     base_url = c.JupyterHub.get("base_url", "/")
-    cull_cmd = [
-        "swanculler",
-        f"--url=http://localhost:8081{url_path_join(base_url, "hub/api")}"
-    ]
+    cull_cmd = ["swanculler", f"--url=http://localhost:8081{url_path_join(base_url, 'hub/api')}"]
 
     cull_value_flags = {
         "--timeout": "custom.cull.timeout",
@@ -73,18 +70,18 @@ if get_config("custom.cull.enabled", False):
             "admin": True,
             "command": cull_cmd,
             "environment": {
-                'SWAN_DEV': os.environ.get('SWAN_DEV', 'false'),
-                'AUTH_CLIENT_ID': c.KeyCloakAuthenticator.client_id,
-                'AUTH_CLIENT_SECRET': c.KeyCloakAuthenticator.client_secret,
-            }
+                "SWAN_DEV": os.environ.get("SWAN_DEV", "false"),
+                "AUTH_CLIENT_ID": c.KeyCloakAuthenticator.client_id,
+                "AUTH_CLIENT_SECRET": c.KeyCloakAuthenticator.client_secret,
+            },
         }
     )
     c.JupyterHub.load_roles.append(swan_idle_culler_role)
 
-c.SwanKubeSpawner.cull_period = get_config('custom.cull.every', 600)
-c.SwanKubeSpawner.tn_enabled = get_config('hub.config.SpawnHandlersConfigs.tn_enabled', False)
-c.SwanKubeSpawner.spark_configuration_path = get_config('custom.spark.configurationPath')
+c.SwanKubeSpawner.cull_period = get_config("custom.cull.every", 600)
+c.SwanKubeSpawner.tn_enabled = get_config("hub.config.SpawnHandlersConfigs.tn_enabled", False)
+c.SwanKubeSpawner.spark_configuration_path = get_config("custom.spark.configurationPath")
 # Get configuration parameters from environment variables
-c.SwanKubeSpawner.swan_container_namespace = os.environ.get('POD_NAMESPACE', 'default')
+c.SwanKubeSpawner.swan_container_namespace = os.environ.get("POD_NAMESPACE", "default")
 
 c.SwanKubeSpawner.modify_pod_hook = swan_pod_hook_prod
