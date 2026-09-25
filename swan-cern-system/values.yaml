@@ -209,3 +209,10 @@ cern-it-monitoring-kubernetes:
 kafka-streams-apps:
   affiliation:
     enabled: true
+
+# Configuration for Managed Addons. Each key under `managedAddons` is rendered into
+# kube-system/managed-addons-<name> secrets. In our case, this is only relevant for CAPI-managed
+# clusters. Magnum does not use this. After every change, the corresponding addon application must
+# be hard-refreshed and synced in Argo. See
+# https://kubernetes.docs.cern.ch/docs/automation/addons/#configuring-addons
+managedAddons: {}
