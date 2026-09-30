@@ -5,6 +5,7 @@ dev = [
 
 [tool.ruff]
 target-version = "py312"
+line-length = 120
 
 # Provided by JupyterHub’s configuration environment
 builtins = [
@@ -15,6 +16,10 @@ builtins = [
     "SwanPodHookHandlerProd",
     "swan_container_namespace",
 ]
+
+[tool.ruff.format]
+quote-style = "double"
+line-ending = "lf"
 
 [tool.ruff.lint]
 select = [
