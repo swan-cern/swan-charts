@@ -32,6 +32,11 @@ on:
 
 permissions: {}  # Deny all permissions by default at workflow level
 
+concurrency:
+  group: tag-chart # Only run one 'tag-chart' workflow at a time to prevent git push conflicts
+  cancel-in-progress: false # Never cancel an in-progress tag-chart mid-flight
+  queue: max
+
 jobs:
   publish_chart:
     runs-on: ubuntu-latest
