@@ -103,10 +103,21 @@ jupyterhub:
     secretToken:
   hub:
     podSecurityContext:
+      runAsNonRoot: False
       fsGroup: 0
     containerSecurityContext:
       runAsUser: 0
       runAsGroup: 0
+      capabilities:
+        add:
+        # allow root to chown/chmod/bypass permission on other users' files
+        - CHOWN
+        - FOWNER
+        - DAC_OVERRIDE
+        # allow sudo
+        - SETGID
+        - SETUID
+        - AUDIT_WRITE
     deploymentStrategy:
       type: RollingUpdate
     resources:
