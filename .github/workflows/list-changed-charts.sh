@@ -11,7 +11,7 @@ CHARTS=("swan" "swan-cern" "swan-cern-system")
 for CHART_NAME in "${CHARTS[@]}"; do
 
     # Determine last tag on the chart
-    LAST_CHART_TAG="$(git tag --list --sort -version:refname ${CHART_NAME}@* | head -n 1)"
+    LAST_CHART_TAG="$(git tag --list --sort -version:refname ${CHART_NAME}@* | { head -n 1; cat >/dev/null; })"
 
     # Determine if there are any changes on the chart/ folder since last tag
     if git diff --quiet HEAD "${LAST_CHART_TAG}" -- ./"${CHART_NAME}"; then
