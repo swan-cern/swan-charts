@@ -21,6 +21,11 @@ eosxd-csi:
   automountHostPath: /var/eos
   commonStorageClass:
     enabled: true
+  nodeplugin:
+    updateStrategySpec:
+      # Recent eosxd-csi versions should be able to do rolling update without breaking existing mounts,
+      # but for now let's be safe and update the nodeplugin manually
+      type: OnDelete
   extraConfigMaps:
     eos-csi-dir-etc-eos:
       # Ensure file versions are shown to allow notebook checkpoints (hide-versions option is added)
