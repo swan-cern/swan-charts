@@ -34,44 +34,6 @@ def build_service_cmd(script, *flags, flag_from_config):
     return cmd
 
 
-# Culling of users
-if get_config("custom.cull.enabled", False):
-    idle_culler_role = {
-        "name": "jupyterhub-idle-culler",
-        "scopes": [
-            "list:users",
-            "read:users:activity",
-            "read:servers",
-            "delete:servers",
-            # "admin:users", # dynamically added if --cull-users is passed
-        ],
-        # assign the role to a jupyterhub service, so it gains these permissions
-        "services": ["jupyterhub-idle-culler"],
-    }
-    if get_config("custom.cull.users"):
-        idle_culler_role["scopes"].append("admin:users")
-
-    base_url = c.JupyterHub.get("base_url", "/")
-    cmd = build_service_cmd(
-        "jupyterhub-idle-culler",
-        f"--url=http://localhost:8081{url_path_join(base_url, 'hub/api')}",
-        flag_from_config={
-            "--timeout": "custom.cull.timeout",
-            "--cull-every": "custom.cull.every",
-            "--max-age": "custom.cull.maxAge",
-            "--cull-users": "custom.cull.users",
-        },
-    )
-
-    c.JupyterHub.services.append(
-        {
-            "name": "jupyterhub-idle-culler",
-            "admin": True,  # required for jupyterhub < 2.0 to delete users
-            "command": cmd,
-        }
-    )
-    c.JupyterHub.load_roles.append(idle_culler_role)
-
 # Ticket refresh
 if get_config("custom.ticketRefresher.enabled", False):
     ticket_refresher_role = {
