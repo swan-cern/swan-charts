@@ -16,6 +16,7 @@ cern-it-monitoring-kubernetes:
   enabled: false
   output:
     includeFalco: false
+    includeIngressController: false
     includeInternal: false
   metrics:
     lts:
@@ -104,6 +105,13 @@ cern-it-monitoring-kubernetes:
             Name    rewrite_tag
             Match   kube.*
             Rule    $kubernetes_container_name ^falco$ swan.falco false
+        {{ end }}
+
+        {{ if .Values.output.includeIngressController }}
+        [FILTER]
+            Name    rewrite_tag
+            Match   kube.*
+            Rule    $kubernetes_pod_name .*ingress-nginx-controller.* swan.system false
         {{ end }}
 
         {{ if .Values.output.includeInternal }}
