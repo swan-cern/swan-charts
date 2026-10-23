@@ -224,9 +224,12 @@ jupyterhub:
       enabled: false
     containerSecurityContext:
       allowPrivilegeEscalation: true
-  # disable upstream cull, but enable custom one
   cull:
-    enabled: false
+    enabled: true
+    every: 600
+    # 4 hours
+    timeout: 14400
+    users: true
   custom:
     eos:
       enabled: *eosEnabled
