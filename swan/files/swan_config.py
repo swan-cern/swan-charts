@@ -91,3 +91,6 @@ c.SwanKubeSpawner.volume_mounts.append(
 
 # Required for swan systemuser.sh
 c.SwanKubeSpawner.cmd = None
+
+# Only accept valid Linux usernames, as that username will be used as the notebook user and appear unescaped in scripts
+c.KeyCloakAuthenticator.username_pattern = "^[A-Za-z_][A-Za-z0-9._-]{0,31}$"
