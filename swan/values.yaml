@@ -115,7 +115,6 @@ jupyterhub:
         scopes:
           - "users:activity!user"
           - "access:servers!user"
-          - "read:users:activity!user"
           - "admin:auth_state!user"
     podSecurityContext:
       runAsNonRoot: False
