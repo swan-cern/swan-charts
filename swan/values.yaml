@@ -102,6 +102,20 @@ jupyterhub:
     # placeholder for hub secret token
     secretToken:
   hub:
+    loadRoles:
+      # Ensure that users can see their own auth_state
+      # This allows retrieving the up to date tokens and put them inside
+      # the user container in SwanOauthRenew
+      # Replace this config with care
+      user:
+        scopes:
+          - "self"
+          - "admin:auth_state!user"
+      server:
+        scopes:
+          - "users:activity!user"
+          - "access:servers!user"
+          - "admin:auth_state!user"
     podSecurityContext:
       runAsNonRoot: False
       fsGroup: 0
