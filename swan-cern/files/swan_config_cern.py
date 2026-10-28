@@ -59,6 +59,9 @@ if get_config("custom.ticketRefresher.enabled", False):
         {
             "name": "swan-ticket-refresher",
             "command": cmd,
+            "environment": {
+                "SWAN_DEV": os.environ.get("SWAN_DEV", "false"),
+            }
         }
     )
     c.JupyterHub.load_roles.append(ticket_refresher_role)
@@ -95,7 +98,6 @@ if get_config("custom.blockedUsersCuller.enabled", False):
             "admin": True,  # required for jupyterhub < 2.0 to delete users
             "command": cmd,
             "environment": {
-                "SWAN_DEV": os.environ.get("SWAN_DEV", "false"),
                 "AUTH_CLIENT_ID": c.KeyCloakAuthenticator.client_id,
                 "AUTH_CLIENT_SECRET": c.KeyCloakAuthenticator.client_secret,
             },
@@ -103,7 +105,7 @@ if get_config("custom.blockedUsersCuller.enabled", False):
     )
     c.JupyterHub.load_roles.append(swan_blocked_users_role)
 
-c.SwanKubeSpawner.token_refresh_period = get_config("custom.cull.every", 600)
+c.SwanKubeSpawner.token_refresh_period = get_config("custom.ticketRefresher.every", 600)
 c.SwanKubeSpawner.tn_enabled = get_config("hub.config.SpawnHandlersConfigs.tn_enabled", False)
 c.SwanKubeSpawner.spark_configuration_path = get_config("custom.spark.configurationPath")
 # Get configuration parameters from environment variables
