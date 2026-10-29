@@ -34,6 +34,8 @@ def build_service_cmd(script, *flags, flag_from_config):
     return cmd
 
 
+base_url = c.JupyterHub.get("base_url", "/")
+
 # Ticket refresh
 if get_config("custom.ticketRefresher.enabled", False):
     ticket_refresher_role = {
@@ -45,7 +47,6 @@ if get_config("custom.ticketRefresher.enabled", False):
         "services": ["swan-ticket-refresher"],
     }
 
-    base_url = c.JupyterHub.get("base_url", "/")
     cmd = build_service_cmd(
         "swanticketrefresher",
         f"--url=http://localhost:8081{url_path_join(base_url, 'hub/api')}",
@@ -61,7 +62,7 @@ if get_config("custom.ticketRefresher.enabled", False):
             "command": cmd,
             "environment": {
                 "SWAN_DEV": os.environ.get("SWAN_DEV", "false"),
-            }
+            },
         }
     )
     c.JupyterHub.load_roles.append(ticket_refresher_role)
@@ -80,7 +81,6 @@ if get_config("custom.blockedUsersCuller.enabled", False):
         "services": ["swan-blocked-users-culler"],
     }
 
-    base_url = c.JupyterHub.get("base_url", "/")
     cmd = build_service_cmd(
         "swanblockedusersculler",
         f"--url=http://localhost:8081{url_path_join(base_url, 'hub/api')}",
@@ -95,7 +95,6 @@ if get_config("custom.blockedUsersCuller.enabled", False):
     c.JupyterHub.services.append(
         {
             "name": "swan-blocked-users-culler",
-            "admin": True,  # required for jupyterhub < 2.0 to delete users
             "command": cmd,
             "environment": {
                 "AUTH_CLIENT_ID": c.KeyCloakAuthenticator.client_id,
