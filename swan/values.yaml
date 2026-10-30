@@ -27,6 +27,10 @@ eosxd-csi:
       # but for now let's be safe and update the nodeplugin manually
       type: OnDelete
   extraConfigMaps:
+    eos-csi-dir-etc-auto-master-d:
+      # Disable /eos/user and /eos/project mounts as they are handled in the main /eos/ mount
+      eos.user.autofs: ""
+      eos.project.autofs: ""
     eos-csi-dir-etc-eos:
       # Ensure file versions are shown to allow notebook checkpoints (hide-versions option is added)
       fuse.home-i00.conf: |
@@ -45,6 +49,97 @@ eosxd-csi:
         {"name":"project-i01","hostport":"eosproject-i01.cern.ch","remotemountdir":"/eos/project/","bind":"l h b p s f w n o","auth":{"ssskeytab":"/etc/eos.keytab"},"options":{"hide-versions":0}}
       fuse.project-i02.conf: |
         {"name":"project-i02","hostport":"eosproject-i02.cern.ch","remotemountdir":"/eos/project/","bind":"d c i r m t u x z","auth":{"ssskeytab":"/etc/eos.keytab"},"options":{"hide-versions":0}}
+      # Mount /eos/project and /eos/user in the main autofs mount instead of separate ones (same behavior as in eosxd-csi 1.4.2)
+      # We'll update to the latest upstream configuration when we recreate the cluster
+      fuse.user.conf: |
+        {"name":"user","hostport":"eosuser-fuse.cern.ch","remotemountdir":"/eos/user/","rm-rf-protect-levels":2,"auth":{"ssskeytab":"/etc/eos.keytab"}}
+      fuse.project.conf: |
+        {"name":"project","hostport":"eosproject-fuse.cern.ch","remotemountdir":"/eos/project/","rm-rf-protect-levels":1,"auth":{"ssskeytab":"/etc/eos.keytab"}}
+      auto.eos: |
+        ams -fstype=eosx,fsname=ams  :eosxd
+        atlas -fstype=eosx,fsname=atlas  :eosxd
+        cms -fstype=eosx,fsname=cms  :eosxd
+        experiment -fstype=eosx,fsname=experiment  :eosxd
+        geant4 -fstype=eosx,fsname=geant4  :eosxd
+        lhcb -fstype=eosx,fsname=lhcb  :eosxd
+        project -fstype=eosx,fsname=project  :eosxd
+        theory -fstype=eosx,fsname=theory  :eosxd
+        user -fstype=eosx,fsname=user  :eosxd
+        web -fstype=eosx,fsname=web  :eosxd
+        workspace -fstype=eosx,fsname=workspace  :eosxd
+
+        # EOS instance-letter mappings are defined in their respective
+        # client configs in /etc/eos.
+
+        home-i00 -fstype=eosx,fsname=home-i00  :eosxd
+        home-i01 -fstype=eosx,fsname=home-i01  :eosxd
+        home-i02 -fstype=eosx,fsname=home-i02  :eosxd
+        home-i03 -fstype=eosx,fsname=home-i03  :eosxd
+        home-i04 -fstype=eosx,fsname=home-i04  :eosxd
+
+        home-d -symlink :/eos/home-i00/d
+        home-l -symlink :/eos/home-i00/l
+        home-n -symlink :/eos/home-i00/n
+        home-t -symlink :/eos/home-i00/t
+        home-z -symlink :/eos/home-i00/z
+
+        home-a -symlink :/eos/home-i01/a
+        home-g -symlink :/eos/home-i01/g
+        home-j -symlink :/eos/home-i01/j
+        home-k -symlink :/eos/home-i01/k
+        home-w -symlink :/eos/home-i01/w
+
+        home-h -symlink :/eos/home-i02/h
+        home-o -symlink :/eos/home-i02/o
+        home-r -symlink :/eos/home-i02/r
+        home-s -symlink :/eos/home-i02/s
+        home-y -symlink :/eos/home-i02/y
+
+        home-b -symlink :/eos/home-i03/b
+        home-e -symlink :/eos/home-i03/e
+        home-m -symlink :/eos/home-i03/m
+        home-v -symlink :/eos/home-i03/v
+        home-x -symlink :/eos/home-i03/x
+
+        home-c -symlink :/eos/home-i04/c
+        home-f -symlink :/eos/home-i04/f
+        home-i -symlink :/eos/home-i04/i
+        home-p -symlink :/eos/home-i04/p
+        home-q -symlink :/eos/home-i04/q
+        home-u -symlink :/eos/home-i04/u
+
+        project-i00 -fstype=eosx,fsname=project-i00  :eosxd
+        project-i01 -fstype=eosx,fsname=project-i01  :eosxd
+        project-i02 -fstype=eosx,fsname=project-i02  :eosxd
+
+        project-a -symlink :/eos/project-i00/a
+        project-e -symlink :/eos/project-i00/e
+        project-j -symlink :/eos/project-i00/j
+        project-g -symlink :/eos/project-i00/g
+        project-v -symlink :/eos/project-i00/v
+        project-k -symlink :/eos/project-i00/k
+        project-q -symlink :/eos/project-i00/q
+        project-y -symlink :/eos/project-i00/y
+
+        project-l -symlink :/eos/project-i01/l
+        project-h -symlink :/eos/project-i01/h
+        project-b -symlink :/eos/project-i01/b
+        project-p -symlink :/eos/project-i01/p
+        project-s -symlink :/eos/project-i01/s
+        project-f -symlink :/eos/project-i01/f
+        project-w -symlink :/eos/project-i01/w
+        project-n -symlink :/eos/project-i01/n
+        project-o -symlink :/eos/project-i01/o
+
+        project-d -symlink :/eos/project-i02/d
+        project-c -symlink :/eos/project-i02/c
+        project-i -symlink :/eos/project-i02/i
+        project-r -symlink :/eos/project-i02/r
+        project-m -symlink :/eos/project-i02/m
+        project-t -symlink :/eos/project-i02/t
+        project-u -symlink :/eos/project-i02/u
+        project-x -symlink :/eos/project-i02/x
+        project-z -symlink :/eos/project-i02/z
 
 #
 # JupyterHub
