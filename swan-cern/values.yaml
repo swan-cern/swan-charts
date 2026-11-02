@@ -252,14 +252,12 @@ swan:
                   matchLabels:
                     kubernetes.io/metadata.name: swan-cern-system
     custom:
-      cull:
+      ticketRefresher:
         enabled: true
         every: 600
-        # 4 hours
-        timeout: 14400
-        users: true
-        checkEosAuth: true
         hooksDir: /srv/jupyterhub/culler
+      blockedUsersCuller:
+        enabled: true
         audience: 'authorization-service-api'
         auth_url: https://auth.cern.ch/auth/realms/cern/api-access/token
         authz_api_url: https://authorization-service-api.web.cern.ch/api/v1.0/Identity
