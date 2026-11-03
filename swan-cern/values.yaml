@@ -206,6 +206,7 @@ swan:
         00-authConf: |
           def pre_spawn_hook(authenticator, spawner, auth_state):
             spawner.environment['ACCESS_TOKEN'] = auth_state['exchanged_tokens']['eos-service']
+            spawner.environment['CERNBOX_ACCESS_TOKEN'] = auth_state['exchanged_tokens']['cernbox-service']
             spawner.environment['OAUTH_INSPECTION_ENDPOINT'] = authenticator.userdata_url.replace('https://', '')
             spawner.user_uid = str(str(auth_state['oauth_user']['cern_uid'])) # k8s only supports values as strings!
             decoded_token = authenticator._decode_token(auth_state['access_token'])
