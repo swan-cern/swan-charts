@@ -49,6 +49,9 @@ eosxd-csi:
         {"name":"project-i01","hostport":"eosproject-i01.cern.ch","remotemountdir":"/eos/project/","bind":"l h b p s f w n o","auth":{"ssskeytab":"/etc/eos.keytab"},"options":{"hide-versions":0}}
       fuse.project-i02.conf: |
         {"name":"project-i02","hostport":"eosproject-i02.cern.ch","remotemountdir":"/eos/project/","bind":"d c i r m t u x z","auth":{"ssskeytab":"/etc/eos.keytab"},"options":{"hide-versions":0}}
+      # Mount opendata directory
+      fuse.opendata.conf: |
+        {"name":"opendata","hostport":"eospublic.cern.ch","remotemountdir":"/eos/opendata/","auth":{"ssskeytab":"/etc/eos.keytab"}}
       # Mount /eos/project and /eos/user in the main autofs mount instead of separate ones (same behavior as in eosxd-csi 1.4.2)
       # We'll update to the latest upstream configuration when we recreate the cluster
       fuse.user.conf: |
@@ -67,6 +70,7 @@ eosxd-csi:
         user -fstype=eosx,fsname=user  :eosxd
         web -fstype=eosx,fsname=web  :eosxd
         workspace -fstype=eosx,fsname=workspace  :eosxd
+        opendata -fstype=eosx,fsname=opendata  :eosxd
 
         # EOS instance-letter mappings are defined in their respective
         # client configs in /etc/eos.
