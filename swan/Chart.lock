@@ -1,12 +1,12 @@
 dependencies:
 - name: jupyterhub
   repository: https://jupyterhub.github.io/helm-chart/
-  version: 4.4.0
+  version: 4.4.4
 - name: eosxd-csi
   repository: oci://registry.cern.ch/kubernetes/charts
   version: 1.4.8
 - name: cvmfs-csi
   repository: oci://registry.cern.ch/kubernetes/charts
   version: 2.5.2
-digest: sha256:9cd8e394504db92144303e7f63dbf549aadb360f73c0578fc3ec8e7145c2f459
-generated: "2026-10-15T10:24:46.003865913+02:00"
+digest: sha256:dc246c386dd71e241e1f5f0d3b3f7f8c07bc776ac6fa6a545e342eca99c3ec40
+generated: "2026-11-02T15:13:50.417125125+01:00"
