@@ -72,6 +72,11 @@ swan:
     singleuser:
       cpu:
         guarantee: 0.5
+      extraResource:
+        guarantees:
+          ephemeral-storage: 1Gi
+        limits:
+          ephemeral-storage: 30Gi
       image:
         name: gitlab-registry.cern.ch/swan/docker-images/jupyter/swan-cern
         tag: v0.0.96
