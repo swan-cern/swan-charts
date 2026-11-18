@@ -269,7 +269,7 @@ jupyterhub:
     config:
       KeyCloakAuthenticator:
         # Config missing
-        oidc_issuer:
+        openid_provider_url:
         scope:
           - profile
           - email
