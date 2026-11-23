@@ -3,7 +3,7 @@ apiVersion: v2
 name: liqo-peering
 type: application
 #
-version: 0.1.0
-appVersion: "1.0.0"
+version: 0.2.0
+appVersion: "1.3.0"
 #
 description: A Helm chart to configure Liqo peering via custom resources.

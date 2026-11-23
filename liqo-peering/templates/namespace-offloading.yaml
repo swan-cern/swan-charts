@@ -1,14 +1,13 @@
-# NamespaceOffloading resource to allow pods in the 'swan' namespace 
-# to be offloaded to remote clusters.
-{{- if eq .Values.role "consumer" }}
+# NamespaceOffloading resource to allow pods of the namespace to be offloaded to the target cluster.
+{{- if eq .Values.role "source" }}
 apiVersion: offloading.liqo.io/v1beta1
 kind: NamespaceOffloading
 metadata:
   name: offloading
-  namespace: swan
+  namespace: {{ .Values.offloading.namespace }}
 spec:
   clusterSelector:
     nodeSelectorTerms: []
   namespaceMappingStrategy: EnforceSameName
-  podOffloadingStrategy: LocalAndRemote
+  podOffloadingStrategy: {{ .Values.offloading.podOffloadingStrategy }}
 {{- end }}
