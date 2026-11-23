@@ -1,4 +1,7 @@
-# Namespace to represent the remote cluster's tenant namespace.
+{{- if not (has .Values.role (list "source" "target")) }}
+{{- fail "role must be either source or target" }}
+{{- end }}
+# Namespace holding the peering resources with the remote cluster.
 apiVersion: v1
 kind: Namespace
 metadata:

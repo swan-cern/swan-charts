@@ -1,22 +1,20 @@
-# ResourceSlice to define the requested resources (CPU, memory, GPU) for the consumer cluster.
-{{- if eq .Values.role "consumer" }}
+# ResourceSlice to request resources (CPU, RAM, GPU) from the target.
+# Liqo creates a virtual node of the same name that exposes them.
+{{- if eq .Values.role "source" }}
 apiVersion: authentication.liqo.io/v1beta1
 kind: ResourceSlice
 metadata:
   annotations:
     liqo.io/create-virtual-node: "true"
-  creationTimestamp: null
   labels:
     liqo.io/remote-cluster-id: {{ .Values.remoteCluster.clusterId }}
     liqo.io/remoteID: {{ .Values.remoteCluster.clusterId }}
     liqo.io/replication: "true"
-  name: pool-gpu
+  name: {{ .Values.resourceSlice.name }}
   namespace: {{ include "liqo.tenantNamespace" . }}
 spec:
   class: default
   providerClusterID: {{ .Values.remoteCluster.clusterId }}
   resources:
-    cpu: 4
-    memory: 128Gi
-    nvidia.com/gpu: "1"
+    {{- toYaml .Values.resourceSlice.resources | nindent 4 }}
 {{- end }}

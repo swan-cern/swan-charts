@@ -1,16 +1,30 @@
-role: consumer  # or provider
+# source: the cluster whose pods are offloaded ("consumer" in Liqo's terms)
+# target: the cluster that runs the offloaded pods (the "provider")
+role:
 
-clusterId: # ID of the local cluster
-privateWireguardKey: # placeholder for private wireguard key
-publicWireguardKey: # placeholder for public wireguard key
+clusterId:  # ID of this cluster
+privateWireguardKey:  # WireGuard key pair of the gateway of this cluster
+publicWireguardKey:
 
-remoteCluster: 
-  clusterId: # ID of the remote cluster 
-  userCommonName: # The CN of the user in the certificate
-  podCidr: # placeholder for pod CIDR
-  publicWireguardKey: # placeholder for public wireguard key
-  kubeconfig: # kubeconfig YAML, base64 encoded
+remoteCluster:
+  clusterId:  # ID of the other cluster
+  podCidr:
+  externalCidr:
+  publicWireguardKey:  # public WireGuard key of its gateway
+  kubeconfig:  # Source only: kubeconfig (base64 encoded) of the ServiceAccount
 
 gateway:
-  serviceType: LoadBalancer
-  loadBalancerIp: # placeholder for IP of the load balancer
+  nodePort: 30840
+  address:  # Source only: IP or DNS name of a node of the target
+
+# Source only: the namespace whose pods can be offloaded
+offloading:
+  namespace: swan
+  podOffloadingStrategy: Local
+
+# Source only: the resources requested from the target
+resourceSlice:
+  name: pool
+  resources:
+    cpu:  # e.g. "8"
+    memory:  # e.g. 32Gi

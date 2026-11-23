@@ -1,11 +1,21 @@
-# RoleBinding to grant the remote cluster's control plane the necessary permissions 
-# to interact with resources in the provider cluster.
-{{- if eq .Values.role "provider" }}
+# ServiceAccount to grant the source cluster's control plane the necessary permissions 
+# to interact with resources in the target cluster.
+{{- if eq .Values.role "target" }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: {{ .Values.remoteCluster.clusterId }}
   namespace: {{ include "liqo.tenantNamespace" . }}
+---
+# ServiceAccount token
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Values.remoteCluster.clusterId }}-token
+  namespace: {{ include "liqo.tenantNamespace" . }}
+  annotations:
+    kubernetes.io/service-account.name: {{ .Values.remoteCluster.clusterId }}
+type: kubernetes.io/service-account-token
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding

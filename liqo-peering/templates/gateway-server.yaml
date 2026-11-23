@@ -1,6 +1,6 @@
-# GatewayServer resource to expose a WireGuard-based network gateway,
-# used by the provider cluster to accept incoming peering connections.
-{{- if eq .Values.role "provider" }}
+# GatewayServer resource to expose a WireGuard gateway on the nodes of the target,
+# to which the source connects.
+{{- if eq .Values.role "target" }}
 apiVersion: networking.liqo.io/v1beta1
 kind: GatewayServer
 metadata:
@@ -8,13 +8,11 @@ metadata:
   namespace: {{ include "liqo.tenantNamespace" . }}
   labels:
     liqo.io/remote-cluster-id: {{ .Values.remoteCluster.clusterId }}
-  annotations:
-    oci.oraclecloud.com/load-balancer-type: "nlb"
 spec:
   endpoint:
-    loadBalancerIP: {{ .Values.gateway.loadBalancerIp }}
+    nodePort: {{ .Values.gateway.nodePort }}
     port: 51840
-    serviceType: {{ .Values.gateway.serviceType }}
+    serviceType: NodePort
   mtu: 1340
   secretRef:
     name: gw-{{ .Values.remoteCluster.clusterId }}
