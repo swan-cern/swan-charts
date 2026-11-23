@@ -1,0 +1,35 @@
+# Liqo does not create the EOS/CVMFS PVCs so we need to create them manually.
+# These are identical to the `swan` chart definitions
+{{- if (index .Values "cvmfs-csi" "enabled") }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cvmfs
+  namespace: {{ .Values.offloadedNamespace }}
+spec:
+  accessModes:
+  - ReadOnlyMany
+  resources:
+    requests:
+      # Volume size value has no effect and is ignored
+      # by the driver, but must be non-zero.
+      storage: 1
+  storageClassName: cvmfs
+{{- end }}
+{{- if (index .Values "eosxd-csi" "enabled") }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: eos
+  namespace: {{ .Values.offloadedNamespace }}
+spec:
+  accessModes:
+  - ReadOnlyMany
+  resources:
+    requests:
+      # Volume size value has no effect and is ignored
+      # by the driver, but must be non-zero.
+      storage: 1
+  storageClassName: eos
+{{- end }}
