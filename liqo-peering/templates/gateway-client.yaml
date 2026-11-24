@@ -1,5 +1,6 @@
-# GatewayClient resource for establishing a WireGuard tunnel to the target's gateway.
-{{- if eq .Values.role "source" }}
+# GatewayClient resource for establishing a WireGuard tunnel to the gateway of
+# the other cluster.
+{{- if eq .Values.gateway.role "client" }}
 apiVersion: networking.liqo.io/v1beta1
 kind: GatewayClient
 metadata:
@@ -17,7 +18,7 @@ spec:
     name: gw-{{ .Values.remoteCluster.clusterId }}
   endpoint:
     addresses:
-      - {{ .Values.gateway.address }}
+      - {{ required "gateway.address is not set" .Values.gateway.address }}
     port: {{ .Values.gateway.nodePort }}
     protocol: UDP
   mtu: 1340

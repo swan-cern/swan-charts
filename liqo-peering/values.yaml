@@ -13,9 +13,12 @@ remoteCluster:
   publicWireguardKey:  # public WireGuard key of its gateway
   kubeconfig:  # Source only: kubeconfig (base64 encoded) of the ServiceAccount
 
+# The WireGuard tunnel between the two clusters.
+# The client & server of the tunnel is configurable and does not depend on the cluster role.
 gateway:
-  nodePort: 30840
-  address:  # Source only: IP or DNS name of a node of the target
+  role:  # `server` or `client`
+  nodePort: 30084
+  address:  # Client only: IP or DNS name of a node of the server
 
 # Source only: the namespace whose pods can be offloaded
 offloading:

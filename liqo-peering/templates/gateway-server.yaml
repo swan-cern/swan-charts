@@ -1,6 +1,6 @@
-# GatewayServer resource to expose a WireGuard gateway on the nodes of the target,
-# to which the source connects.
-{{- if eq .Values.role "target" }}
+# GatewayServer resource to expose a WireGuard gateway on the nodes of this cluster,
+# to which the other cluster connects.
+{{- if eq .Values.gateway.role "server" }}
 apiVersion: networking.liqo.io/v1beta1
 kind: GatewayServer
 metadata:
