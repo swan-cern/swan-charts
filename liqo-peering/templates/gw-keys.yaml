@@ -9,5 +9,5 @@ metadata:
     networking.liqo.io/gateway-resource: "true"
 type: Opaque
 data:
-  privateKey: {{ .Values.privateWireguardKey }}
-  publicKey: {{ .Values.publicWireguardKey }}
+  privateKey: {{ required "privateWireguardKey is not set" .Values.privateWireguardKey }}
+  publicKey: {{ required "publicWireguardKey is not set" .Values.publicWireguardKey }}
