@@ -12,9 +12,6 @@ builtins = [
     "c",
     "get_config",
     "url_path_join",
-    "SwanPodHookHandler",
-    "SwanPodHookHandlerProd",
-    "swan_container_namespace",
 ]
 
 [tool.ruff.format]
