@@ -4,17 +4,17 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ .Values.remoteCluster.clusterId }}
+  name: {{ .Values.remoteCluster.clusterId }}-controlplane
   namespace: {{ include "liqo.tenantNamespace" . }}
 ---
 # ServiceAccount token
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ .Values.remoteCluster.clusterId }}-token
+  name: {{ .Values.remoteCluster.clusterId }}-controlplane-token
   namespace: {{ include "liqo.tenantNamespace" . }}
   annotations:
-    kubernetes.io/service-account.name: {{ .Values.remoteCluster.clusterId }}
+    kubernetes.io/service-account.name: {{ .Values.remoteCluster.clusterId }}-controlplane
 type: kubernetes.io/service-account-token
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -30,6 +30,6 @@ roleRef:
   name: liqo-remote-controlplane
 subjects:
 - kind: ServiceAccount
-  name: {{ .Values.remoteCluster.clusterId }}
+  name: {{ .Values.remoteCluster.clusterId }}-controlplane
   namespace: {{ include "liqo.tenantNamespace" . }}
 {{- end }}
