@@ -9,4 +9,4 @@ metadata:
     liqo.io/remote-cluster-id: {{ .Values.remoteCluster.clusterId }}
     networking.liqo.io/gateway-resource: "true"
 spec:
-  publicKey: {{ .Values.remoteCluster.publicWireguardKey }}
+  publicKey: {{ required "remoteCluster.publicWireguardKey is not set" .Values.remoteCluster.publicWireguardKey }}
