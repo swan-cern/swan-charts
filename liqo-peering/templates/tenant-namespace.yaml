@@ -1,6 +1,9 @@
 {{- if not (has .Values.role (list "source" "target")) }}
 {{- fail "role must be either source or target" }}
 {{- end }}
+{{- if not (has .Values.gateway.role (list "server" "client")) }}
+{{- fail "gateway.role must be either server or client" }}
+{{- end }}
 # Namespace holding the peering resources with the remote cluster.
 apiVersion: v1
 kind: Namespace
