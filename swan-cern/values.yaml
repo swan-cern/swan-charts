@@ -92,14 +92,17 @@ swan:
             - protocol: TCP
               port: 30000
               endPort: 32767
-          # Allow the Prometheus pod to scrape metrics from the singleuser pod
+          # Allow the Prometheus pod to scrape metrics from the singleuser pod. Prometheus runs in
+          # swan-cern-system when deployed by our chart and in kube-system when deployed as a Managed Addon.
           - from:
             - podSelector:
                 matchLabels:
                   app.kubernetes.io/name: prometheus
               namespaceSelector:
-                  matchLabels:
-                    kubernetes.io/metadata.name: swan-cern-system
+                  matchExpressions:
+                    - key: kubernetes.io/metadata.name
+                      operator: In
+                      values: [swan-cern-system, kube-system]
             ports:
             - protocol: TCP
               port: notebook-port
@@ -248,7 +251,8 @@ swan:
           - ports:
               - port: 6443
         ingress:
-          # Allow connection from prometheus to the hub, to scrape the metrics endpoint
+          # Allow connection from prometheus to the hub, to scrape the metrics endpoint. Prometheus runs in
+          # swan-cern-system when deployed by our chart and in kube-system when deployed as a Managed Addon.
           - ports:
               - protocol: TCP
                 port: 8081
@@ -257,8 +261,10 @@ swan:
                   matchLabels:
                     app.kubernetes.io/name: prometheus
                 namespaceSelector:
-                  matchLabels:
-                    kubernetes.io/metadata.name: swan-cern-system
+                  matchExpressions:
+                    - key: kubernetes.io/metadata.name
+                      operator: In
+                      values: [swan-cern-system, kube-system]
     custom:
       ticketRefresher:
         enabled: true

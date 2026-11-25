@@ -14,6 +14,8 @@ gpu-operator-cern:
 
 cern-it-monitoring-kubernetes:
   enabled: false
+  # CAPI clusters: set `enabled` to false and `managedAddon` to true when monit is deployed as a Managed Addon.
+  managedAddon: false
   output:
     includeFalco: false
     includeIngressController: false
