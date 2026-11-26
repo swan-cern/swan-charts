@@ -1,5 +1,7 @@
 gpu-operator-cern:
   enabled: true
+  # CAPI clusters: set `enabled` to false and `managedAddon` to true when the gpu operator is deployed as a Managed Addon.
+  managedAddon: false
   taintGpuNodes: false
   gpu-operator:
     driver:
