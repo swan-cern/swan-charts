@@ -14,6 +14,15 @@ gpu-operator-cern:
 
 cern-it-monitoring-kubernetes:
   enabled: false
+  # CAPI clusters: set `enabled` to false and `managedAddon` to true when monit is deployed as a Managed Addon.
+  managedAddon: false
+  # The Managed Addon defaults to reading the tenant credentials from a `monit-tenant` secret, which
+  # takes precedence over the name/password we set (from our secrets). Setting `fromSecret.name` to an
+  # empty string turns it off. See:
+  # https://gitlab.cern.ch/kubernetes/automation/releases/addons/kops-user-addons/-/blob/46fb759c75175c7c302b8e1e464e1df2637cd189/addons/cern-it-monitoring-kubernetes/values.yaml?blame=1#L8
+  tenant:
+    fromSecret:
+      name: ""
   output:
     includeFalco: false
     includeIngressController: false
