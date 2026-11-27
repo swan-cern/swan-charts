@@ -72,7 +72,6 @@ if eos_enabled:
 else:
     # No access to EOS provided, congfigure HOME to point to /home/<user> instead of EOS HOME.
     c.SwanKubeSpawner.local_home = True
-    c.SpawnHandlersConfigs.local_home = True
 
 # Manage CVMFS access
 c.SwanKubeSpawner.volumes.append(
